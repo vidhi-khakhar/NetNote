@@ -23,9 +23,18 @@ import javafx.util.Pair;
 public class MainCtrl {
 
     private Stage primaryStage;
+    private Scene markdownScene;
 
-    public void initialize(Stage primaryStage) {
+    /**
+     * Initializes the JavaFX app
+     * @param primaryStage the initial stage
+     * @param markdown used to set the scene of the stage
+     */
+
+    public void initialize(Stage primaryStage, Pair<MarkdownCtrl, Parent> markdown) {
         this.primaryStage = primaryStage;
+        markdownScene = new Scene(markdown.getValue());
+        primaryStage.setScene(markdownScene);
         this.primaryStage.show();
     }
 }
