@@ -2,6 +2,10 @@ package commons;
 
 import jakarta.persistence.*;
 import java.util.Objects;
+import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Entity Note.
@@ -85,36 +89,27 @@ public class Note {
     }
 
     /**
-     * @return String representation of Note (for debugging purposes).
+     * @param anotherNote another note
+     * @return whether two notes are equal
      */
     @Override
-    public String toString() {
-        return "Note{" +
-                "noteId=" + noteId +
-                ", title='" + title + '\'' +
-                ", text='" + text + '\'' +
-                '}';
+    public boolean equals(Object anotherNote) {
+        return EqualsBuilder.reflectionEquals(this,anotherNote);
     }
 
     /**
-     * Equals method of a note compares only the Notes' noteId.
-     * @param o another note
-     * @return whether two notes have the same noteId
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Note note = (Note) o;
-        return Objects.equals(noteId, note.noteId);
-    }
-
-    /**
-     * Hashcode uses only noteId.
      * @return hashcode
      */
     @Override
     public int hashCode() {
-        return Objects.hashCode(noteId);
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    /**
+     * @return String representation
+     */
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
     }
 }
