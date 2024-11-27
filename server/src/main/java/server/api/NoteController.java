@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Note;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import server.database.NoteRepository;
 
@@ -29,7 +30,6 @@ public class NoteController {
      */
     @PostMapping("/")
     public void storeNote(@RequestBody Note note) {
-        System.out.println(note);
         notesTable.save(note);
     }
 
@@ -45,10 +45,62 @@ public class NoteController {
     }
 
     /**
+     * Updates the title and text of a note
+     *
+     * @param id The id of the note to update (part of URL)
+     * @param noteData A list of key-value pairs which should have
+     *                 one value for the "text" key
+     *                 and/or one value for the "title" key.<br>
+     *
+     *                 Example usage:<br>
+     *                 <code>{ "title": "New title" }</code>
+     *                 Only updates the title<br>
+     *                 <code>{ "title": "New title", "text": "..." }</code>
+     *                 Updates both the title and the text<br>
+     * @return Returns the appropriate HTTP response based on whether
+     * the request is valid or not.
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<String> updateNote(@PathVariable("id") Long id,
+                                     @RequestBody Map<String, String> noteData) {
+        Optional<Note> noteOptional = notesTable.findById(id);
+        if (noteOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("The note with the specified id does not exist");
+        }
+        Note note = noteOptional.get();
+
+        boolean containsInvalidKey = noteData
+                .keySet()
+                .stream()
+                .anyMatch(k -> !k.equals("text") && !k.equals("title"));
+
+        if (containsInvalidKey) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("One or more fields in the request body are not recognised. " +
+                            "Must be one of: \"title\" or \"text\".");
+        }
+
+        String newTitle = noteData.get("title");
+        if (newTitle != null) {
+            note.setTitle(newTitle);
+        }
+
+        String newText = noteData.get("text");
+        if (newText != null) {
+            note.setText(newText);
+        }
+
+        notesTable.save(note);
+
+        return ResponseEntity.ok("Note updated successfully.");
+    }
+
+    /**
      * Deletes the note with the specified id
      * from the note repository
      *
-     * @param id The id of the note to be deleted
+     * @param id The id of the note to be deleted (part of URL)
      */
     @DeleteMapping("/{id}")
     public void deleteNote(@PathVariable("id") Long id) {
