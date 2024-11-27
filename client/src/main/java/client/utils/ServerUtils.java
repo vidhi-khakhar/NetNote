@@ -26,19 +26,19 @@ import jakarta.ws.rs.client.ClientBuilder;
 
 public class ServerUtils {
 
-	private static final String SERVER = "http://localhost:8080/";
+    private static final String SERVER = "http://localhost:8080/";
 
-	public boolean isServerAvailable() {
-		try {
-			ClientBuilder.newClient(new ClientConfig()) //
-					.target(SERVER) //
-					.request(APPLICATION_JSON) //
-					.get();
-		} catch (ProcessingException e) {
-			if (e.getCause() instanceof ConnectException) {
-				return false;
-			}
-		}
-		return true;
-	}
+    public boolean isServerAvailable() {
+        try {
+            ClientBuilder.newClient(new ClientConfig()) //
+                    .target(SERVER) //
+                    .request(APPLICATION_JSON) //
+                    .get();
+        } catch (ProcessingException e) {
+            if (e.getCause() instanceof ConnectException) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
