@@ -11,16 +11,16 @@ import java.util.*;
 @RequestMapping("/api/notes/")
 public class NoteController {
 
-    private final NoteRepository notesTable;
+    private final NoteRepository db;
 
     /**
      * Constructor for the note controller.
      * Used to inject the database note repository as a dependency.
      *
-     * @param notesTable The note repository.
+     * @param db The note repository.
      */
-    public NoteController(NoteRepository notesTable) {
-        this.notesTable = notesTable;
+    public NoteController(NoteRepository db) {
+        this.db = db;
     }
 
     /**
@@ -30,7 +30,7 @@ public class NoteController {
      */
     @PostMapping("/")
     public void storeNote(@RequestBody Note note) {
-        notesTable.save(note);
+        db.save(note);
     }
 
     /**
@@ -41,7 +41,7 @@ public class NoteController {
     @GetMapping("/")
     @ResponseBody
     public List<Note> getAllNotes() {
-        return notesTable.findAll();
+        return db.findAll();
     }
 
     /**
@@ -64,7 +64,7 @@ public class NoteController {
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateNote(@PathVariable("id") Long id,
                                      @RequestBody Map<String, String> noteData) {
-        Optional<Note> noteOptional = notesTable.findById(id);
+        Optional<Note> noteOptional = db.findById(id);
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("The note with the specified id does not exist");
@@ -92,7 +92,7 @@ public class NoteController {
             note.setText(newText);
         }
 
-        notesTable.save(note);
+        db.save(note);
 
         return ResponseEntity.ok("Note updated successfully.");
     }
@@ -108,14 +108,14 @@ public class NoteController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Note> deleteNote(@PathVariable("id") Long id) {
-        Optional<Note> noteOptional = notesTable.findById(id);
+        Optional<Note> noteOptional = db.findById(id);
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(null);
         }
         Note note = noteOptional.get();
 
-        notesTable.deleteById(id);
+        db.deleteById(id);
 
         return ResponseEntity.ok(note);
     }
