@@ -57,8 +57,9 @@ public class NoteController {
      *                 Only updates the title<br>
      *                 <code>{ "title": "New title", "text": "..." }</code>
      *                 Updates both the title and the text<br>
-     * @return Returns the appropriate HTTP response based on whether
-     * the request is valid or not.
+     * @return Returns an HTTP response with a string message based on whether
+     * the request is valid or not, and on whether there is a note
+     * with the specified id or not.
      */
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateNote(@PathVariable("id") Long id,
@@ -101,9 +102,21 @@ public class NoteController {
      * from the note repository
      *
      * @param id The id of the note to be deleted (part of URL)
+     * @return Returns an HTTP response with the deleted note entity
+     * if the provided id was valid, otherwise returns a 404 not found response
+     * with an empty body.
      */
     @DeleteMapping("/{id}")
-    public void deleteNote(@PathVariable("id") Long id) {
+    public ResponseEntity<Note> deleteNote(@PathVariable("id") Long id) {
+        Optional<Note> noteOptional = notesTable.findById(id);
+        if (noteOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+        Note note = noteOptional.get();
+
         notesTable.deleteById(id);
+
+        return ResponseEntity.ok(note);
     }
 }
