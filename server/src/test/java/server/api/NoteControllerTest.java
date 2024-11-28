@@ -22,26 +22,26 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void post() {
+    public void storeNote() {
         Note n3 = new Note("Note3", "Note 3 content");
         sut.storeNote(n3);
         assertEquals(List.of(n1, n2, n3), db.findAll());
     }
 
     @Test
-    public void get() {
+    public void getAllNotes() {
         assertEquals(List.of(n1, n2), sut.getAllNotes());
     }
 
     @Test
-    public void patchInvalidId() {
+    public void updateNoteInvalidId() {
         assertEquals(404, sut.updateNote((long) 123, null)
                 .getStatusCode()
                 .value());
     }
 
     @Test
-    public void patchInvalidBody() {
+    public void updateNoteInvalidBody() {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("newTitle", "Changed note title");  // Key should be "title"
         requestBody.put("newText", "Changed note content"); // Key should be "text"
@@ -51,7 +51,7 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void patchTitleOnly() {
+    public void updateNoteTitleOnly() {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("title", "Changed note title");
         assertEquals(200, sut.updateNote((long) 1, requestBody)
@@ -62,7 +62,7 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void patchTextOnly() {
+    public void updateNoteTextOnly() {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("text", "Changed note content");
         assertEquals(200, sut.updateNote((long) 0, requestBody)
@@ -73,7 +73,7 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void patchBothTitleAndText() {
+    public void updateNoteBothTitleAndText() {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("title", "Changed note title");
         requestBody.put("text", "Changed note content");
@@ -85,15 +85,14 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void deleteInvalidId() {
+    public void deleteNoteInvalidId() {
         assertEquals(404, sut.deleteNote((long) 123).getStatusCode().value());
         assertEquals(List.of(n1, n2), db.findAll());
     }
 
     @Test
-    public void deleteOneNote() {
+    public void deleteNoteSuccess() {
         assertEquals(200, sut.deleteNote((long) 1).getStatusCode().value());
         assertEquals(List.of(n1), db.findAll());
-
     }
 }
