@@ -83,4 +83,17 @@ public class NoteControllerTest {
         assertEquals(new Note("Changed note title", "Changed note content"),
                 db.getById((long) 1));
     }
+
+    @Test
+    public void deleteInvalidId() {
+        assertEquals(404, sut.deleteNote((long) 123).getStatusCode().value());
+        assertEquals(List.of(n1, n2), db.findAll());
+    }
+
+    @Test
+    public void deleteOneNote() {
+        assertEquals(200, sut.deleteNote((long) 1).getStatusCode().value());
+        assertEquals(List.of(n1), db.findAll());
+
+    }
 }
