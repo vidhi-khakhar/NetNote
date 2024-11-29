@@ -33,6 +33,10 @@ public class MainController {
     private ListView<Note> notesList;
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList(); // To store saved notes.
 
+    public ObservableList<Note> getSavedNotes() {
+        return savedNotes;
+    }
+
     @FXML
     private Button addButton;
 
