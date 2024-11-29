@@ -10,6 +10,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.Optional;
+
 public class MainController {
 
     private int selectedNoteIndex  = -1; // Index of the note being edited (-1 means no note is selected).
@@ -105,19 +107,88 @@ public class MainController {
 
     // METHOD IMPLEMENTATIONS
     @FXML
-    void handleAddNote(ActionEvent event) {
+    public void initialize() {
+        notesList.setItems(savedNotes); // Bind the list to the ListView.
+    }
 
+    /**
+     * JAVADOC:
+     * The `selectedNoteIndex` variable trackS the index of the currently selected or edited note
+     * in the `savedNotes` list.
+
+     * When rendering a note (i.e., displaying its title and content in the display fields):
+     * If `selectedNoteIndex == -1`,  no note is being edited, and thus a new note is ADDED
+     * If `selectedNoteIndex != -1`, an existing note is being updated, and the note at the
+     *   `selectedNoteIndex` is modified (`savedNotes.set()`).
+
+     * When deleting a note:
+     * The selected index is used to find the note to be removed from the list. The note at that index is removed from the list
+     *   (`savedNotes.remove()`).
+
+     * The `selectedNoteIndex` is reset to `-1` when no note is selected.
+     * **/
+
+
+    @FXML
+    void handleAddNote(ActionEvent event) {
+        selectedNoteIndex = -1; // Reset the selected index
+        inputTitle.clear(); // Clear the input fields
+        inputNote.clear();
+        displayTitle.setText("");
+        displayNote.setText("");
     }
 
     @FXML
     void handleDeleteNote(ActionEvent event) {
+        int index = notesList.getSelectionModel().getSelectedIndex();
 
+        if (index != -1) {
+            // Show confirmation dialog before deleting
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete Note");
+            alert.setHeaderText(null);
+            alert.setContentText("Are you sure you want to delete this note?");
+
+            // Show the dialog and wait for the response
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // If the user confirms, delete the note
+                savedNotes.remove(index);
+                inputTitle.clear();
+                inputNote.clear();
+                displayTitle.setText("The title is empty");
+                displayNote.setText("The note is empty");
+                selectedNoteIndex = -1; // No note selected after deletion
+            }
+        } else {
+            System.out.println("No note selected for deletion");
+        }
     }
 
     @FXML
     void handleRefresh(ActionEvent event) {
 
     }
+
+    @FXML
+    void displaySavedNote(MouseEvent event) { // unfortunately doesnt work yet
+        int index = notesList.getSelectionModel().getSelectedIndex();
+        if (index != -1) {
+            String selectedNote = savedNotes.get(index);
+            selectedNoteIndex = index;
+
+            String[] parts = selectedNote.split("\n", 2);
+            if (parts.length == 2) {
+                inputTitle.setText(parts[0].replace("Title: ", "").trim());
+                inputNote.setText(parts[1].replace("Note: ", "").trim());
+            }
+
+            displayTitle.setText(inputTitle.getText()); // Display the title
+            displayNote.setText(inputNote.getText()); // Display the note
+        }
+    }
+
 
     @FXML
     void renderNote(MouseEvent event) {
@@ -130,8 +201,10 @@ public class MainController {
             displayNote.setText("The note is empty");
             return;
         } else {
+            // If the title is empty, set a default title
             if (title.isEmpty()) {
-                displayTitle.setText("The title is empty");
+                title = "Untitled Note";  // Default title
+                displayTitle.setText(title);
             } else {
                 displayTitle.setText(title);
             }
@@ -155,6 +228,7 @@ public class MainController {
         }
     }
 
+
     @FXML
     void updateDisplay(KeyEvent event) {
 
@@ -172,10 +246,7 @@ public class MainController {
         }
     }
 
-    @FXML
-    public void initialize() {
-        notesList.setItems(savedNotes); // Bind the list to the ListView.
-    }
+
 }
 
 
