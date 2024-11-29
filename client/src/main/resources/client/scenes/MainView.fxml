@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.MainController">
+   <children>
+      <HBox fx:id="rootContainer" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #f4f4f4;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <VBox fx:id="leftPanel" prefHeight="500.0" prefWidth="200.0" spacing="10.0" style="-fx-background-color: #f4f4f4;" styleClass="leftPanel" HBox.hgrow="ALWAYS">
+               <children>
+                  <HBox prefHeight="29.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="searchBar" prefHeight="26.0" prefWidth="100.0" promptText="Search..." style="-fx-background-color: #ffffff; -fx-border-color: grey;" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets left="5.0" top="5.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Button fx:id="searchButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="27.0" style="-fx-background-color: #6fbed5;" text="🔎">
+                           <HBox.margin>
+                              <Insets left="5.0" top="5.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <ListView fx:id="notesList" onMouseClicked="#displaySavedNote" prefHeight="314.0" prefWidth="134.0" VBox.vgrow="ALWAYS" />
+                  <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
+                     <children>
+                        <Button fx:id="addButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold;" text="+">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="deleteButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #d43b3b; -fx-font-weight: bold;" text="-">
+                           <HBox.margin>
+                              <Insets left="5.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="refreshButton" layoutX="35.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRefresh" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold;" text="⟳">
+                           <HBox.margin>
+                              <Insets left="5.0" right="10.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Button>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox fx:id="middlePanel" opacity="0.66" prefHeight="500.0" prefWidth="300.0" spacing="10.0" style="-fx-background-color: #ffffff;" styleClass="middlePanel" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="noteEditor" style="-fx-font-weight: bold;" text="Note Editor">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="5.0" top="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <HBox prefHeight="21.0" prefWidth="234.0">
+                     <children>
+                        <TextField fx:id="inputTitle" prefHeight="26.0" prefWidth="230.0" promptText="Title ">
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </HBox.margin>
+                        </TextField>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <TextArea fx:id="inputNote" onKeyReleased="#updateDisplay" prefHeight="278.0" prefWidth="224.0" promptText="Write your notes here..." VBox.vgrow="ALWAYS">
+                     <VBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </VBox.margin></TextArea>
+                  <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
+                     <children>
+                        <Button fx:id="renderButton" mnemonicParsing="false" onMouseClicked="#renderNote" text="Render!">
+                           <HBox.margin>
+                              <Insets bottom="5.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </VBox>
+            <VBox fx:id="rightPanel" layoutX="218.0" layoutY="10.0" opacity="0.61" prefHeight="500.0" prefWidth="300.0" spacing="10.0" style="-fx-background-color: #ffffff;" styleClass="rightPanel" HBox.hgrow="ALWAYS">
+               <children>
+                  <HBox maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
+                     <children>
+                        <Label style="-fx-font-weight: bold;" text="Rendered Note">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets left="5.0" top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="hideEditorButton" maxHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#hideEditor" prefHeight="25.0" prefWidth="27.0" text="👁️‍🗨️">
+                           <HBox.margin>
+                              <Insets left="10.0" right="5.0" top="5.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <Label fx:id="displayTitle" prefHeight="18.0" prefWidth="238.0" style="-fx-font-weight: bold;" text="Title of Note">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="displayNote" alignment="TOP_LEFT" contentDisplay="TOP" prefHeight="314.0" prefWidth="235.0" text="Rendered content of the note will appear here." wrapText="true" VBox.vgrow="ALWAYS">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets left="1.0" right="5.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

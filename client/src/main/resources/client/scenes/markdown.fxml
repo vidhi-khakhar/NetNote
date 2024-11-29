@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.web.WebView?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#saveHtml" prefHeight="481.0" prefWidth="685.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.MarkdownCtrl">
+   <children>
+      <TextArea fx:id="myTextArea" layoutX="46.0" layoutY="73.0" onMouseClicked="#saveHtml" onTouchStationary="#saveHtml" prefHeight="314.0" prefWidth="286.0" />
+      <WebView fx:id="myWebView" layoutX="374.0" layoutY="73.0" onKeyPressed="#saveHtml" onMouseClicked="#saveHtml" prefHeight="314.0" prefWidth="286.0" />
+   </children>
+</AnchorPane>
