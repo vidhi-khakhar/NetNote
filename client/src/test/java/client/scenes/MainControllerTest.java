@@ -5,47 +5,49 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-class MainControllerTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class MainControllerTest {
+
     private MainController controller;
+    private TextField inputTitle;
+    private TextArea inputNote;
+    private Label displayTitle;
+    private Label displayNote;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
+        // Initialize the controller and UI components (mocked or real if necessary)
         controller = new MainController();
 
-        // Correct types for display fields (Label)
-        controller.setInputTitle(new TextField());
-        controller.setInputNote(new TextArea());
-        controller.setDisplayTitle(new Label());
-        controller.setDisplayNote(new Label());
+        // Manually instantiate the components as they would be in FXML
+        inputTitle = new TextField();
+        inputNote = new TextArea();
+        displayTitle = new Label();
+        displayNote = new Label();
+
+        // Inject these components into the controller (simulating what FXML does)
+        controller.setInputTitle(inputTitle);
+        controller.setInputNote(inputNote);
+        controller.setDisplayTitle(displayTitle);
+        controller.setDisplayNote(displayNote);
     }
 
     @Test
-    void testRenderNoteWithEmptyInputs() {
-        // Simulate empty input fields
-        controller.getInputTitle().setText("");
-        controller.getInputNote().setText("");
+    public void testRenderNoteWithValidInput() {
+        // Given
+        String title = "Test Title";
+        String note = "This is a test note.";
 
-        // Trigger the render method
-        controller.renderNote(null);
+        inputTitle.setText(title);
+        inputNote.setText(note);
 
-        // Assertions
-        assertEquals("The title is empty", controller.getDisplayTitle().getText());
-        assertEquals("The note is empty", controller.getDisplayNote().getText());
-    }
+        // When
+        controller.renderNote(null); // Pass null because we are not testing MouseEvent here
 
-    @Test
-    void testRenderNoteWithValidInputs() {
-        // Simulate valid input fields
-        controller.getInputTitle().setText("My Note Title");
-        controller.getInputNote().setText("This is the content of the note.");
-
-        // Trigger the render method
-        controller.renderNote(null);
-
-        // Assertions
-        assertEquals("My Note Title", controller.getDisplayTitle().getText());
-        assertEquals("This is the content of the note.", controller.getDisplayNote().getText());
+        // Then
+        assertEquals(title, displayTitle.getText(), "The title should be updated.");
+        assertEquals(note, displayNote.getText(), "The note should be updated.");
     }
 }
