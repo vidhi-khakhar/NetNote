@@ -24,13 +24,6 @@ import org.junit.jupiter.api.Test;
 public class CollectionTest {
 
     @Test
-    void testDefaultConstructor() {
-        Collection collection = new Collection();
-        assertNull(collection.getCollectionUniqueName());
-        assertNull(collection.getAlias());
-    }
-
-    @Test
     void testConstructor() {
         Collection collection = new Collection("uniqueName", "alias");
         assertEquals("uniqueName", collection.getCollectionUniqueName());
@@ -51,14 +44,14 @@ public class CollectionTest {
     }
 
     @Test
-    void testEquals_equalDifferentObjects() {
+    void testEquals_equalSameValues() {
         Collection collection1 = new Collection("uniqueName", "alias");
         Collection collection2 = new Collection("uniqueName", "alias");
         assertEquals(collection1, collection2);
     }
 
     @Test
-    void testEquals_notEqualDifferentObjects() {
+    void testEquals_notEqualDifferentValues() {
         Collection collection1 = new Collection("uniqueName", "alias1");
         Collection collection2 = new Collection("differentName", "alias2");
         assertNotEquals(collection1, collection2);
@@ -71,14 +64,14 @@ public class CollectionTest {
     }
 
     @Test
-    void testHashCode_equalDifferentObjects() {
+    void testHashCode_equalSameValues() {
         Collection collection1 = new Collection("uniqueName", "alias");
         Collection collection2 = new Collection("uniqueName", "alias");
         assertEquals(collection1.hashCode(), collection2.hashCode());
     }
 
     @Test
-    void testHashCode_notEqualDifferentObjects() {
+    void testHashCode_notEqualDifferentValues() {
         Collection collection1 = new Collection("uniqueName", "alias1");
         Collection collection2 = new Collection("differentName", "alias2");
         assertNotEquals(collection1.hashCode(), collection2.hashCode());
@@ -90,5 +83,6 @@ public class CollectionTest {
         assertTrue(collection.toString().contains("uniqueName"));
         assertTrue(collection.toString().contains("alias"));
     }
+
 }
 

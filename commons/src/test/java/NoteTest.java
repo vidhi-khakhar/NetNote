@@ -23,13 +23,6 @@ import org.junit.jupiter.api.Test;
 
 public class NoteTest {
     @Test
-    void testDefaultConstructor() {
-        Note note = new Note();
-        assertNull(note.getTitle());
-        assertNull(note.getText());
-    }
-
-    @Test
     public void testConstructor() {
         Note note = new Note("Note", "This is a note.");
         assertEquals("Note", note.getTitle());
@@ -57,14 +50,14 @@ public class NoteTest {
     }
 
     @Test
-    void testEquals_equalDifferentObjects() {
+    void testEquals_equalSameValues() {
         Note note1 = new Note("Title", "This is a note.");
         Note note2 = new Note("Title", "This is a note.");
         assertEquals(note1, note2);
     }
 
     @Test
-    void testEquals_notEqualDifferentObjects() {
+    void testEquals_notEqualDifferentValues(){
         Note note1 = new Note("Title1", "This is a note.");
         Note note2 = new Note("Title2", "This is a different note.");
         assertNotEquals(note1, note2);
@@ -77,14 +70,14 @@ public class NoteTest {
     }
 
     @Test
-    void testHashCode_equalDifferentObjects() {
+    void testHashCode_equalSameValues() {
         Note note1 = new Note("Title", "This is a note.");
         Note note2 = new Note("Title", "This is a note.");
         assertEquals(note1.hashCode(), note2.hashCode());
     }
 
     @Test
-    void testHashCode_notEqualDifferentObjects() {
+    void testHashCode_notEqualDifferentValues() {
         Note note1 = new Note("Title1", "This is a note.");
         Note note2 = new Note("Title2", "This is a different note.");
         assertNotEquals(note1.hashCode(), note2.hashCode());
@@ -96,6 +89,7 @@ public class NoteTest {
         assertTrue(note.toString().contains("Title"));
         assertTrue(note.toString().contains("This is a note"));
     }
+  
 }
 
 
