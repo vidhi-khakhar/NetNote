@@ -303,7 +303,15 @@ public class MainController {
             middlePanel.setVisible(true);
         }
     }
+    @FXML
+    void updateTitle(KeyEvent event) {
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
+        if (selectedNote != null) {
+            selectedNote.setTitle(inputTitle.getText());
+            notesList.refresh();
+        }
+    }
 
 }
 
