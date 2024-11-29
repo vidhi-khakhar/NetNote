@@ -303,6 +303,15 @@ public class MainController {
             middlePanel.setVisible(true);
         }
     }
+    /**
+     * Updates the title of the selected note with the text entered in the inputTitle field.
+     * This method is triggered whenever the user types or modifies the text in the inputTitle TextField.
+     * It checks if a note is currently selected in the ListView. If a note is selected,
+     * the title of the note is updated with the text entered by the user in the inputTitle field.
+     *
+     * @param event it is triggered when the user types in the inputTitle field.
+     *              This method listens to key releases in the TextField.
+     */
     @FXML
     void updateTitle(KeyEvent event) {
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
