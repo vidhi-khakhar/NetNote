@@ -33,7 +33,17 @@ public class MarkdownCtrl implements Initializable {
     @FXML
     private CheckBox problemsCheckBox;
 
+    /**
+     * Stores the text currently in the editor
+     */
+
     private String content = "";
+
+    /**
+     * Made this attribute because for some reason
+     * the program would do the getProblems method twice.
+     */
+
     private boolean problemChecked = false;
 
     /**
