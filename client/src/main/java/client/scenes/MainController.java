@@ -1,5 +1,6 @@
 package client.scenes;
 
+import commons.Note;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -29,8 +30,8 @@ public class MainController {
     private Button searchButton;
 
     @FXML
-    private ListView<String> notesList;
-    private ObservableList<String> savedNotes = FXCollections.observableArrayList(); // To store saved notes.
+    private ListView<Note> notesList;
+    private ObservableList<Note> savedNotes = FXCollections.observableArrayList(); // To store saved notes.
 
     @FXML
     private Button addButton;
@@ -108,7 +109,29 @@ public class MainController {
     // METHOD IMPLEMENTATIONS
     @FXML
     public void initialize() {
-        notesList.setItems(savedNotes); // Bind the list to the ListView.
+
+        notesList.setItems(savedNotes);
+
+
+        // This part was created with the help of generative AI, it makes only the Title of the note appear in ListView
+        notesList.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Note note, boolean empty) {
+                super.updateItem(note, empty);
+                if (empty || note == null) {
+                    setText(null);
+                } else {
+                    setText(note.getTitle());
+                }
+            }
+        });
+
+        notesList.getSelectionModel().selectedItemProperty().addListener((obs, oldNote, selectedNote) -> {
+            if (selectedNote != null) {
+                inputTitle.setText(selectedNote.getTitle()); // Change title in the editor
+                inputNote.setText(selectedNote.getText());  // Change text in the editor
+            }
+        });
     }
 
     /**
@@ -154,7 +177,20 @@ public class MainController {
                 alert.setContentText("The title cannot be empty!");
                 alert.showAndWait();
             } else {
-                savedNotes.add(title.trim()); //Adding new Note to the display List.
+                // Create a new Note object
+                Note newNote = new Note();
+                newNote.setTitle(title.trim());
+                newNote.setText(""); // Default empty text
+
+                savedNotes.add(newNote);     // Add the new note to the savedNotes list
+
+                notesList.getSelectionModel().select(savedNotes.size() - 1);  // Select the new note in the ListView
+
+                inputTitle.setText(newNote.getTitle()); //Set the title in editor
+                inputNote.setText(newNote.getText());   //Set the note text in editor
+                displayNote.setText("The note is empty"); // Default message for empty note text
+
+                selectedNoteIndex = savedNotes.size() - 1;
             }
         });
     }
@@ -196,17 +232,14 @@ public class MainController {
     void displaySavedNote(MouseEvent event) { // unfortunately doesnt work yet
         int index = notesList.getSelectionModel().getSelectedIndex();
         if (index != -1) {
-            String selectedNote = savedNotes.get(index);
+            Note selectedNote = savedNotes.get(index);
             selectedNoteIndex = index;
 
-            String[] parts = selectedNote.split("\n", 2);
-            if (parts.length == 2) {
-                inputTitle.setText(parts[0].replace("Title: ", "").trim());
-                inputNote.setText(parts[1].replace("Note: ", "").trim());
-            }
+            inputTitle.setText(selectedNote.getTitle());
+            inputNote.setText(selectedNote.getText());
 
-            displayTitle.setText(inputTitle.getText()); // Display the title
-            displayNote.setText(inputNote.getText()); // Display the note
+            displayTitle.setText(selectedNote.getTitle());
+            displayNote.setText(selectedNote.getText());
         }
     }
 
@@ -239,12 +272,16 @@ public class MainController {
 
         // If no note is being updated (new note)
         if (selectedNoteIndex == -1) {
-            String savedNote = title;
+            Note savedNote = new Note();
+            savedNote.setTitle(title);
+            savedNote.setText(note);
             savedNotes.add(savedNote); // Add to the ObservableList
             selectedNoteIndex = savedNotes.size() - 1; // Set the index of the newly added note
         } else {
             // Update the existing note
-            String updatedNote = title;
+            Note updatedNote = new Note();
+            updatedNote.setTitle(title);
+            updatedNote.setText(note);
             savedNotes.set(selectedNoteIndex, updatedNote); // Update the note in the list
         }
     }
