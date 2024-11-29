@@ -36,6 +36,9 @@ public class MainController {
     public ObservableList<Note> getSavedNotes() {
         return savedNotes;
     }
+    public void setSavedNotes(ObservableList<Note> newNotes) {
+        this.savedNotes = newNotes;
+    }
 
     @FXML
     private Button addButton;
