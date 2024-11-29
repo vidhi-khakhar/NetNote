@@ -1,0 +1,92 @@
+/* General Styling for the VBox containers */
+
+/* Left Panel (VBox for List and Buttons) */
+.leftPanel {
+    -fx-background-color: #f0f0f0; /* Light gray background */
+    -fx-border-color: #dcdcdc; /* Border color */
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+    -fx-pref-width: 200px; /* Set a default width */
+    -fx-hgrow: ALWAYS; /* Allow left panel to grow horizontally */
+}
+
+/* Middle Panel (VBox for Note Editor) */
+.middlePanel {
+    -fx-background-color: white; /* White background */
+    -fx-border-color: #dcdcdc; /* Border color */
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+    -fx-pref-width: 350px; /* Set width for middle panel */
+    -fx-hgrow: ALWAYS; /* Middle panel should expand horizontally */
+    -fx-vgrow: ALWAYS; /* Middle panel should expand vertically */
+}
+
+/* Right Panel (VBox for My Note) */
+.rightPanel {
+    -fx-background-color: white; /* White background */
+    -fx-border-color: #dcdcdc; /* Border color */
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+    -fx-pref-width: 350px; /* Set width for right panel */
+    -fx-hgrow: ALWAYS; /* Right panel should expand horizontally */
+    -fx-vgrow: ALWAYS; /* Right panel should expand vertically */
+}
+
+/* Styling for Search Box in Left Panel */
+.search-box {
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-pref-width: 250px;
+    -fx-font-size: 14px;
+    -fx-background-color: #ffffff;
+    -fx-hgrow: ALWAYS; /* Allow search box to grow horizontally */
+}
+
+/* Title Styling for Note Editor and My Note */
+.note-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-padding-bottom: 5px;
+}
+
+/* Note Editor (TextArea) Styling */
+.text-area {
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #dcdcdc;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-pref-height: 300px;
+    -fx-font-size: 14px;
+    -fx-hgrow: ALWAYS; /* Allow text area to grow horizontally */
+}
+
+/* List Styling in Left Panel */
+.list-view {
+    -fx-pref-height: 400px; /* Set the height of the list */
+    -fx-border-color: #dcdcdc;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-background-color: #ffffff;
+    -fx-vgrow: ALWAYS; /* Allow the list view to expand vertically */
+    -fx-hgrow: ALWAYS; /* Allow list view to grow horizontally */
+}
+
+/* Styling for Buttons in Left Panel */
+.left-panel-buttons {
+    -fx-hgrow: ALWAYS; /* Allow buttons to grow horizontally */
+}
+
+/* Dull Effect on Hover */
+.button:hover {
+    -fx-opacity: 0.7; /* Reduce opacity to make the button appear duller */
+    -fx-border-color: #dcdcdc; /* Border color on hover */
+}
+
+
+
