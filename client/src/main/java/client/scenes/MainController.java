@@ -50,8 +50,25 @@ public class MainController {
     @FXML
     private TextArea inputNote;
 
+    public TextArea getInputNote() {
+        return inputNote;
+    }
+
+    public void setInputNote(TextArea inputNote) {
+        this.inputNote = inputNote;
+    }
+
     @FXML
     private TextField inputTitle;
+
+    public TextField getInputTitle() {
+        return inputTitle;
+    }
+
+    public void setInputTitle(TextField inputTitle) {
+        this.inputTitle = inputTitle;
+    }
+
 
     @FXML
     private Button renderButton;
@@ -64,8 +81,23 @@ public class MainController {
     @FXML
     private Label displayNote;
 
+    public Label getDisplayNote() {
+        return displayNote;
+    }
+
+    public void setDisplayNote(Label displayNote) {
+        this.displayNote = displayNote;
+    }
+
     @FXML
     private Label displayTitle;
+    public Label getDisplayTitle() {
+        return displayTitle;
+    }
+
+    public void setDisplayTitle(Label displayTitle) {
+        this.displayTitle = displayTitle;
+    }
 
     @FXML
     private Button hideEditorButton;
