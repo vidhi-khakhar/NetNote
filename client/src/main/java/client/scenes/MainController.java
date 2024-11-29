@@ -128,14 +128,35 @@ public class MainController {
      * The `selectedNoteIndex` is reset to `-1` when no note is selected.
      * **/
 
-
+    /**
+     * Opens a dialog to add a new note.
+     * This method shows a small input dialog asking the user to enter a note title.
+     * If the title is valid (not empty), it adds the title to the list of notes.
+     * If the title is empty, an error message is displayed.
+     *
+     * @param event the action event triggered by clicking the "+" button
+     */
     @FXML
     void handleAddNote(ActionEvent event) {
-        selectedNoteIndex = -1; // Reset the selected index
-        inputTitle.clear(); // Clear the input fields
-        inputNote.clear();
-        displayTitle.setText("");
-        displayNote.setText("");
+
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Add Note");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Please enter the title of your note:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(title -> {
+            if (title.trim().isEmpty()) {
+                // Handling the invalid inputs
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Invalid Title");
+                alert.setHeaderText(null);
+                alert.setContentText("The title cannot be empty!");
+                alert.showAndWait();
+            } else {
+                savedNotes.add(title.trim()); //Adding new Note to the display List.
+            }
+        });
     }
 
     @FXML
