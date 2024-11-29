@@ -229,7 +229,7 @@ public class MainController {
     }
 
     @FXML
-    void displaySavedNote(MouseEvent event) { // unfortunately doesnt work yet
+    void displaySavedNote(MouseEvent event) {
         int index = notesList.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             Note selectedNote = savedNotes.get(index);
