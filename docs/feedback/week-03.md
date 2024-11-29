@@ -22,7 +22,7 @@ Feedback: NA
 
 Quick Summary: Good
 
-Feedback: check template?
+Feedback: 
 
 - It is great that in each talking point the chair asked about everybodys opinion.
 - It is good to check on the things that needed to be done by each member for example the template project. But you also have an extra meeting that I dont attend so I trust you will take care of it greatly!
