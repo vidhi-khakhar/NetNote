@@ -1,6 +1,6 @@
 package client.scenes;
 
-public enum ProblemType {
+public enum MarkdownProblemType {
     NO_LINE("Make sure to keep empty lines between paragraphs."),
     HASHTAGS_ONLY("Incomplete heading, make sure to add text after the #'s"),
     HASHTAG_NO_SPACE("Leave a space after the #"),
@@ -10,7 +10,7 @@ public enum ProblemType {
     INCORRECT_LIST("Leave a space between the hyphen and the rest of the text.");
 
     private final String description;
-    ProblemType(String description) {
+    MarkdownProblemType(String description) {
         this.description = description;
     }
     public String getDescription() {

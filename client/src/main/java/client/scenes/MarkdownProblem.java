@@ -1,16 +1,16 @@
 package client.scenes;
 
-public class Problem {
+public class MarkdownProblem {
 
     private int lineNr;
-    private ProblemType type;
+    private MarkdownProblemType type;
 
-    public Problem(int lineNr, ProblemType type) {
+    public MarkdownProblem(int lineNr, MarkdownProblemType type) {
         this.lineNr = lineNr;
         this.type = type;
     }
 
-    public ProblemType getType() {
+    public MarkdownProblemType getType() {
         return type;
     }
 
