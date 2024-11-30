@@ -9,6 +9,7 @@ import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -115,12 +116,12 @@ public class MarkdownCtrl implements Initializable {
     /**
      * Method that creates a list of the problems in the
      * text editor. So far it can detect the following problems:
-     *  1. #, then at least 1 space, then #, then 0 or more spaces,
-     *  2. only # on a line,
-     *  3. checks that there is an empty line between paragraphs,
-     *  4. checks if a space is left between - and the rest of the text,
-     *  5. checks if a space is left between # and the rest of the text,
-     *  Doesn't check sublists yet(list within a list).
+     *  <br>1. #, then at least 1 space, then #, then 0 or more spaces
+     *  <br>2. only # on a line,
+     *  <br>3. checks that there is an empty line between paragraphs,
+     *  <br>4. checks if a space is left between - and the rest of the text,
+     *  <br>5. checks if a space is left between # and the rest of the text,
+     *  <br>Doesn't check sublists yet(list within a list).
      * @return List of the problems
      *
      */
@@ -137,37 +138,49 @@ public class MarkdownCtrl implements Initializable {
         String lastLine = "";
         while (scanner.hasNextLine()) {
             lineNr++;
-            String format = "Problem at line " + lineNr;
             String line = scanner.nextLine();
 
-            if(lineNr != 1 && !problems.contains("Make sure to keep empty lines between paragraphs."))
-                if(spaceBetweenParagraphs(line, lastLine, lastLineBlank))
-                    problems.add("Make sure to keep empty lines between paragraphs.");
+            if(lineNr != 1 && spaceBetweenParagraphs(line, lastLine, lastLineBlank)) {
+                MarkdownProblem problem = new MarkdownProblem(lineNr,
+                        MarkdownProblemType.NO_LINE);
+                problems.add(problem.toString());
+            }
 
-            if(!line.isEmpty() && (line.charAt(0) == '-' && !listCheck(line)))
-                problems.add(format +
-                        ": Leave a space between the hyphen and the rest of the text.");
+            if(!line.isEmpty() && (line.charAt(0) == '-' && !listCheck(line))) {
+                MarkdownProblem problem = new MarkdownProblem(lineNr,
+                        MarkdownProblemType.INCORRECT_LIST);
+                problems.add(problem.toString());
+            }
 
-            if(!line.isEmpty() && line.charAt(0) == '#') {
-                Scanner lineScanner = new Scanner(line);
-                if(hashtagSpacesHashtag(lineScanner))
-                    problems.add(format + ": Incomplete input, " +
-                            "does not display anything, " +
-                            "either delete the #'s or add text after the last #");
+            if(hashtagsOnly(line)) {
+                MarkdownProblem problem = new MarkdownProblem(lineNr,
+                        MarkdownProblemType.HASHTAGS_ONLY);
+                problems.add(problem.toString());
+            }
 
-                if(hashtagsOnly(line))
-                    problems.add(format +
-                            ": Incomplete heading, make sure to add text after the #'s");
+            Scanner lineScanner = new Scanner(line);
+            if(hashtagStarterCondition(line) && hashtagSpacesHashtag(lineScanner)) {
+                MarkdownProblem problem = new MarkdownProblem(lineNr,
+                        MarkdownProblemType.HASHTAGS_SPACE_HASHTAGS);
+                problems.add(problem.toString());
+            }
+            lineScanner.close();
 
-                if(!spaceAfterHashTag(line))
-                    problems.add(format + ": Leave space between the" +
-                            " # and the rest of the text");
+            if(hashtagStarterCondition(line) && !spaceAfterHashTag(line)) {
+                MarkdownProblem problem = new MarkdownProblem(lineNr,
+                        MarkdownProblemType.HASHTAG_NO_SPACE);
+                problems.add(problem.toString());
+
             }
             lastLineBlank = line.isBlank();
             lastLine = line;
         }
         problemChecked = true;
         return problems;
+    }
+
+    private boolean hashtagStarterCondition(String line){
+        return !line.isEmpty() && line.charAt(0) == '#';
     }
 
     /**
@@ -202,19 +215,15 @@ public class MarkdownCtrl implements Initializable {
     private boolean numberedListCheck(String line){
         if(line.length() < 2)
             return false;
-        if(line.length() == 2){
-            char digit = line.charAt(0);
-            char dot = line.charAt(1);
-            if(Character.isDigit(digit) && dot == '.')
-                return true;
-        }
-        if(line.length() > 2) {
-            char digit = line.charAt(0);
-            char dot = line.charAt(1);
-            char space = line.charAt(2);
-            if (Character.isDigit(digit) && dot == '.' && space == ' ')
-                return true;
-        }
+        if(!line.contains("."))
+            return false;
+        String[] split = line.split("\\.");
+        if(!NumberUtils.isCreatable(split[0]))
+            return false;
+        if(line.indexOf('.') == line.length() - 1)
+            return true;
+        if(line.indexOf(' ') == line.indexOf('.') + 1)
+            return true;
         return false;
     }
 
