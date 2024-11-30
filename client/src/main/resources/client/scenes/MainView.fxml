@@ -80,7 +80,7 @@
                   </Label>
                   <HBox prefHeight="21.0" prefWidth="234.0">
                      <children>
-                        <TextField fx:id="inputTitle" onKeyReleased="#updateTitle" prefHeight="26.0" prefWidth="230.0" promptText="Title ">
+                        <TextField fx:id="inputTitle" prefHeight="26.0" prefWidth="230.0" promptText="Title ">
                            <HBox.margin>
                               <Insets left="5.0" right="5.0" />
                            </HBox.margin>
