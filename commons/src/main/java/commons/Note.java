@@ -1,7 +1,6 @@
 package commons;
 
 import jakarta.persistence.*;
-import java.util.Objects;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -36,7 +35,8 @@ public class Note {
     /**
      * Default constructor is requested by JPA.
      */
-    public Note() { }
+    @SuppressWarnings("unused")
+    protected Note() { }
 
     /**
      * Recommended constructor for the Note.
