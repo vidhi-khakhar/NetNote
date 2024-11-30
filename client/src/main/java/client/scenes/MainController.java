@@ -10,7 +10,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
 import java.util.Optional;
 
 public class MainController {
@@ -136,19 +135,19 @@ public class MainController {
 
     /**
      * JAVADOC:
-     * The `selectedNoteIndex` variable trackS the index of the currently selected or edited note
-     * in the `savedNotes` list.
+     * The selectedNoteIndex variable trackS the index of the currently selected or edited note
+     * in the savedNotes list.
 
      * When rendering a note (i.e., displaying its title and content in the display fields):
-     * If `selectedNoteIndex == -1`,  no note is being edited, and thus a new note is ADDED
-     * If `selectedNoteIndex != -1`, an existing note is being updated, and the note at the
-     *   `selectedNoteIndex` is modified (`savedNotes.set()`).
+     * If selectedNoteIndex == -1,  no note is being edited, and thus a new note is ADDED
+     * If selectedNoteIndex != -1, an existing note is being updated, and the note at the
+     *   selectedNoteIndex is modified (savedNotes.set()).
 
      * When deleting a note:
      * The selected index is used to find the note to be removed from the list. The note at that index is removed from the list
-     *   (`savedNotes.remove()`).
+     *   (savedNotes.remove()).
 
-     * The `selectedNoteIndex` is reset to `-1` when no note is selected.
+     * The selectedNoteIndex is reset to -1 when no note is selected.
      * **/
 
     /**
@@ -304,7 +303,24 @@ public class MainController {
         }
     }
 
+    /**
+     * Updates the title of the selected note with the text entered in the inputTitle field.
+     * This method is triggered whenever the user types or modifies the text in the inputTitle TextField.
+     * It checks if a note is currently selected in the ListView. If a note is selected,
+     * the title of the note is updated with the text entered by the user in the inputTitle field.
+     *
+     * @param event it is triggered when the user types in the inputTitle field.
+     *              This method listens to key releases in the TextField.
+     *
+     */
+    @FXML
+    void updateTitle(KeyEvent event) {
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
+
+        if (selectedNote != null) {
+            selectedNote.setTitle(inputTitle.getText());
+            notesList.refresh();
+        }
+    }
 
 }
-
-
