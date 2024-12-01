@@ -1,5 +1,13 @@
 package client.scenes;
 
+import commons.Note;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,104 +17,85 @@ class MainControllerTest {
 
     private MainController sut;
 
-    @BeforeEach
-    public void setup() {
-        sut = new MainController();
+    @BeforeAll
+    static void initJavaFX() {
+        Platform.startup(() -> {});
     }
 
+    /**
+     * Setting up the Controller for the tests.
+     */
+    @BeforeEach
+    void setup() {
+        sut = new MainController();
+
+        sut.setSavedNotes(FXCollections.observableArrayList());
+        sut.setInputNote(new TextArea());
+        sut.setInputTitle(new TextField());
+        sut.setDisplayNote(new Label());
+        sut.setDisplayTitle(new Label());
+    }
 
     @Test
     void getSavedNotesTest() {
-        //to be implemented
+        assertNotNull(sut.getSavedNotes());
+        assertTrue(sut.getSavedNotes().isEmpty());
     }
 
     @Test
     void setSavedNotesTest() {
-        //to be implemented
-    }
-
-    @Test
-    void getInputNoteTest() {
-        //to be implemented
-    }
-
-    @Test
-    void setInputNoteTest() {
-        //to be implemented
-    }
-
-    @Test
-    void getInputTitleTest() {
-        //to be implemented
-    }
-
-    @Test
-    void setInputTitleTest() {
-        //to be implemented
-    }
-
-    @Test
-    void getDisplayNoteTest() {
-        //to be implemented
-    }
-
-    @Test
-    void setDisplayNoteTest() {
-        //to be implemented
-    }
-
-    @Test
-    void getDisplayTitleTest() {
-        //to be implemented
-    }
-
-    @Test
-    void setDisplayTitleTest() {
-        //to be implemented
-    }
-
-    @Test
-    void initializeTest() {
-        //to be implemented
-    }
-
-    @Test
-    void handleAddNoteTest() {
-        //to be implemented
+        ObservableList<Note> newNotes = FXCollections.observableArrayList(new Note());
+        sut.setSavedNotes(newNotes);
+        assertEquals(newNotes, sut.getSavedNotes());
     }
 
     @Test
     void handleDeleteNoteTest() {
-        //to be implemented
-    }
-
-    @Test
-    void handleRefreshTest() {
-        //to be implemented
+        Note note = new Note();
+        note.setTitle("Test123");
+        sut.getSavedNotes().add(note);
+        sut.getSavedNotes().remove(0);
+        assertTrue(sut.getSavedNotes().isEmpty());
     }
 
     @Test
     void displaySavedNoteTest() {
-        //to be implemented
+        Note note = new Note();
+        note.setTitle("Title");
+        note.setText("Text");
+        sut.getSavedNotes().add(note);
+
+        sut.getInputTitle().setText(note.getTitle());
+        sut.getInputNote().setText(note.getText());
+
+        assertEquals("Title", sut.getInputTitle().getText());
+        assertEquals("Text", sut.getInputNote().getText());
     }
 
     @Test
     void renderNoteTest() {
-        //to be implemented
+        sut.getInputTitle().setText("Title");
+        sut.getInputNote().setText("Text");
+        sut.renderNote(null);
+
+        assertEquals(1, sut.getSavedNotes().size());
+        assertEquals("Title", sut.getSavedNotes().get(0).getTitle());
+        assertEquals("Text", sut.getSavedNotes().get(0).getText());
     }
 
     @Test
-    void updateDisplayTest() {
-        //to be implemented
+    void handleAddNoteTest() {
+        //test still to be implemented
     }
 
     @Test
-    void hideEditorTest() {
-        //to be implemented
+    void handleRefreshTest(){
+        //method not implemented yet
     }
 
     @Test
-    void updateTitleTest() {
-        //to be implemented
+    void updateDisplayTest(){
+        //method not implemented yet
     }
+
 }
