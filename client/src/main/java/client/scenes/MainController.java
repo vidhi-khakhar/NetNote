@@ -185,9 +185,7 @@ public class MainController {
                 alert.showAndWait();
             } else {
                 // Create a new Note object
-                Note newNote = new Note();
-                newNote.setTitle(title.trim());
-                newNote.setText(""); // Default empty text
+                Note newNote = new Note(title.trim(), ""); // Default empty text
 
                 savedNotes.add(newNote);     // Add the new note to the savedNotes list
 
@@ -279,16 +277,12 @@ public class MainController {
 
         // If no note is being updated (new note)
         if (selectedNoteIndex == -1) {
-            Note savedNote = new Note();
-            savedNote.setTitle(title);
-            savedNote.setText(note);
+            Note savedNote = new Note(title, note);
             savedNotes.add(savedNote); // Add to the ObservableList
             selectedNoteIndex = savedNotes.size() - 1; // Set the index of the newly added note
         } else {
             // Update the existing note
-            Note updatedNote = new Note();
-            updatedNote.setTitle(title);
-            updatedNote.setText(note);
+            Note updatedNote = new Note(title, note);
             savedNotes.set(selectedNoteIndex, updatedNote); // Update the note in the list
         }
     }

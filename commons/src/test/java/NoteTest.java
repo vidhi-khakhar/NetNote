@@ -31,14 +31,14 @@ public class NoteTest {
 
     @Test
     public void testSetTitle() {
-        Note note = new Note();
+        Note note = new Note("", "");
         note.setTitle("Updated Title");
         assertEquals("Updated Title", note.getTitle());
     }
 
     @Test
     public void testSetText() {
-        Note note = new Note();
+        Note note = new Note("", "");
         note.setText("Updated text content");
         assertEquals("Updated text content", note.getText());
     }
