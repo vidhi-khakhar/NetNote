@@ -34,6 +34,13 @@ public class MainController {
     private ListView<Note> notesList;
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList(); // To store saved notes.
 
+    public ObservableList<Note> getSavedNotes() {
+        return savedNotes;
+    }
+    public void setSavedNotes(ObservableList<Note> newNotes) {
+        this.savedNotes = newNotes;
+    }
+
     @FXML
     private Button addButton;
 
@@ -336,14 +343,28 @@ public class MainController {
      */
     @FXML
     void updateTitle(KeyEvent event) {
+        String updatedTitle = inputTitle.getText();
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
-
+            //common scenario:
         if (selectedNote != null) {
-            selectedNote.setTitle(inputTitle.getText());
+            selectedNote.setTitle(updatedTitle);
+            notesList.refresh();
+            //scenario where no note is selected:
+        } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) {
+            Note newNote = savedNotes.get(0);
+            newNote.setTitle(updatedTitle);
+            selectedNoteIndex = 0;
+            notesList.getSelectionModel().select(0);
+            notesList.refresh();
+            //scenario where there is no note:
+        } else if (savedNotes.isEmpty()) {
+            Note firstNote = new Note(updatedTitle, "");
+            savedNotes.add(firstNote);
+            selectedNoteIndex = 0;
+            notesList.getSelectionModel().select(0);
             notesList.refresh();
         }
     }
-
 }
 
 
