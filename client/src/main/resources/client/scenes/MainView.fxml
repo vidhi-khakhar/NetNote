@@ -15,7 +15,7 @@
    <children>
       <HBox fx:id="rootContainer" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #f4f4f4;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <VBox fx:id="leftPanel" prefHeight="500.0" prefWidth="200.0" spacing="10.0" style="-fx-background-color: #f4f4f4;" styleClass="leftPanel" HBox.hgrow="ALWAYS">
+            <VBox fx:id="leftPanel" prefHeight="500.0" prefWidth="200.0" spacing="10.0" styleClass="leftPanel" HBox.hgrow="ALWAYS">
                <children>
                   <HBox prefHeight="29.0" prefWidth="200.0">
                      <children>
@@ -68,7 +68,7 @@
                   </HBox>
                </children>
             </VBox>
-            <VBox fx:id="middlePanel" opacity="0.66" prefHeight="500.0" prefWidth="300.0" spacing="10.0" style="-fx-background-color: #ffffff;" styleClass="middlePanel" HBox.hgrow="ALWAYS">
+            <VBox fx:id="middlePanel" opacity="0.66" prefHeight="500.0" prefWidth="300.0" spacing="10.0" styleClass="middlePanel" HBox.hgrow="ALWAYS">
                <children>
                   <Label fx:id="noteEditor" style="-fx-font-weight: bold;" text="Note Editor">
                      <font>
@@ -108,7 +108,7 @@
                   <Insets />
                </HBox.margin>
             </VBox>
-            <VBox fx:id="rightPanel" layoutX="218.0" layoutY="10.0" opacity="0.61" prefHeight="500.0" prefWidth="300.0" spacing="10.0" style="-fx-background-color: #ffffff;" styleClass="rightPanel" HBox.hgrow="ALWAYS">
+            <VBox fx:id="rightPanel" layoutX="218.0" layoutY="10.0" opacity="0.61" prefHeight="500.0" prefWidth="300.0" spacing="10.0" styleClass="rightPanel" HBox.hgrow="ALWAYS">
                <children>
                   <HBox maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
                      <children>
@@ -120,13 +120,18 @@
                               <Insets left="5.0" top="5.0" />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="hideEditorButton" maxHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#hideEditor" prefHeight="25.0" prefWidth="27.0" text="👁️‍🗨️">
+                        <Button fx:id="hideEditorButton" maxHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#hideEditor" prefHeight="27.0" prefWidth="27.0" text="👁️‍🗨️">
                            <HBox.margin>
                               <Insets left="10.0" right="5.0" top="5.0" />
                            </HBox.margin>
                            <font>
                               <Font size="10.0" />
                            </font>
+                        </Button>
+                        <Button fx:id="themeToggleButton" maxHeight="27.0" maxWidth="32.0" minHeight="27.0" minWidth="32.0" mnemonicParsing="false" onAction="#toggleTheme" prefHeight="27.0" prefWidth="32.0" text="☾">
+                           <HBox.margin>
+                              <Insets left="5.0" right="3.0" top="5.0" />
+                           </HBox.margin>
                         </Button>
                      </children>
                   </HBox>
