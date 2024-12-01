@@ -1,0 +1,118 @@
+/* General Styling for the VBox containers */
+
+/* Left Panel (VBox for List and Buttons) */
+#leftPanel {
+    -fx-background-color: #333333; /* Dark gray background for left panel */
+    -fx-border-color: #444444; /* Lighter gray border */
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+    -fx-pref-width: 200px; /* Set a default width */
+    -fx-hgrow: ALWAYS; /* Allow left panel to grow horizontally */
+}
+
+/* Middle Panel (VBox for Note Editor) */
+.middlePanel {
+    -fx-background-color: #333333; /* Dark gray background */
+    -fx-opacity: 1; /* Fully opaque */
+    -fx-border-color: #444444; /* Lighter gray border */
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+    -fx-pref-width: 350px; /* Set width for middle panel */
+    -fx-hgrow: ALWAYS; /* Middle panel should expand horizontally */
+    -fx-vgrow: ALWAYS; /* Middle panel should expand vertically */
+}
+
+/* Right Panel (VBox for My Note) */
+.rightPanel {
+    -fx-background-color: #333333; /* Dark gray background */
+    -fx-opacity: 1; /* Fully opaque */
+    -fx-border-color: #444444; /* Lighter gray border */
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+    -fx-pref-width: 350px; /* Set width for right panel */
+    -fx-hgrow: ALWAYS; /* Right panel should expand horizontally */
+    -fx-vgrow: ALWAYS; /* Right panel should expand vertically */
+}
+
+/* Note Editor (TextArea) Styling */
+.text-area {
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #dcdcdc;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-pref-height: 300px;
+    -fx-font-size: 14px;
+    -fx-hgrow: ALWAYS; /* Allow text area to grow horizontally */
+}
+
+/* General Text Styling */
+.text, .label {
+    -fx-text-fill: white; /* Set text color to white */
+}
+
+/* Styling for Search Box in Left Panel */
+.search-box {
+    -fx-border-color: #444444;
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-pref-width: 250px;
+    -fx-font-size: 14px;
+    -fx-background-color: #444444; /* Slightly lighter background */
+    -fx-text-fill: white; /* Text color inside search box */
+    -fx-hgrow: ALWAYS; /* Allow search box to grow horizontally */
+}
+
+/* Title Styling for Note Editor and My Note */
+/* Title Styling for Note Editor and My Note */
+.note-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: black; /* Black text for input */
+    -fx-padding-bottom: 5px;
+}
+
+/* Note Editor (TextArea) Styling */
+.text-area {
+    -fx-background-color: #444444; /* Slightly lighter background */
+    -fx-border-color: #555555; /* Border color */
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-pref-height: 300px;
+    -fx-font-size: 14px;
+    -fx-text-fill: black; /* Black text for input */
+    -fx-hgrow: ALWAYS; /* Allow text area to grow horizontally */
+}
+
+/* Styling for Buttons */
+.button {
+    -fx-background-color: #444444; /* Slightly lighter gray for buttons */
+    -fx-text-fill: white; /* White text on buttons */
+    -fx-border-color: #555555; /* Border color */
+    -fx-border-radius: 5px;
+}
+
+
+
+.button:hover {
+    -fx-background-color: #555555; /* Highlight on hover */
+    -fx-opacity: 0.9; /* Slight transparency effect */
+}
+
+/* Dull Effect on Hover */
+.button:hover {
+    -fx-opacity: 0.9; /* Reduce opacity slightly */
+}
+
+/* Additional Styling for Hover Effects */
+#deleteButton:hover {
+    -fx-background-color: #990000; /* Red background for delete button hover */
+    -fx-text-fill: white; /* Keep text white */
+}
+
+#addButton:hover {
+    -fx-background-color: #009900; /* Green background for add button hover */
+    -fx-text-fill: white; /* Keep text white */
+}

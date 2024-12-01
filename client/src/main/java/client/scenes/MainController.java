@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -87,6 +88,33 @@ public class MainController {
     // RIGHT PANEL ELEMENTS
     @FXML
     private VBox rightPanel;
+
+    @FXML
+    private Button themeToggleButton;
+
+    private boolean isDarkTheme = false; // Track the current theme
+
+    @FXML
+    void toggleTheme() {
+        Scene scene = themeToggleButton.getScene();
+
+        if (isDarkTheme) {
+            // Switch to light theme
+            scene.getStylesheets().remove(getClass().getResource("/client/scenes/dark-theme.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/client/scenes/gui.css").toExternalForm());
+            themeToggleButton.setText("🌙");
+        } else {
+            // Switch to dark theme
+            scene.getStylesheets().remove(getClass().getResource("/client/scenes/gui.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/client/scenes/dark-theme.css").toExternalForm());
+
+            // Set the sun icon and adjust font size
+            themeToggleButton.setText("☀");
+            themeToggleButton.setStyle("-fx-font-size: 10px;");
+        }
+
+        isDarkTheme = !isDarkTheme;
+    }
 
     @FXML
     private Label displayNote;
