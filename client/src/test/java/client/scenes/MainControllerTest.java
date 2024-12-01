@@ -84,11 +84,6 @@ class MainControllerTest {
     }
 
     @Test
-    void handleAddNoteTest() {
-        //test still to be implemented
-    }
-
-    @Test
     void handleRefreshTest(){
         //method not implemented yet
     }

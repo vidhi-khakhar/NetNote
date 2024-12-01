@@ -321,14 +321,25 @@ public class MainController {
      */
     @FXML
     void updateTitle(KeyEvent event) {
+        String updatedTitle = inputTitle.getText();
+        if (savedNotes.isEmpty()) {
+            Note newNote = new Note();
+            newNote.setTitle(updatedTitle);
+            newNote.setText("");
+            savedNotes.add(newNote);
+            notesList.refresh();
+            return;
+        }
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         if (selectedNote != null) {
-            selectedNote.setTitle(inputTitle.getText());
+            selectedNote.setTitle(updatedTitle);
+            notesList.refresh();
+        } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) { //when there is no note selected
+            savedNotes.get(0).setTitle(updatedTitle);
             notesList.refresh();
         }
     }
-
 }
 
 
