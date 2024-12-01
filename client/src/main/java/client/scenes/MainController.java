@@ -353,11 +353,15 @@ public class MainController {
         } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) {
             Note newNote = savedNotes.get(0);
             newNote.setTitle(updatedTitle);
+            selectedNoteIndex = 0;
+            notesList.getSelectionModel().select(0);
             notesList.refresh();
             //scenario where there is no note:
         } else if (savedNotes.isEmpty()) {
             Note firstNote = new Note(updatedTitle, "");
             savedNotes.add(firstNote);
+            selectedNoteIndex = 0;
+            notesList.getSelectionModel().select(0);
             notesList.refresh();
         }
     }
