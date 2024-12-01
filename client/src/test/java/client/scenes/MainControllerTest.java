@@ -29,15 +29,14 @@ class MainControllerTest {
 
     @Test
     void setSavedNotesTest() {
-        ObservableList<Note> newNotes = FXCollections.observableArrayList(new Note());
+        ObservableList<Note> newNotes = FXCollections.observableArrayList(new Note("Title", "Text"));
         sut.setSavedNotes(newNotes);
         assertEquals(newNotes, sut.getSavedNotes());
     }
 
     @Test
     void handleDeleteNoteTest() {
-        Note note = new Note();
-        note.setTitle("Test123");
+        Note note = new Note("Title", "Text");
         sut.getSavedNotes().add(note);
         sut.getSavedNotes().remove(0);
         assertTrue(sut.getSavedNotes().isEmpty());
@@ -45,9 +44,7 @@ class MainControllerTest {
 
     @Test
     void renderNoteTest() {
-        Note newNote = new Note();
-        newNote.setTitle("Title");
-        newNote.setText("Text");
+        Note newNote = new Note("Title", "Text");
         sut.getSavedNotes().add(newNote);
 
         assertEquals(1, sut.getSavedNotes().size());
