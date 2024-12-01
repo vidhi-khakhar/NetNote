@@ -22,9 +22,18 @@ class MainControllerTest {
     }
 
     @Test
-    void getSavedNotesTest() {
+    void initializeSavedNotesTest() {
         assertNotNull(sut.getSavedNotes());
         assertTrue(sut.getSavedNotes().isEmpty());
+    }
+
+    @Test
+    void getSavedNotesTest() {
+        Note test = new Note("Title", "Text");
+        sut.getSavedNotes().add(test);
+        assertEquals(1, sut.getSavedNotes().size());
+        assertEquals("Title", sut.getSavedNotes().get(0).getTitle());
+        assertEquals("Text", sut.getSavedNotes().get(0).getText());
     }
 
     @Test
@@ -64,5 +73,8 @@ class MainControllerTest {
     void updateDisplayTest(){
         //method not implemented yet
     }
-
+    @Test
+    void updateTitleTest(){
+        //test still to be implemented
+    }
 }
