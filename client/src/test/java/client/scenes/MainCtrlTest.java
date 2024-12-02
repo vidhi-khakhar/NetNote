@@ -65,7 +65,7 @@ class MainCtrlTest {
         //test still to be implemented
     }
     @Test
-    void handleRefreshTest(){
+    void handleRefreshNoteTest(){
         //method not implemented yet
     }
 
