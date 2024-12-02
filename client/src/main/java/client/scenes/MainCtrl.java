@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -41,21 +40,11 @@ public class MainCtrl {
                                          // (-1 means no note is selected).
     private boolean isDarkTheme = false; // Track the current theme
     private String content = "";
+    private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
 
     private Stage primaryStage;
     private Scene mainView;
-
-    @FXML
-    private HBox rootContainer;
-
-    // LEFT PANEL ELEMENTS
-    @FXML
-    private VBox leftPanel;
-
-    // ADD SEARCH ELEMENTS
-    @FXML
-    private Button searchButton;
 
     @FXML
     private ListView<Note> notesList;
@@ -73,9 +62,6 @@ public class MainCtrl {
     private VBox middlePanel;
 
     @FXML
-    private Label noteEditorLabel;
-
-    @FXML
     private TextArea noteEditor;
 
     @FXML
@@ -84,7 +70,6 @@ public class MainCtrl {
     @FXML
     private Button renderButton;
 
-    // RIGHT PANEL ELEMENTS
     @FXML
     private VBox rightPanel;
 
@@ -102,8 +87,6 @@ public class MainCtrl {
 
     @FXML
     private CheckBox problemsCheckbox;
-
-    private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
 
     /**
      * Initializes the controller.
@@ -136,11 +119,7 @@ public class MainCtrl {
                 .selectedItemProperty()
                 .addListener((obs, oldNote, selectedNote) -> {
                     if (selectedNote != null) {
-
-                        // Change title in the editor
                         noteTitleInput.setText(selectedNote.getTitle());
-
-                        // Change text in the editor
                         noteEditor.setText(selectedNote.getText());
                     }
                 });
@@ -249,25 +228,14 @@ public class MainCtrl {
                 alert.setContentText("The title cannot be empty!");
                 alert.showAndWait();
             } else {
-
-                // Create a new Note object with default empty text
                 Note newNote = new Note(title.trim(), "");
-
-                // Add the new note to the savedNotes list
                 savedNotes.add(newNote);
-
-                // Select the new note in the ListView
                 notesList.getSelectionModel().select(savedNotes.size() - 1);
-
-                // Set the title in editor
                 noteTitleInput.setText(newNote.getTitle());
-
-                // Set the note text in editor
                 noteEditor.setText(newNote.getText());
 
                 // Default message for empty note text
                 renderedNoteView.getEngine().loadContent("The note is empty");
-
                 selectedNoteIndex = savedNotes.size() - 1;
             }
         });
@@ -283,23 +251,22 @@ public class MainCtrl {
         int index = notesList.getSelectionModel().getSelectedIndex();
 
         if (index != -1) {
-            // Show confirmation dialog before deleting
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Delete Note");
             alert.setHeaderText(null);
             alert.setContentText("Are you sure you want to delete this note?");
 
-            // Show the dialog and wait for the response
             Optional<ButtonType> result = alert.showAndWait();
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                // If the user confirms, delete the note
                 savedNotes.remove(index);
                 noteTitleInput.clear();
                 noteEditor.clear();
                 renderedNoteTitleLabel.setText("The title is empty");
                 renderedNoteView.getEngine().loadContent("The note is empty");
-                selectedNoteIndex = -1; // No note selected after deletion
+
+                // No note selected after deletion
+                selectedNoteIndex = -1;
             }
         } else {
             System.out.println("No note selected for deletion");
@@ -346,15 +313,13 @@ public class MainCtrl {
         String title = noteTitleInput.getText().trim();
         String note = noteEditor.getText().trim();
 
-        // Check if inputs are empty and display appropriate messages
         if (title.isEmpty() && note.isEmpty()) {
             renderedNoteTitleLabel.setText("The title is empty");
             renderedNoteView.getEngine().loadContent("The note is empty");
             return;
         } else {
-            // If the title is empty, set a default title
             if (title.isEmpty()) {
-                title = "Untitled Note";  // Default title
+                title = "Untitled Note"; // Default title
                 renderedNoteTitleLabel.setText(title);
             } else {
                 renderedNoteTitleLabel.setText(title);
@@ -367,15 +332,15 @@ public class MainCtrl {
             }
         }
 
-        // If no note is being updated (new note)
         if (selectedNoteIndex == -1) {
+            // If the note has not been created yet, create it
             Note savedNote = new Note(title, note);
-            savedNotes.add(savedNote); // Add to the ObservableList
-            selectedNoteIndex = savedNotes.size() - 1; // Set the index of the newly added note
+            savedNotes.add(savedNote);
+            selectedNoteIndex = savedNotes.size() - 1;
         } else {
-            // Update the existing note
+            // Otherwise, update the existing note
             Note updatedNote = new Note(title, note);
-            savedNotes.set(selectedNoteIndex, updatedNote); // Update the note in the list
+            savedNotes.set(selectedNoteIndex, updatedNote);
         }
     }
 
@@ -442,18 +407,16 @@ public class MainCtrl {
     public void updateTitle(KeyEvent event) {
         String updatedTitle = noteTitleInput.getText();
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
-            //common scenario:
+
         if (selectedNote != null) {
             selectedNote.setTitle(updatedTitle);
             notesList.refresh();
-            //scenario where no note is selected:
         } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) {
             Note newNote = savedNotes.getFirst();
             newNote.setTitle(updatedTitle);
             selectedNoteIndex = 0;
             notesList.getSelectionModel().select(0);
             notesList.refresh();
-            //scenario where there is no note:
         } else if (savedNotes.isEmpty()) {
             Note firstNote = new Note(updatedTitle, "");
             savedNotes.add(firstNote);
