@@ -8,16 +8,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MainControllerTest {
+class MainCtrlTest {
 
-    private MainController sut;
+    private MainCtrl sut;
 
     /**
      * Setting up the Controller for the tests.
      */
     @BeforeEach
     void setup() {
-        sut = new MainController();
+        sut = new MainCtrl();
         sut.setSavedNotes(FXCollections.observableArrayList());
     }
 

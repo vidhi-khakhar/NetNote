@@ -20,7 +20,7 @@ import static com.google.inject.Guice.createInjector;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import client.scenes.MainController;
+import client.scenes.MainCtrl;
 import com.google.inject.Injector;
 
 import client.utils.ServerUtils;
@@ -47,7 +47,7 @@ public class Main extends Application {
             return;
         }
 
-        var mainView = FXML.load(MainController.class, "client", "scenes", "MainView.fxml");
+        var mainView = FXML.load(MainCtrl.class, "client", "scenes", "MainView.fxml");
         primaryStage.setTitle("Main View");
         primaryStage.setScene(new Scene(mainView.getValue()));
         primaryStage.show();

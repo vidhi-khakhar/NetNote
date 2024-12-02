@@ -16,7 +16,7 @@ import javafx.scene.web.WebView;
 import java.util.List;
 import java.util.Optional;
 
-public class MainController{
+public class MainCtrl {
 
     private int selectedNoteIndex  = -1; // Index of the note being edited (-1 means no note is selected).
 
