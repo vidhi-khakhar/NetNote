@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -193,34 +194,27 @@ public class MainCtrl {
         return renderedNoteTitleLabel;
     }
 
-
     /**
      * Toggles the dark mode theme on/off depending on the current theme.
      */
     public void toggleTheme() {
+        URL darkThemeCss = getClass().getResource("/client/scenes/dark-theme.css");
+        URL lightThemeCss = getClass().getResource("/client/scenes/gui.css");
+        if (darkThemeCss == null || lightThemeCss == null) return; //TODO handle null
+
+        String oldForm = isDarkTheme ?
+                darkThemeCss.toExternalForm() :
+                lightThemeCss.toExternalForm();
+        String newForm = isDarkTheme ?
+                lightThemeCss.toExternalForm() :
+                darkThemeCss.toExternalForm();
+
+        mainView.getStylesheets().remove(oldForm);
+        mainView.getStylesheets().add(newForm);
+
         if (isDarkTheme) {
-            // Switch to light theme
-            mainView.getStylesheets()
-                    .remove(getClass()
-                            .getResource("/client/scenes/dark-theme.css")
-                            .toExternalForm());
-            mainView.getStylesheets()
-                    .add(getClass()
-                            .getResource("/client/scenes/gui.css")
-                            .toExternalForm());
             themeToggleButton.setText("🌙");
         } else {
-            // Switch to dark theme
-            mainView.getStylesheets()
-                    .remove(getClass()
-                            .getResource("/client/scenes/gui.css")
-                            .toExternalForm());
-            mainView.getStylesheets()
-                    .add(getClass()
-                            .getResource("/client/scenes/dark-theme.css")
-                            .toExternalForm());
-
-            // Set the sun icon and adjust font size
             themeToggleButton.setText("☀");
             themeToggleButton.setStyle("-fx-font-size: 10px;");
         }
