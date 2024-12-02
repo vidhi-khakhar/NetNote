@@ -1,116 +1,28 @@
 package client.scenes;
 
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.web.WebView;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Scanner;
 
-public class MarkdownCtrl implements Initializable {
-
-    @FXML
-    private TextArea myTextArea;
-
-    @FXML
-    private WebView myWebView;
-
-    @FXML
-    private TextArea problemsTextArea;
-
-    @FXML
-    private CheckBox problemsCheckBox;
-
-    /**
-     * Stores the text currently in the editor
-     */
-
-    private String content = "";
-
-    /**
-     * Made this attribute because for some reason
-     * the program would do the getProblems method twice.
-     */
-
-    private boolean problemChecked = false;
-
-    /**
-     * Initializes the WebView element.
-     * It updates the WebView panel when the TextArea is updated.
-     * @param url not used
-     * @param resourceBundle not used
-     */
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        myTextArea.setWrapText(true);
-        myTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
-            content = newValue;
-            myWebView.getEngine().loadContent(markdownToHtml());
-        });
-    }
+public class MarkdownCtrl{
 
     /**
      * Method that parses a markdown string to html.
+     * @param content String that is being parsed
      * @return html formatted string
      */
 
-    public String markdownToHtml() {
+    public String markdownToHtml(String content) {
         Parser parser = Parser.builder().build();
-        Node document = parser.parse(myTextArea.getText());
+        Node document = parser.parse(content);
         HtmlRenderer renderer = HtmlRenderer.builder().build();
         return renderer.render(document);
-    }
-
-    /**
-     * Method that creates a temporary Html file
-     * from the parsed markdown string.
-     * Saves if you click anywhere in the app
-     * (TextArea, Pane, WebView)
-     * @throws IOException should the file not be found
-     */
-
-    public void saveHtml() throws IOException {
-        File file = new File("markdown.html");
-        FileWriter fileWriter = new FileWriter(file);
-        fileWriter.write(markdownToHtml());
-        fileWriter.close();
-        file.deleteOnExit();
-    }
-
-    /**
-     * This method display the TextArea that contains the List
-     * of Problems in the text editor, if there are any. When the
-     * CheckBox is ticked off, the TextArea dissapears.
-     */
-
-    public void showProblems(){
-        if(problemsCheckBox.isSelected()){
-            problemsTextArea.setVisible(true);
-            List<String> problems = getProblems();
-            for(int i = 0; i < problems.size(); i++){
-                problemsTextArea.appendText(problems.get(i));
-                if(i < problems.size() - 1)
-                    problemsTextArea.appendText("\n");
-            }
-        }
-        else {
-            problemsTextArea.setVisible(false);
-            problemsTextArea.setText("");
-        }
     }
 
     /**
@@ -122,15 +34,12 @@ public class MarkdownCtrl implements Initializable {
      *  <br>4. checks if a space is left between - and the rest of the text,
      *  <br>5. checks if a space is left between # and the rest of the text,
      *  <br>Doesn't check sublists yet(list within a list).
+     * @param content the String it is checking
      * @return List of the problems
      *
      */
 
-    public List<String> getProblems(){
-        if(problemChecked) {
-            problemChecked = false;
-            return new ArrayList<>();
-        }
+    public List<String> getProblems(String content){
         List<String> problems = new ArrayList<>();
         Scanner scanner = new Scanner(content);
         int lineNr = 0;
@@ -152,7 +61,7 @@ public class MarkdownCtrl implements Initializable {
                 problems.add(problem.toString());
             }
 
-            if(hashtagsOnly(line)) {
+            if(hashtagStarterCondition(line) && hashtagsOnly(line)) {
                 MarkdownProblem problem = new MarkdownProblem(lineNr,
                         MarkdownProblemType.HASHTAGS_ONLY);
                 problems.add(problem.toString());
@@ -175,7 +84,6 @@ public class MarkdownCtrl implements Initializable {
             lastLineBlank = line.isBlank();
             lastLine = line;
         }
-        problemChecked = true;
         return problems;
     }
 
@@ -288,8 +196,14 @@ public class MarkdownCtrl implements Initializable {
         if(line.length() == 1)
             if(line.charAt(0) == '#')
                 return true;
-        if(line.charAt(0) == '#' && line.charAt(1) == ' ')
-            return true;
+        for(int i = 0; i < line.length(); i++){
+            if(line.charAt(i) == '#')
+                continue;
+            if(line.charAt(i) == ' ')
+                return true;
+            else
+                return false;
+        }
         if(StringUtils.containsOnly(line, "#"))
             return true;
         return false;
