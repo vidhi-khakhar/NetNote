@@ -1,0 +1,88 @@
+package client.utils.undo;
+
+import java.util.*;
+
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class UndoHandlerTest {
+
+    private UndoHandler sut;
+    private List<String> testData = new ArrayList<>();
+
+    @BeforeEach
+    void setUp() {
+        sut = new UndoHandler(3);
+        testData.add("AB");
+        sut.pushAction(new TestAction(testData, "AB"));
+        testData.add("CD");
+        sut.pushAction(new TestAction(testData, "CD"));
+    }
+
+    @Test
+    void pushActionClearsRemainderOfUndoStack() {
+        try {
+            sut.undoAction();
+            testData.add("EF");
+            sut.pushAction(new TestAction(testData, "EF"));
+            assertThrows(CannotRedoException.class, () -> sut.redoAction());
+        } catch (Exception e) {
+            fail("Should be able to undo/redo");
+        }
+    }
+
+    @Test
+    void undoActionSuccess() {
+        try {
+            sut.undoAction();
+            assertEquals(List.of("AB"), testData);
+        } catch (Exception e) {
+            fail("Should be able to undo/redo");
+        }
+    }
+
+    @Test
+    void undoActionTooManyTimes() {
+        try {
+            sut.undoAction();
+            sut.undoAction();
+            assertThrows(CannotUndoException.class, () -> sut.undoAction());
+        } catch (Exception e) {
+            fail("Should be able to undo/redo");
+        }
+    }
+
+    @Test
+    void undoActionAndRedoAction() {
+        try {
+            sut.undoAction();
+            sut.redoAction();
+            assertEquals(List.of("AB", "CD"), testData);
+        } catch (Exception e) {
+            fail("Should be able to undo/redo");
+        }
+    }
+
+    @Test
+    void undoActionMoreThanThreeTimesFails() { // Because we set the capacity to be 3
+        testData.add("EF");
+        sut.pushAction(new TestAction(testData, "EF"));
+        testData.add("GH");
+        sut.pushAction(new TestAction(testData, "GH"));
+        testData.add("IJ");
+        sut.pushAction(new TestAction(testData, "IJ"));
+        try {
+            sut.undoAction();
+            sut.undoAction();
+            sut.undoAction();
+            assertThrows(CannotUndoException.class, () -> sut.undoAction());
+        } catch (Exception e) {
+            fail("Should be able to undo/redo");
+        }
+    }
+
+    @Test
+    void redoActionWithoutPreviousUndoFails() {
+        assertThrows(CannotRedoException.class, () -> sut.redoAction());
+    }
+}
