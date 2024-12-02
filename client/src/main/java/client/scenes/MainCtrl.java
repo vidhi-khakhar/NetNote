@@ -18,11 +18,11 @@ import java.util.Optional;
 
 public class MainCtrl {
 
-    private int selectedNoteIndex  = -1; // Index of the note being edited (-1 means no note is selected).
+    private int selectedNoteIndex  = -1; // Index of the note being edited
+                                         // (-1 means no note is selected).
 
     @FXML
     private HBox rootContainer;
-
 
     // LEFT PANEL ELEMENTS
     @FXML
@@ -34,11 +34,22 @@ public class MainCtrl {
 
     @FXML
     private ListView<Note> notesList;
-    private ObservableList<Note> savedNotes = FXCollections.observableArrayList(); // To store saved notes.
 
+    // Stores saved notes
+    private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
+
+    /**
+     * Getter for the list of saved notes.
+     * @return The list of saved notes.
+     */
     public ObservableList<Note> getSavedNotes() {
         return savedNotes;
     }
+
+    /**
+     * Setter for the list of saved notes.
+     * @param newNotes The new list of saved notes.
+     */
     public void setSavedNotes(ObservableList<Note> newNotes) {
         this.savedNotes = newNotes;
     }
@@ -58,34 +69,32 @@ public class MainCtrl {
     private VBox middlePanel;
 
     @FXML
-    private Label noteEditor;
+    private Label noteEditorLabel;
 
     @FXML
-    private TextArea inputNote;
+    private TextArea noteEditor;
 
-    public TextArea getInputNote() {
-        return inputNote;
-    }
-
-    public void setInputNote(TextArea inputNote) {
-        this.inputNote = inputNote;
+    /**
+     * Getter for the note editor.
+     * @return An instance of the note editor textarea.
+     */
+    public TextArea getNoteEditor() {
+        return noteEditor;
     }
 
     @FXML
-    private TextField inputTitle;
+    private TextField noteTitleInput;
 
-    public TextField getInputTitle() {
-        return inputTitle;
+    /**
+     * Getter for the note title input box.
+     * @return An instance of the note title input box.
+     */
+    public TextField getNoteTitleInput() {
+        return noteTitleInput;
     }
-
-    public void setInputTitle(TextField inputTitle) {
-        this.inputTitle = inputTitle;
-    }
-
 
     @FXML
     private Button renderButton;
-
 
     // RIGHT PANEL ELEMENTS
     @FXML
@@ -102,13 +111,25 @@ public class MainCtrl {
 
         if (isDarkTheme) {
             // Switch to light theme
-            scene.getStylesheets().remove(getClass().getResource("/client/scenes/dark-theme.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/client/scenes/gui.css").toExternalForm());
+            scene.getStylesheets()
+                    .remove(getClass()
+                            .getResource("/client/scenes/dark-theme.css")
+                            .toExternalForm());
+            scene.getStylesheets()
+                    .add(getClass()
+                            .getResource("/client/scenes/gui.css")
+                            .toExternalForm());
             themeToggleButton.setText("🌙");
         } else {
             // Switch to dark theme
-            scene.getStylesheets().remove(getClass().getResource("/client/scenes/gui.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/client/scenes/dark-theme.css").toExternalForm());
+            scene.getStylesheets()
+                    .remove(getClass()
+                            .getResource("/client/scenes/gui.css")
+                            .toExternalForm());
+            scene.getStylesheets()
+                    .add(getClass()
+                            .getResource("/client/scenes/dark-theme.css")
+                            .toExternalForm());
 
             // Set the sun icon and adjust font size
             themeToggleButton.setText("☀");
@@ -119,44 +140,45 @@ public class MainCtrl {
     }
 
     @FXML
-    private WebView displayNote;
+    private WebView renderedNoteView;
 
-    public WebView getDisplayNote() {
-        return displayNote;
-    }
-
-    public void setDisplayNote(WebView displayNote) {
-        this.displayNote = displayNote;
+    /**
+     * Getter for the rendered note webview.
+     * @return An instance of the rendered note webview.
+     */
+    public WebView getRenderedNoteView() {
+        return renderedNoteView;
     }
 
     @FXML
-    private Label displayTitle;
-    public Label getDisplayTitle() {
-        return displayTitle;
-    }
+    private Label renderedNoteTitleLabel;
 
-    public void setDisplayTitle(Label displayTitle) {
-        this.displayTitle = displayTitle;
+    /**
+     * Getter for the rendered note title label.
+     * @return An instance of the rendered note title label.
+     */
+    public Label getRenderedNoteTitleLabel() {
+        return renderedNoteTitleLabel;
     }
 
     @FXML
     private Button hideEditorButton;
 
     @FXML
-    private CheckBox problemsNote;
+    private CheckBox problemsCheckbox;
 
     private String content = "";
     private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
 
-
-    // METHOD IMPLEMENTATIONS
-    @FXML
+    /**
+     * Initializes the scene.
+     */
     public void initialize() {
 
         notesList.setItems(savedNotes);
 
-
-        // This part was created with the help of generative AI, it makes only the Title of the note appear in ListView
+        // This part was created with the help of generative AI,
+        // it makes only the Title of the note appear in ListView
         notesList.setCellFactory(listView -> new ListCell<>() {
             @Override
             protected void updateItem(Note note, boolean empty) {
@@ -169,16 +191,22 @@ public class MainCtrl {
             }
         });
 
-        notesList.getSelectionModel().selectedItemProperty().addListener((obs, oldNote, selectedNote) -> {
-            if (selectedNote != null) {
-                inputTitle.setText(selectedNote.getTitle()); // Change title in the editor
-                inputNote.setText(selectedNote.getText());  // Change text in the editor
-            }
-        });
+        notesList
+                .getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldNote, selectedNote) -> {
+                    if (selectedNote != null) {
+
+                        // Change title in the editor
+                        noteTitleInput.setText(selectedNote.getTitle());
+
+                        // Change text in the editor
+                        noteEditor.setText(selectedNote.getText());
+                    }
+                });
     }
 
-    /**
-     * JAVADOC:
+    /*
      * The `selectedNoteIndex` variable trackS the index of the currently selected or edited note
      * in the `savedNotes` list.
 
@@ -188,11 +216,12 @@ public class MainCtrl {
      *   `selectedNoteIndex` is modified (`savedNotes.set()`).
 
      * When deleting a note:
-     * The selected index is used to find the note to be removed from the list. The note at that index is removed from the list
+     * The selected index is used to find the note to be removed from the list.
+     * The note at that index gets removed from the list
      *   (`savedNotes.remove()`).
 
      * The `selectedNoteIndex` is reset to `-1` when no note is selected.
-     * **/
+     */
 
     /**
      * Opens a dialog to add a new note.
@@ -202,8 +231,8 @@ public class MainCtrl {
      *
      * @param event the action event triggered by clicking the "+" button
      */
-    @FXML
-    void handleAddNote(ActionEvent event) {
+    @SuppressWarnings("unused")
+    public void handleAddNote(ActionEvent event) {
 
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Note");
@@ -213,6 +242,7 @@ public class MainCtrl {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(title -> {
             if (title.trim().isEmpty()) {
+
                 // Handling the invalid inputs
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Invalid Title");
@@ -220,24 +250,37 @@ public class MainCtrl {
                 alert.setContentText("The title cannot be empty!");
                 alert.showAndWait();
             } else {
-                // Create a new Note object
-                Note newNote = new Note(title.trim(), ""); // Default empty text
 
-                savedNotes.add(newNote);     // Add the new note to the savedNotes list
+                // Create a new Note object with default empty text
+                Note newNote = new Note(title.trim(), "");
 
-                notesList.getSelectionModel().select(savedNotes.size() - 1);  // Select the new note in the ListView
+                // Add the new note to the savedNotes list
+                savedNotes.add(newNote);
 
-                inputTitle.setText(newNote.getTitle()); //Set the title in editor
-                inputNote.setText(newNote.getText());   //Set the note text in editor
-                displayNote.getEngine().loadContent("The note is empty"); // Default message for empty note text
+                // Select the new note in the ListView
+                notesList.getSelectionModel().select(savedNotes.size() - 1);
+
+                // Set the title in editor
+                noteTitleInput.setText(newNote.getTitle());
+
+                // Set the note text in editor
+                noteEditor.setText(newNote.getText());
+
+                // Default message for empty note text
+                renderedNoteView.getEngine().loadContent("The note is empty");
 
                 selectedNoteIndex = savedNotes.size() - 1;
             }
         });
     }
 
-    @FXML
-    void handleDeleteNote(ActionEvent event) {
+    /**
+     * Deletes a note from the list of notes.
+     *
+     * @param event Reference to the action event.
+     */
+    @SuppressWarnings("unused")
+    public void handleDeleteNote(ActionEvent event) {
         int index = notesList.getSelectionModel().getSelectedIndex();
 
         if (index != -1) {
@@ -253,10 +296,10 @@ public class MainCtrl {
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 // If the user confirms, delete the note
                 savedNotes.remove(index);
-                inputTitle.clear();
-                inputNote.clear();
-                displayTitle.setText("The title is empty");
-                displayNote.getEngine().loadContent("The note is empty");
+                noteTitleInput.clear();
+                noteEditor.clear();
+                renderedNoteTitleLabel.setText("The title is empty");
+                renderedNoteView.getEngine().loadContent("The note is empty");
                 selectedNoteIndex = -1; // No note selected after deletion
             }
         } else {
@@ -264,50 +307,64 @@ public class MainCtrl {
         }
     }
 
-    @FXML
-    void handleRefresh(ActionEvent event) {
-
+    /**
+     * Fetches new data from the server
+     *
+     * @param event Reference to the action event
+     */
+    @SuppressWarnings("unused")
+    public void handleRefresh(ActionEvent event) {
+        // TODO
     }
 
-    @FXML
-    void displaySavedNote(MouseEvent event) {
+    /**
+     * Updates the contents of the editor and the rendered view
+     * after the user select a different note to load.
+     *
+     * @param event Reference to the mouse click event.
+     */
+    @SuppressWarnings("unused")
+    public void displaySavedNote(MouseEvent event) {
         int index = notesList.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             Note selectedNote = savedNotes.get(index);
             selectedNoteIndex = index;
 
-            inputTitle.setText(selectedNote.getTitle());
-            inputNote.setText(selectedNote.getText());
+            noteTitleInput.setText(selectedNote.getTitle());
+            noteEditor.setText(selectedNote.getText());
 
-            displayTitle.setText(selectedNote.getTitle());
-            displayNote.getEngine().loadContent(selectedNote.getText());
+            renderedNoteTitleLabel.setText(selectedNote.getTitle());
+            renderedNoteView.getEngine().loadContent(selectedNote.getText());
         }
     }
 
-
-    @FXML
-    void renderNote(MouseEvent event) {
-        String title = inputTitle.getText().trim();
-        String note = inputNote.getText().trim();
+    /**
+     * Provides the rendered view when the "Render!" button is pressed.
+     * @param event Reference to the mouse click event.
+     */
+    @SuppressWarnings("unused")
+    public void renderNote(MouseEvent event) {
+        String title = noteTitleInput.getText().trim();
+        String note = noteEditor.getText().trim();
 
         // Check if inputs are empty and display appropriate messages
         if (title.isEmpty() && note.isEmpty()) {
-            displayTitle.setText("The title is empty");
-            displayNote.getEngine().loadContent("The note is empty");
+            renderedNoteTitleLabel.setText("The title is empty");
+            renderedNoteView.getEngine().loadContent("The note is empty");
             return;
         } else {
             // If the title is empty, set a default title
             if (title.isEmpty()) {
                 title = "Untitled Note";  // Default title
-                displayTitle.setText(title);
+                renderedNoteTitleLabel.setText(title);
             } else {
-                displayTitle.setText(title);
+                renderedNoteTitleLabel.setText(title);
             }
 
             if (note.isEmpty()) {
-                displayNote.getEngine().loadContent("The note is empty");
+                renderedNoteView.getEngine().loadContent("The note is empty");
             } else {
-                displayNote.getEngine().loadContent(note);
+                renderedNoteView.getEngine().loadContent(note);
             }
         }
 
@@ -323,57 +380,68 @@ public class MainCtrl {
         }
     }
 
-
-    @FXML
-    void updateDisplay(KeyEvent event) {
-        inputNote.textProperty().addListener((observable, oldValue, newValue) -> {
+    /**
+     * Adds a listener to the text editor to listen to changes made in the text,
+     * so that they are automatically propagated in the rendered view.
+     *
+     * @param event Reference to the key press event
+     */
+    @SuppressWarnings("unused")
+    public void updateDisplay(KeyEvent event) {
+        noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
-            displayNote.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
+            renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
         });
     }
 
-    public void showProblems(){
+    /**
+     * Displays the problems with Markdown rendering in the webview.
+     */
+    public void showProblems() {
         String renderedContent = markdownCtrl.markdownToHtml(content);
-        if(problemsNote.isSelected()){
-            inputNote.setEditable(false);
+        if(problemsCheckbox.isSelected()){
+            noteEditor.setEditable(false);
             List<String> problems = markdownCtrl.getProblems(content);
-            String result = "";
+            StringBuilder result = new StringBuilder();
             for(int i = 0; i < problems.size(); i++){
-                result += problems.get(i);
+                result.append(problems.get(i));
                 if(i < problems.size() - 1)
-                    result += "\n";
+                    result.append("\n");
             }
-            displayNote.getEngine().loadContent(result);
+            renderedNoteView.getEngine().loadContent(result.toString());
         }
         else{
-            inputNote.setEditable(true);
-            displayNote.getEngine().loadContent(renderedContent);
+            noteEditor.setEditable(true);
+            renderedNoteView.getEngine().loadContent(renderedContent);
         }
     }
 
-    @FXML
-    void hideEditor(MouseEvent event) {
-        if (middlePanel.isVisible()) {
-            // Hide the middle panel
-            middlePanel.setVisible(false);
-
-        } else {
-            // Show the middle panel again
-            middlePanel.setVisible(true);
-        }
-    }
     /**
-     * Updates the title of the selected note with the text entered in the inputTitle field.
-     * This method is triggered whenever the user types or modifies the text in the inputTitle TextField.
+     * Toggles the middle panel of the interface.
+     *
+     * @param event Reference to the mouse click event
+     */
+    @SuppressWarnings("unused")
+    public void toggleEditor(MouseEvent event) {
+        middlePanel.setVisible(!middlePanel.isVisible());
+    }
+
+    /**
+     * Updates the title of the selected note with the text in the inputTitle field.<br>
+     * <br>
+     * This method is triggered whenever the user types or modifies the text
+     * in the inputTitle TextField.<br>
+     * <br>
      * It checks if a note is currently selected in the ListView. If a note is selected,
-     * the title of the note is updated with the text entered by the user in the inputTitle field.
+     * the title of the note is updated with the text entered by the user
+     * in the inputTitle field.<br>
      *
      * @param event it is triggered when the user types in the inputTitle field.
      *              This method listens to key releases in the TextField.
      */
-    @FXML
-    void updateTitle(KeyEvent event) {
-        String updatedTitle = inputTitle.getText();
+    @SuppressWarnings("unused")
+    public void updateTitle(KeyEvent event) {
+        String updatedTitle = noteTitleInput.getText();
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
             //common scenario:
         if (selectedNote != null) {
@@ -381,7 +449,7 @@ public class MainCtrl {
             notesList.refresh();
             //scenario where no note is selected:
         } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) {
-            Note newNote = savedNotes.get(0);
+            Note newNote = savedNotes.getFirst();
             newNote.setTitle(updatedTitle);
             selectedNoteIndex = 0;
             notesList.getSelectionModel().select(0);
@@ -396,5 +464,3 @@ public class MainCtrl {
         }
     }
 }
-
-

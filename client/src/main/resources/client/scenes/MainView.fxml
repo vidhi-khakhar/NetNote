@@ -72,7 +72,7 @@
             </VBox>
             <VBox fx:id="middlePanel" opacity="0.66" prefHeight="500.0" prefWidth="300.0" spacing="10.0" styleClass="middlePanel" HBox.hgrow="ALWAYS">
                <children>
-                  <Label fx:id="noteEditor" style="-fx-font-weight: bold;" text="Note Editor">
+                  <Label fx:id="noteEditorLabel" style="-fx-font-weight: bold;" text="Note Editor">
                      <font>
                         <Font size="18.0" />
                      </font>
@@ -82,7 +82,7 @@
                   </Label>
                   <HBox prefHeight="21.0" prefWidth="234.0">
                      <children>
-                        <TextField fx:id="inputTitle" onKeyReleased="#updateTitle" prefHeight="26.0" prefWidth="230.0" promptText="Title ">
+                        <TextField fx:id="noteTitleInput" onKeyReleased="#updateTitle" prefHeight="26.0" prefWidth="230.0" promptText="Title ">
                            <HBox.margin>
                               <Insets left="5.0" right="5.0" />
                            </HBox.margin>
@@ -92,7 +92,7 @@
                         <Insets bottom="5.0" />
                      </VBox.margin>
                   </HBox>
-                  <TextArea fx:id="inputNote" onKeyReleased="#updateDisplay" prefHeight="278.0" prefWidth="224.0" promptText="Write your notes here..." VBox.vgrow="ALWAYS">
+                  <TextArea fx:id="noteEditor" onKeyReleased="#updateDisplay" prefHeight="278.0" prefWidth="224.0" promptText="Write your notes here..." VBox.vgrow="ALWAYS">
                      <VBox.margin>
                         <Insets left="5.0" right="5.0" />
                      </VBox.margin></TextArea>
@@ -122,7 +122,7 @@
                               <Insets left="5.0" top="5.0" />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="hideEditorButton" maxHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#hideEditor" prefHeight="27.0" prefWidth="27.0" text="👁️‍🗨️">
+                        <Button fx:id="hideEditorButton" maxHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#toggleEditor" prefHeight="27.0" prefWidth="27.0" text="👁️‍🗨️">
                            <HBox.margin>
                               <Insets left="10.0" right="5.0" top="5.0" />
                            </HBox.margin>
@@ -137,7 +137,7 @@
                         </Button>
                      </children>
                   </HBox>
-                  <Label fx:id="displayTitle" prefHeight="18.0" prefWidth="238.0" style="-fx-font-weight: bold;" text="Title of Note">
+                  <Label fx:id="renderedNoteTitleLabel" prefHeight="18.0" prefWidth="238.0" style="-fx-font-weight: bold;" text="Title of Note">
                      <font>
                         <Font size="13.0" />
                      </font>
@@ -145,8 +145,8 @@
                         <Insets left="5.0" right="5.0" />
                      </VBox.margin>
                   </Label>
-                  <CheckBox fx:id="problemsNote" mnemonicParsing="false" onAction="#showProblems" text="Show Problems" />
-                  <WebView fx:id="displayNote" prefHeight="383.0" prefWidth="234.0" />
+                  <CheckBox fx:id="problemsCheckbox" mnemonicParsing="false" onAction="#showProblems" text="Show Problems" />
+                  <WebView fx:id="renderedNoteView" prefHeight="383.0" prefWidth="234.0" />
                </children>
             </VBox>
          </children>
