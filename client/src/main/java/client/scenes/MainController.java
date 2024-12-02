@@ -5,16 +5,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
 
+import java.net.URL;
+import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
-public class MainController {
+public class MainController{
 
     private int selectedNoteIndex  = -1; // Index of the note being edited (-1 means no note is selected).
 
@@ -117,13 +122,13 @@ public class MainController {
     }
 
     @FXML
-    private Label displayNote;
+    private WebView displayNote;
 
-    public Label getDisplayNote() {
+    public WebView getDisplayNote() {
         return displayNote;
     }
 
-    public void setDisplayNote(Label displayNote) {
+    public void setDisplayNote(WebView displayNote) {
         this.displayNote = displayNote;
     }
 
@@ -139,6 +144,12 @@ public class MainController {
 
     @FXML
     private Button hideEditorButton;
+
+    @FXML
+    private CheckBox problemsNote;
+
+    private String content = "";
+    private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
 
 
     // METHOD IMPLEMENTATIONS
@@ -221,7 +232,7 @@ public class MainController {
 
                 inputTitle.setText(newNote.getTitle()); //Set the title in editor
                 inputNote.setText(newNote.getText());   //Set the note text in editor
-                displayNote.setText("The note is empty"); // Default message for empty note text
+                displayNote.getEngine().loadContent("The note is empty"); // Default message for empty note text
 
                 selectedNoteIndex = savedNotes.size() - 1;
             }
@@ -248,7 +259,7 @@ public class MainController {
                 inputTitle.clear();
                 inputNote.clear();
                 displayTitle.setText("The title is empty");
-                displayNote.setText("The note is empty");
+                displayNote.getEngine().loadContent("The note is empty");
                 selectedNoteIndex = -1; // No note selected after deletion
             }
         } else {
@@ -272,7 +283,7 @@ public class MainController {
             inputNote.setText(selectedNote.getText());
 
             displayTitle.setText(selectedNote.getTitle());
-            displayNote.setText(selectedNote.getText());
+            displayNote.getEngine().loadContent(selectedNote.getText());
         }
     }
 
@@ -285,7 +296,7 @@ public class MainController {
         // Check if inputs are empty and display appropriate messages
         if (title.isEmpty() && note.isEmpty()) {
             displayTitle.setText("The title is empty");
-            displayNote.setText("The note is empty");
+            displayNote.getEngine().loadContent("The note is empty");
             return;
         } else {
             // If the title is empty, set a default title
@@ -297,9 +308,9 @@ public class MainController {
             }
 
             if (note.isEmpty()) {
-                displayNote.setText("The note is empty");
+                displayNote.getEngine().loadContent("The note is empty");
             } else {
-                displayNote.setText(note);
+                displayNote.getEngine().loadContent(note);
             }
         }
 
@@ -318,7 +329,29 @@ public class MainController {
 
     @FXML
     void updateDisplay(KeyEvent event) {
+        inputNote.textProperty().addListener((observable, oldValue, newValue) -> {
+            content = newValue;
+            displayNote.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
+        });
+    }
 
+    public void showProblems(){
+        String renderedContent = markdownCtrl.markdownToHtml(content);
+        if(problemsNote.isSelected()){
+            inputNote.setEditable(false);
+            List<String> problems = markdownCtrl.getProblems(content);
+            String result = "";
+            for(int i = 0; i < problems.size(); i++){
+                result += problems.get(i);
+                if(i < problems.size() - 1)
+                    result += "\n";
+            }
+            displayNote.getEngine().loadContent(result);
+        }
+        else{
+            inputNote.setEditable(true);
+            displayNote.getEngine().loadContent(renderedContent);
+        }
     }
 
     @FXML

@@ -49,7 +49,7 @@
 }
 
 /* General Text Styling */
-.text, .label {
+.text, .label, .check-box {
     -fx-text-fill: white; /* Set text color to white */
 }
 

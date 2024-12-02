@@ -23,7 +23,6 @@ import java.net.URISyntaxException;
 import client.scenes.MainController;
 import com.google.inject.Injector;
 
-import client.scenes.MainCtrl;
 import client.utils.ServerUtils;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -48,11 +47,9 @@ public class Main extends Application {
             return;
         }
 
-        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        //mainCtrl.initialize(primaryStage);
-        var mainView = FXML.load(MainController.class, "client", "scenes", "client/scenes/MainView.fxml");
+        var mainView = FXML.load(MainController.class, "client", "scenes", "MainView.fxml");
         primaryStage.setTitle("Main View");
-        primaryStage.setScene(new Scene(mainView.getValue(), 300, 275));
+        primaryStage.setScene(new Scene(mainView.getValue()));
         primaryStage.show();
     }
 }
