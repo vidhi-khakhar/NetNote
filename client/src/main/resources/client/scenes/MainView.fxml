@@ -55,7 +55,7 @@
                               <Font size="14.0" />
                            </font>
                         </Button>
-                        <Button fx:id="refreshButton" layoutX="35.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRefresh" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold;" text="⟳">
+                        <Button fx:id="refreshButton" layoutX="35.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold;" text="⟳">
                            <HBox.margin>
                               <Insets left="5.0" right="10.0" />
                            </HBox.margin>

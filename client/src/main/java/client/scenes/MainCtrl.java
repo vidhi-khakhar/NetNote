@@ -12,14 +12,38 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Optional;
 
 public class MainCtrl {
 
+    /**
+     * The {@code selectedNoteIndex} variable tracks the index of the currently selected or
+     * edited note in the {@code savedNotes} list.<br>
+     * <br>
+     * When rendering a note (i.e., displaying its title and content in the display fields):<br>
+     * If {@code selectedNoteIndex == -1},  no note is being edited, and thus a new note
+     * is ADDED<br>
+     * If {@code selectedNoteIndex != -1}, an existing note is being updated, and the note at the
+     *   {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
+     * <br>
+     * When deleting a note:<br>
+     * The selected index is used to find the note to be removed from the list.<br>
+     * The note at that index gets removed from the list
+     *   ({@code savedNotes.remove()}).<br>
+     * <br>
+     * The {@code selectedNoteIndex} is reset to {@code -1} when no note is selected.
+     **/
     private int selectedNoteIndex  = -1; // Index of the note being edited
                                          // (-1 means no note is selected).
+    private boolean isDarkTheme = false; // Track the current theme
+    private String content = "";
+    private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
+
+    private Stage primaryStage;
+    private Scene mainView;
 
     @FXML
     private HBox rootContainer;
@@ -35,25 +59,6 @@ public class MainCtrl {
     @FXML
     private ListView<Note> notesList;
 
-    // Stores saved notes
-    private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
-
-    /**
-     * Getter for the list of saved notes.
-     * @return The list of saved notes.
-     */
-    public ObservableList<Note> getSavedNotes() {
-        return savedNotes;
-    }
-
-    /**
-     * Setter for the list of saved notes.
-     * @param newNotes The new list of saved notes.
-     */
-    public void setSavedNotes(ObservableList<Note> newNotes) {
-        this.savedNotes = newNotes;
-    }
-
     @FXML
     private Button addButton;
 
@@ -63,8 +68,6 @@ public class MainCtrl {
     @FXML
     private Button refreshButton;
 
-
-    // MIDDLE PANEL ELEMENTS
     @FXML
     private VBox middlePanel;
 
@@ -74,24 +77,8 @@ public class MainCtrl {
     @FXML
     private TextArea noteEditor;
 
-    /**
-     * Getter for the note editor.
-     * @return An instance of the note editor textarea.
-     */
-    public TextArea getNoteEditor() {
-        return noteEditor;
-    }
-
     @FXML
     private TextField noteTitleInput;
-
-    /**
-     * Getter for the note title input box.
-     * @return An instance of the note title input box.
-     */
-    public TextField getNoteTitleInput() {
-        return noteTitleInput;
-    }
 
     @FXML
     private Button renderButton;
@@ -103,63 +90,11 @@ public class MainCtrl {
     @FXML
     private Button themeToggleButton;
 
-    private boolean isDarkTheme = false; // Track the current theme
-
-    @FXML
-    void toggleTheme() {
-        Scene scene = themeToggleButton.getScene();
-
-        if (isDarkTheme) {
-            // Switch to light theme
-            scene.getStylesheets()
-                    .remove(getClass()
-                            .getResource("/client/scenes/dark-theme.css")
-                            .toExternalForm());
-            scene.getStylesheets()
-                    .add(getClass()
-                            .getResource("/client/scenes/gui.css")
-                            .toExternalForm());
-            themeToggleButton.setText("🌙");
-        } else {
-            // Switch to dark theme
-            scene.getStylesheets()
-                    .remove(getClass()
-                            .getResource("/client/scenes/gui.css")
-                            .toExternalForm());
-            scene.getStylesheets()
-                    .add(getClass()
-                            .getResource("/client/scenes/dark-theme.css")
-                            .toExternalForm());
-
-            // Set the sun icon and adjust font size
-            themeToggleButton.setText("☀");
-            themeToggleButton.setStyle("-fx-font-size: 10px;");
-        }
-
-        isDarkTheme = !isDarkTheme;
-    }
-
     @FXML
     private WebView renderedNoteView;
 
-    /**
-     * Getter for the rendered note webview.
-     * @return An instance of the rendered note webview.
-     */
-    public WebView getRenderedNoteView() {
-        return renderedNoteView;
-    }
-
     @FXML
     private Label renderedNoteTitleLabel;
-
-    /**
-     * Getter for the rendered note title label.
-     * @return An instance of the rendered note title label.
-     */
-    public Label getRenderedNoteTitleLabel() {
-        return renderedNoteTitleLabel;
-    }
 
     @FXML
     private Button hideEditorButton;
@@ -167,13 +102,17 @@ public class MainCtrl {
     @FXML
     private CheckBox problemsCheckbox;
 
-    private String content = "";
-    private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
+    private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
 
     /**
-     * Initializes the scene.
+     * Initializes the controller.
+     *
+     * @param primaryStage Reference to the primary stage.
+     * @param mainView Holds a reference to the mainView scene.
      */
-    public void initialize() {
+    public void initialize(Stage primaryStage, Scene mainView) {
+
+        this.mainView = mainView;
 
         notesList.setItems(savedNotes);
 
@@ -206,22 +145,88 @@ public class MainCtrl {
                 });
     }
 
-    /*
-     * The `selectedNoteIndex` variable trackS the index of the currently selected or edited note
-     * in the `savedNotes` list.
-
-     * When rendering a note (i.e., displaying its title and content in the display fields):
-     * If `selectedNoteIndex == -1`,  no note is being edited, and thus a new note is ADDED
-     * If `selectedNoteIndex != -1`, an existing note is being updated, and the note at the
-     *   `selectedNoteIndex` is modified (`savedNotes.set()`).
-
-     * When deleting a note:
-     * The selected index is used to find the note to be removed from the list.
-     * The note at that index gets removed from the list
-     *   (`savedNotes.remove()`).
-
-     * The `selectedNoteIndex` is reset to `-1` when no note is selected.
+    /**
+     * Getter for the list of saved notes.
+     * @return The list of saved notes.
      */
+    public ObservableList<Note> getSavedNotes() {
+        return savedNotes;
+    }
+
+    /**
+     * Setter for the list of saved notes.
+     * @param newNotes The new list of saved notes.
+     */
+    public void setSavedNotes(ObservableList<Note> newNotes) {
+        this.savedNotes = newNotes;
+    }
+
+    /**
+     * Getter for the note editor.
+     * @return An instance of the note editor textarea.
+     */
+    public TextArea getNoteEditor() {
+        return noteEditor;
+    }
+
+    /**
+     * Getter for the note title input box.
+     * @return An instance of the note title input box.
+     */
+    public TextField getNoteTitleInput() {
+        return noteTitleInput;
+    }
+
+    /**
+     * Getter for the rendered note webview.
+     * @return An instance of the rendered note webview.
+     */
+    public WebView getRenderedNoteView() {
+        return renderedNoteView;
+    }
+
+    /**
+     * Getter for the rendered note title label.
+     * @return An instance of the rendered note title label.
+     */
+    public Label getRenderedNoteTitleLabel() {
+        return renderedNoteTitleLabel;
+    }
+
+
+    /**
+     * Toggles the dark mode theme on/off depending on the current theme.
+     */
+    public void toggleTheme() {
+        if (isDarkTheme) {
+            // Switch to light theme
+            mainView.getStylesheets()
+                    .remove(getClass()
+                            .getResource("/client/scenes/dark-theme.css")
+                            .toExternalForm());
+            mainView.getStylesheets()
+                    .add(getClass()
+                            .getResource("/client/scenes/gui.css")
+                            .toExternalForm());
+            themeToggleButton.setText("🌙");
+        } else {
+            // Switch to dark theme
+            mainView.getStylesheets()
+                    .remove(getClass()
+                            .getResource("/client/scenes/gui.css")
+                            .toExternalForm());
+            mainView.getStylesheets()
+                    .add(getClass()
+                            .getResource("/client/scenes/dark-theme.css")
+                            .toExternalForm());
+
+            // Set the sun icon and adjust font size
+            themeToggleButton.setText("☀");
+            themeToggleButton.setStyle("-fx-font-size: 10px;");
+        }
+
+        isDarkTheme = !isDarkTheme;
+    }
 
     /**
      * Opens a dialog to add a new note.
@@ -313,7 +318,7 @@ public class MainCtrl {
      * @param event Reference to the action event
      */
     @SuppressWarnings("unused")
-    public void handleRefresh(ActionEvent event) {
+    public void handleRefreshNote(ActionEvent event) {
         // TODO
     }
 
