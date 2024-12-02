@@ -49,7 +49,7 @@ public class Main extends Application {
 
         var mainView = FXML.load(MainCtrl.class, "client", "scenes", "MainView.fxml");
         var mainViewScene = new Scene(mainView.getValue());
-        primaryStage.setTitle("Main View");
+        primaryStage.setTitle("NetNote");
         primaryStage.setScene(mainViewScene);
         primaryStage.show();
 

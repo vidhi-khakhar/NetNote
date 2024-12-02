@@ -3,12 +3,9 @@ package client.scenes;
 import commons.Note;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -96,13 +93,14 @@ public class MainCtrl {
      */
     public void initialize(Stage primaryStage, Scene mainView) {
 
+        this.primaryStage = primaryStage;
         this.mainView = mainView;
 
         notesList.setItems(savedNotes);
 
         // This part was created with the help of generative AI,
         // it makes only the Title of the note appear in ListView
-        notesList.setCellFactory(listView -> new ListCell<>() {
+        notesList.setCellFactory(_ -> new ListCell<>() {
             @Override
             protected void updateItem(Note note, boolean empty) {
                 super.updateItem(note, empty);
@@ -117,7 +115,7 @@ public class MainCtrl {
         notesList
                 .getSelectionModel()
                 .selectedItemProperty()
-                .addListener((obs, oldNote, selectedNote) -> {
+                .addListener((_, _, selectedNote) -> {
                     if (selectedNote != null) {
                         noteTitleInput.setText(selectedNote.getTitle());
                         noteEditor.setText(selectedNote.getText());
@@ -206,11 +204,8 @@ public class MainCtrl {
      * This method shows a small input dialog asking the user to enter a note title.
      * If the title is valid (not empty), it adds the title to the list of notes.
      * If the title is empty, an error message is displayed.
-     *
-     * @param event the action event triggered by clicking the "+" button
      */
-    @SuppressWarnings("unused")
-    public void handleAddNote(ActionEvent event) {
+    public void handleAddNote() {
 
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Note");
@@ -243,11 +238,8 @@ public class MainCtrl {
 
     /**
      * Deletes a note from the list of notes.
-     *
-     * @param event Reference to the action event.
      */
-    @SuppressWarnings("unused")
-    public void handleDeleteNote(ActionEvent event) {
+    public void handleDeleteNote() {
         int index = notesList.getSelectionModel().getSelectedIndex();
 
         if (index != -1) {
@@ -275,22 +267,16 @@ public class MainCtrl {
 
     /**
      * Fetches new data from the server
-     *
-     * @param event Reference to the action event
      */
-    @SuppressWarnings("unused")
-    public void handleRefreshNote(ActionEvent event) {
+    public void handleRefreshNote() {
         // TODO
     }
 
     /**
      * Updates the contents of the editor and the rendered view
      * after the user select a different note to load.
-     *
-     * @param event Reference to the mouse click event.
      */
-    @SuppressWarnings("unused")
-    public void displaySavedNote(MouseEvent event) {
+    public void displaySavedNote() {
         int index = notesList.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             Note selectedNote = savedNotes.get(index);
@@ -306,10 +292,8 @@ public class MainCtrl {
 
     /**
      * Provides the rendered view when the "Render!" button is pressed.
-     * @param event Reference to the mouse click event.
      */
-    @SuppressWarnings("unused")
-    public void renderNote(MouseEvent event) {
+    public void renderNote() {
         String title = noteTitleInput.getText().trim();
         String note = noteEditor.getText().trim();
 
@@ -347,11 +331,8 @@ public class MainCtrl {
     /**
      * Adds a listener to the text editor to listen to changes made in the text,
      * so that they are automatically propagated in the rendered view.
-     *
-     * @param event Reference to the key press event
      */
-    @SuppressWarnings("unused")
-    public void updateDisplay(KeyEvent event) {
+    public void updateDisplay() {
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
             renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
@@ -382,11 +363,8 @@ public class MainCtrl {
 
     /**
      * Toggles the middle panel of the interface.
-     *
-     * @param event Reference to the mouse click event
      */
-    @SuppressWarnings("unused")
-    public void toggleEditor(MouseEvent event) {
+    public void toggleEditor() {
         middlePanel.setVisible(!middlePanel.isVisible());
     }
 
@@ -399,12 +377,8 @@ public class MainCtrl {
      * It checks if a note is currently selected in the ListView. If a note is selected,
      * the title of the note is updated with the text entered by the user
      * in the inputTitle field.<br>
-     *
-     * @param event it is triggered when the user types in the inputTitle field.
-     *              This method listens to key releases in the TextField.
      */
-    @SuppressWarnings("unused")
-    public void updateTitle(KeyEvent event) {
+    public void updateTitle() {
         String updatedTitle = noteTitleInput.getText();
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
