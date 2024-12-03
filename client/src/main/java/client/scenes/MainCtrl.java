@@ -3,45 +3,48 @@ package client.scenes;
 import commons.Note;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
 public class MainCtrl {
 
-    private int selectedNoteIndex  = -1; // Index of the note being edited (-1 means no note is selected).
+    /**
+     * The {@code selectedNoteIndex} variable tracks the index of the currently selected or
+     * edited note in the {@code savedNotes} list.<br>
+     * <br>
+     * When rendering a note (i.e., displaying its title and content in the display fields):<br>
+     * If {@code selectedNoteIndex == -1},  no note is being edited, and thus a new note
+     * is ADDED<br>
+     * If {@code selectedNoteIndex != -1}, an existing note is being updated, and the note at the
+     *   {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
+     * <br>
+     * When deleting a note:<br>
+     * The selected index is used to find the note to be removed from the list.<br>
+     * The note at that index gets removed from the list
+     *   ({@code savedNotes.remove()}).<br>
+     * <br>
+     * The {@code selectedNoteIndex} is reset to {@code -1} when no note is selected.
+     **/
+    private int selectedNoteIndex  = -1; // Index of the note being edited
+                                         // (-1 means no note is selected).
+    private boolean isDarkTheme = false; // Track the current theme
+    private String content = "";
+    private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
+    private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
 
-    @FXML
-    private HBox rootContainer;
-
-
-    // LEFT PANEL ELEMENTS
-    @FXML
-    private VBox leftPanel;
-
-    // ADD SEARCH ELEMENTS
-    @FXML
-    private Button searchButton;
+    private Stage primaryStage;
+    private Scene mainView;
 
     @FXML
     private ListView<Note> notesList;
-    private ObservableList<Note> savedNotes = FXCollections.observableArrayList(); // To store saved notes.
-
-    public ObservableList<Note> getSavedNotes() {
-        return savedNotes;
-    }
-    public void setSavedNotes(ObservableList<Note> newNotes) {
-        this.savedNotes = newNotes;
-    }
 
     @FXML
     private Button addButton;
@@ -52,112 +55,52 @@ public class MainCtrl {
     @FXML
     private Button refreshButton;
 
-
-    // MIDDLE PANEL ELEMENTS
     @FXML
     private VBox middlePanel;
 
     @FXML
-    private Label noteEditor;
+    private TextArea noteEditor;
 
     @FXML
-    private TextArea inputNote;
-
-    public TextArea getInputNote() {
-        return inputNote;
-    }
-
-    public void setInputNote(TextArea inputNote) {
-        this.inputNote = inputNote;
-    }
-
-    @FXML
-    private TextField inputTitle;
-
-    public TextField getInputTitle() {
-        return inputTitle;
-    }
-
-    public void setInputTitle(TextField inputTitle) {
-        this.inputTitle = inputTitle;
-    }
-
+    private TextField noteTitleInput;
 
     @FXML
     private Button renderButton;
 
-
-    // RIGHT PANEL ELEMENTS
     @FXML
     private VBox rightPanel;
 
     @FXML
     private Button themeToggleButton;
 
-    private boolean isDarkTheme = false; // Track the current theme
+    @FXML
+    private WebView renderedNoteView;
 
     @FXML
-    void toggleTheme() {
-        Scene scene = themeToggleButton.getScene();
-
-        if (isDarkTheme) {
-            // Switch to light theme
-            scene.getStylesheets().remove(getClass().getResource("/client/scenes/dark-theme.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/client/scenes/gui.css").toExternalForm());
-            themeToggleButton.setText("🌙");
-        } else {
-            // Switch to dark theme
-            scene.getStylesheets().remove(getClass().getResource("/client/scenes/gui.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/client/scenes/dark-theme.css").toExternalForm());
-
-            // Set the sun icon and adjust font size
-            themeToggleButton.setText("☀");
-            themeToggleButton.setStyle("-fx-font-size: 10px;");
-        }
-
-        isDarkTheme = !isDarkTheme;
-    }
-
-    @FXML
-    private WebView displayNote;
-
-    public WebView getDisplayNote() {
-        return displayNote;
-    }
-
-    public void setDisplayNote(WebView displayNote) {
-        this.displayNote = displayNote;
-    }
-
-    @FXML
-    private Label displayTitle;
-    public Label getDisplayTitle() {
-        return displayTitle;
-    }
-
-    public void setDisplayTitle(Label displayTitle) {
-        this.displayTitle = displayTitle;
-    }
+    private Label renderedNoteTitleLabel;
 
     @FXML
     private Button hideEditorButton;
 
     @FXML
-    private CheckBox problemsNote;
+    private CheckBox problemsCheckbox;
 
-    private String content = "";
-    private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
+    /**
+     * Initializes the controller.
+     *
+     * @param primaryStage Reference to the primary stage.
+     * @param mainView Holds a reference to the mainView scene.
+     */
+    public void initialize(Stage primaryStage, Scene mainView) {
 
-
-    // METHOD IMPLEMENTATIONS
-    @FXML
-    public void initialize() {
+        this.primaryStage = primaryStage;
+        this.mainView = mainView;
 
         notesList.setItems(savedNotes);
 
-
-        // This part was created with the help of generative AI, it makes only the Title of the note appear in ListView
-        notesList.setCellFactory(listView -> new ListCell<>() {
+        // This part was created with the help of generative AI,
+        // it makes only the Title of the note appear in ListView
+        notesList.setCellFactory(_ -> new ListCell<>() {
             @Override
             protected void updateItem(Note note, boolean empty) {
                 super.updateItem(note, empty);
@@ -169,41 +112,100 @@ public class MainCtrl {
             }
         });
 
-        notesList.getSelectionModel().selectedItemProperty().addListener((obs, oldNote, selectedNote) -> {
-            if (selectedNote != null) {
-                inputTitle.setText(selectedNote.getTitle()); // Change title in the editor
-                inputNote.setText(selectedNote.getText());  // Change text in the editor
-            }
-        });
+        notesList
+                .getSelectionModel()
+                .selectedItemProperty()
+                .addListener((_, _, selectedNote) -> {
+                    if (selectedNote != null) {
+                        noteTitleInput.setText(selectedNote.getTitle());
+                        noteEditor.setText(selectedNote.getText());
+                    }
+                });
     }
 
     /**
-     * JAVADOC:
-     * The `selectedNoteIndex` variable trackS the index of the currently selected or edited note
-     * in the `savedNotes` list.
+     * Getter for the list of saved notes.
+     * @return The list of saved notes.
+     */
+    public ObservableList<Note> getSavedNotes() {
+        return savedNotes;
+    }
 
-     * When rendering a note (i.e., displaying its title and content in the display fields):
-     * If `selectedNoteIndex == -1`,  no note is being edited, and thus a new note is ADDED
-     * If `selectedNoteIndex != -1`, an existing note is being updated, and the note at the
-     *   `selectedNoteIndex` is modified (`savedNotes.set()`).
+    /**
+     * Setter for the list of saved notes.
+     * @param newNotes The new list of saved notes.
+     */
+    public void setSavedNotes(ObservableList<Note> newNotes) {
+        this.savedNotes = newNotes;
+    }
 
-     * When deleting a note:
-     * The selected index is used to find the note to be removed from the list. The note at that index is removed from the list
-     *   (`savedNotes.remove()`).
+    /**
+     * Getter for the note editor.
+     * @return An instance of the note editor textarea.
+     */
+    public TextArea getNoteEditor() {
+        return noteEditor;
+    }
 
-     * The `selectedNoteIndex` is reset to `-1` when no note is selected.
-     * **/
+    /**
+     * Getter for the note title input box.
+     * @return An instance of the note title input box.
+     */
+    public TextField getNoteTitleInput() {
+        return noteTitleInput;
+    }
+
+    /**
+     * Getter for the rendered note webview.
+     * @return An instance of the rendered note webview.
+     */
+    public WebView getRenderedNoteView() {
+        return renderedNoteView;
+    }
+
+    /**
+     * Getter for the rendered note title label.
+     * @return An instance of the rendered note title label.
+     */
+    public Label getRenderedNoteTitleLabel() {
+        return renderedNoteTitleLabel;
+    }
+
+    /**
+     * Toggles the dark mode theme on/off depending on the current theme.
+     */
+    public void toggleTheme() {
+        URL darkThemeCss = getClass().getResource("/client/scenes/dark-theme.css");
+        URL lightThemeCss = getClass().getResource("/client/scenes/gui.css");
+        if (darkThemeCss == null || lightThemeCss == null) return; //TODO handle null
+
+        String oldForm = isDarkTheme ?
+                darkThemeCss.toExternalForm() :
+                lightThemeCss.toExternalForm();
+        String newForm = isDarkTheme ?
+                lightThemeCss.toExternalForm() :
+                darkThemeCss.toExternalForm();
+
+        mainView.getStylesheets().remove(oldForm);
+        mainView.getStylesheets().add(newForm);
+
+        if (isDarkTheme) {
+            themeToggleButton.setText("🌙");
+        } else {
+            themeToggleButton.setText("☀");
+            themeToggleButton.setStyle("-fx-font-size: 10px;");
+        }
+
+        isDarkTheme = !isDarkTheme;
+    }
 
     /**
      * Opens a dialog to add a new note.
      * This method shows a small input dialog asking the user to enter a note title.
      * If the title is valid (not empty), it adds the title to the list of notes.
      * If the title is empty, an error message is displayed.
-     *
-     * @param event the action event triggered by clicking the "+" button
      */
-    @FXML
-    void handleAddNote(ActionEvent event) {
+    public void handleAddNote() {
 
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Note");
@@ -213,6 +215,7 @@ public class MainCtrl {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(title -> {
             if (title.trim().isEmpty()) {
+
                 // Handling the invalid inputs
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Invalid Title");
@@ -220,173 +223,174 @@ public class MainCtrl {
                 alert.setContentText("The title cannot be empty!");
                 alert.showAndWait();
             } else {
-                // Create a new Note object
-                Note newNote = new Note(title.trim(), ""); // Default empty text
+                Note newNote = new Note(title.trim(), "");
+                savedNotes.add(newNote);
+                notesList.getSelectionModel().select(savedNotes.size() - 1);
+                noteTitleInput.setText(newNote.getTitle());
+                noteEditor.setText(newNote.getText());
 
-                savedNotes.add(newNote);     // Add the new note to the savedNotes list
-
-                notesList.getSelectionModel().select(savedNotes.size() - 1);  // Select the new note in the ListView
-
-                inputTitle.setText(newNote.getTitle()); //Set the title in editor
-                inputNote.setText(newNote.getText());   //Set the note text in editor
-                displayNote.getEngine().loadContent("The note is empty"); // Default message for empty note text
-
+                // Default message for empty note text
+                renderedNoteView.getEngine().loadContent("The note is empty");
                 selectedNoteIndex = savedNotes.size() - 1;
             }
         });
     }
 
-    @FXML
-    void handleDeleteNote(ActionEvent event) {
+    /**
+     * Deletes a note from the list of notes.
+     */
+    public void handleDeleteNote() {
         int index = notesList.getSelectionModel().getSelectedIndex();
 
         if (index != -1) {
-            // Show confirmation dialog before deleting
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Delete Note");
             alert.setHeaderText(null);
             alert.setContentText("Are you sure you want to delete this note?");
 
-            // Show the dialog and wait for the response
             Optional<ButtonType> result = alert.showAndWait();
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                // If the user confirms, delete the note
                 savedNotes.remove(index);
-                inputTitle.clear();
-                inputNote.clear();
-                displayTitle.setText("The title is empty");
-                displayNote.getEngine().loadContent("The note is empty");
-                selectedNoteIndex = -1; // No note selected after deletion
+                noteTitleInput.clear();
+                noteEditor.clear();
+                renderedNoteTitleLabel.setText("The title is empty");
+                renderedNoteView.getEngine().loadContent("The note is empty");
+
+                // No note selected after deletion
+                selectedNoteIndex = -1;
             }
         } else {
             System.out.println("No note selected for deletion");
         }
     }
 
-    @FXML
-    void handleRefresh(ActionEvent event) {
-
+    /**
+     * Fetches new data from the server
+     */
+    public void handleRefreshNote() {
+        // TODO
     }
 
-    @FXML
-    void displaySavedNote(MouseEvent event) {
+    /**
+     * Updates the contents of the editor and the rendered view
+     * after the user select a different note to load.
+     */
+    public void displaySavedNote() {
         int index = notesList.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             Note selectedNote = savedNotes.get(index);
             selectedNoteIndex = index;
 
-            inputTitle.setText(selectedNote.getTitle());
-            inputNote.setText(selectedNote.getText());
+            noteTitleInput.setText(selectedNote.getTitle());
+            noteEditor.setText(selectedNote.getText());
 
-            displayTitle.setText(selectedNote.getTitle());
-            displayNote.getEngine().loadContent(selectedNote.getText());
+            renderedNoteTitleLabel.setText(selectedNote.getTitle());
+            renderedNoteView.getEngine().loadContent(selectedNote.getText());
         }
     }
 
+    /**
+     * Provides the rendered view when the "Render!" button is pressed.
+     */
+    public void renderNote() {
+        String title = noteTitleInput.getText().trim();
+        String note = noteEditor.getText().trim();
 
-    @FXML
-    void renderNote(MouseEvent event) {
-        String title = inputTitle.getText().trim();
-        String note = inputNote.getText().trim();
-
-        // Check if inputs are empty and display appropriate messages
         if (title.isEmpty() && note.isEmpty()) {
-            displayTitle.setText("The title is empty");
-            displayNote.getEngine().loadContent("The note is empty");
+            renderedNoteTitleLabel.setText("The title is empty");
+            renderedNoteView.getEngine().loadContent("The note is empty");
             return;
         } else {
-            // If the title is empty, set a default title
             if (title.isEmpty()) {
-                title = "Untitled Note";  // Default title
-                displayTitle.setText(title);
+                title = "Untitled Note"; // Default title
+                renderedNoteTitleLabel.setText(title);
             } else {
-                displayTitle.setText(title);
+                renderedNoteTitleLabel.setText(title);
             }
 
             if (note.isEmpty()) {
-                displayNote.getEngine().loadContent("The note is empty");
+                renderedNoteView.getEngine().loadContent("The note is empty");
             } else {
-                displayNote.getEngine().loadContent(note);
+                renderedNoteView.getEngine().loadContent(note);
             }
         }
 
-        // If no note is being updated (new note)
         if (selectedNoteIndex == -1) {
+            // If the note has not been created yet, create it
             Note savedNote = new Note(title, note);
-            savedNotes.add(savedNote); // Add to the ObservableList
-            selectedNoteIndex = savedNotes.size() - 1; // Set the index of the newly added note
+            savedNotes.add(savedNote);
+            selectedNoteIndex = savedNotes.size() - 1;
         } else {
-            // Update the existing note
+            // Otherwise, update the existing note
             Note updatedNote = new Note(title, note);
-            savedNotes.set(selectedNoteIndex, updatedNote); // Update the note in the list
+            savedNotes.set(selectedNoteIndex, updatedNote);
         }
     }
 
-
-    @FXML
-    void updateDisplay(KeyEvent event) {
-        inputNote.textProperty().addListener((observable, oldValue, newValue) -> {
+    /**
+     * Adds a listener to the text editor to listen to changes made in the text,
+     * so that they are automatically propagated in the rendered view.
+     */
+    public void updateDisplay() {
+        noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
-            displayNote.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
+            renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
         });
     }
 
-    public void showProblems(){
+    /**
+     * Displays the problems with Markdown rendering in the webview.
+     */
+    public void showProblems() {
         String renderedContent = markdownCtrl.markdownToHtml(content);
-        if(problemsNote.isSelected()){
-            inputNote.setEditable(false);
+        if(problemsCheckbox.isSelected()){
+            noteEditor.setEditable(false);
             List<String> problems = markdownCtrl.getProblems(content);
-            String result = "";
+            StringBuilder result = new StringBuilder();
             for(int i = 0; i < problems.size(); i++){
-                result += problems.get(i);
+                result.append(problems.get(i));
                 if(i < problems.size() - 1)
-                    result += "\n";
+                    result.append("\n");
             }
-            displayNote.getEngine().loadContent(result);
+            renderedNoteView.getEngine().loadContent(result.toString());
         }
         else{
-            inputNote.setEditable(true);
-            displayNote.getEngine().loadContent(renderedContent);
+            noteEditor.setEditable(true);
+            renderedNoteView.getEngine().loadContent(renderedContent);
         }
     }
 
-    @FXML
-    void hideEditor(MouseEvent event) {
-        if (middlePanel.isVisible()) {
-            // Hide the middle panel
-            middlePanel.setVisible(false);
-
-        } else {
-            // Show the middle panel again
-            middlePanel.setVisible(true);
-        }
-    }
     /**
-     * Updates the title of the selected note with the text entered in the inputTitle field.
-     * This method is triggered whenever the user types or modifies the text in the inputTitle TextField.
-     * It checks if a note is currently selected in the ListView. If a note is selected,
-     * the title of the note is updated with the text entered by the user in the inputTitle field.
-     *
-     * @param event it is triggered when the user types in the inputTitle field.
-     *              This method listens to key releases in the TextField.
+     * Toggles the middle panel of the interface.
      */
-    @FXML
-    void updateTitle(KeyEvent event) {
-        String updatedTitle = inputTitle.getText();
+    public void toggleEditor() {
+        middlePanel.setVisible(!middlePanel.isVisible());
+    }
+
+    /**
+     * Updates the title of the selected note with the text in the inputTitle field.<br>
+     * <br>
+     * This method is triggered whenever the user types or modifies the text
+     * in the inputTitle TextField.<br>
+     * <br>
+     * It checks if a note is currently selected in the ListView. If a note is selected,
+     * the title of the note is updated with the text entered by the user
+     * in the inputTitle field.<br>
+     */
+    public void updateTitle() {
+        String updatedTitle = noteTitleInput.getText();
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
-            //common scenario:
+
         if (selectedNote != null) {
             selectedNote.setTitle(updatedTitle);
             notesList.refresh();
-            //scenario where no note is selected:
         } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) {
-            Note newNote = savedNotes.get(0);
+            Note newNote = savedNotes.getFirst();
             newNote.setTitle(updatedTitle);
             selectedNoteIndex = 0;
             notesList.getSelectionModel().select(0);
             notesList.refresh();
-            //scenario where there is no note:
         } else if (savedNotes.isEmpty()) {
             Note firstNote = new Note(updatedTitle, "");
             savedNotes.add(firstNote);
@@ -396,5 +400,3 @@ public class MainCtrl {
         }
     }
 }
-
-
