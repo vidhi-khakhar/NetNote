@@ -4,6 +4,8 @@ import client.scenes.MainCtrl;
 import commons.Note;
 
 public record DeleteNoteAction(Note deletedNote,
+                               String originalTitle,
+                               String originalText,
                                int selectedNoteIndex,
                                MainCtrl mainCtrl) implements ClientAction {
 
@@ -19,7 +21,10 @@ public record DeleteNoteAction(Note deletedNote,
      * Redoes the previously undone note deletion
      */
     @Override
-    public void redo() {
-        // TODO
+    public void redo() throws CannotRedoException {
+        if (!deletedNote.getText().equals(originalText) ||
+                !deletedNote.getTitle().equals(originalTitle))
+            throw new CannotRedoException();
+        mainCtrl.commitDeleteNote(selectedNoteIndex);
     }
 }

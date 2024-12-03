@@ -47,24 +47,31 @@ public class UndoHandler {
     /**
      * Undoes the most recent action that was not already undone.
      *
-     * @throws CannotUndoException If the action cannot be undone or there are no
-     * more actions to undo.
+     * @throws CannotUndoException If there are no more actions to undo.
      */
     public void undoAction() throws CannotUndoException {
         if (currentIndex == -1) throw new CannotUndoException();
-        actions.get(currentIndex).undo();
+        try {
+            actions.get(currentIndex).undo();
+        } catch (CannotUndoException e) {
+            actions.remove(currentIndex);
+        }
         currentIndex--;
     }
 
     /**
      * Redoes the last action that was undone.
      *
-     * @throws CannotRedoException If the action cannot be redone or there are no
-     * more actions to redo.
+     * @throws CannotRedoException If there are no more actions to redo.
      */
     public void redoAction() throws CannotRedoException {
         if (currentIndex == actions.size() - 1) throw new CannotRedoException();
-        currentIndex++;
-        actions.get(currentIndex).redo();
+        try {
+            actions.get(currentIndex + 1).redo();
+            currentIndex++;
+        } catch (CannotRedoException e) {
+            actions.remove(currentIndex + 1);
+            redoAction();
+        }
     }
 }

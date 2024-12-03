@@ -5,10 +5,10 @@ public interface ClientAction {
     /**
      * Undoes the action
      */
-    void undo();
+    void undo() throws CannotUndoException;
 
     /**
      * Redoes the previously undone action
      */
-    void redo();
+    void redo() throws CannotRedoException;
 }

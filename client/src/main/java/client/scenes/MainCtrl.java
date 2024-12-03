@@ -36,13 +36,14 @@ public class MainCtrl {
      * <br>
      * The {@code selectedNoteIndex} is reset to {@code -1} when no note is selected.
      **/
-    private int selectedNoteIndex  = -1; // Index of the note being edited
-                                         // (-1 means no note is selected).
-    private boolean isDarkTheme = false; // Track the current theme
+    private int selectedNoteIndex  = -1;
+    private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
-    private final UndoHandler undoHandler = new UndoHandler(10);
+
+    // The capacity gives how many previous actions are stored.
+    private final UndoHandler undoHandler = new UndoHandler(100);
 
     private Stage primaryStage;
     private Scene mainView;
@@ -132,6 +133,16 @@ public class MainCtrl {
                     undoHandler.undoAction();
                 } catch (CannotUndoException e) {
                     //TODO Show pop-up that the action could not be undone
+                }
+            }
+        });
+
+        mainView.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.Y) {
+                try {
+                    undoHandler.redoAction();
+                } catch (CannotRedoException e) {
+                    //TODO Show pop-up that the action could not be redone
                 }
             }
         });
@@ -266,19 +277,15 @@ public class MainCtrl {
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
 
+                Note deletedNote = savedNotes.get(index);
                 undoHandler.pushAction(new DeleteNoteAction(
-                        savedNotes.get(index),
+                        deletedNote,
+                        deletedNote.getTitle(),
+                        deletedNote.getText(),
                         selectedNoteIndex,
                         this));
 
-                savedNotes.remove(index);
-                noteTitleInput.clear();
-                noteEditor.clear();
-                renderedNoteTitleLabel.setText("The title is empty");
-                renderedNoteView.getEngine().loadContent("The note is empty");
-
-                // No note selected after deletion
-                selectedNoteIndex = -1;
+                commitDeleteNote(index);
             }
         } else {
             System.out.println("No note selected for deletion");
@@ -303,6 +310,20 @@ public class MainCtrl {
 
         renderedNoteTitleLabel.setText(deletedNote.getTitle());
         renderedNoteView.getEngine().loadContent(deletedNote.getText());
+    }
+
+    /**
+     * Modifies the note list by deleting the note at a given index.
+     *
+     * @param noteIndex The index (in the note list) of the note to be deleted.
+     */
+    public void commitDeleteNote(int noteIndex) {
+        savedNotes.remove(noteIndex);
+        noteTitleInput.clear();
+        noteEditor.clear();
+        renderedNoteTitleLabel.setText("The title is empty");
+        renderedNoteView.getEngine().loadContent("The note is empty");
+        selectedNoteIndex = -1; // No selected note after deletion
     }
 
     /**
@@ -373,8 +394,9 @@ public class MainCtrl {
             selectedNoteIndex = savedNotes.size() - 1;
         } else {
             // Otherwise, update the existing note
-            Note updatedNote = new Note(title, note);
-            savedNotes.set(selectedNoteIndex, updatedNote);
+            Note currentNote = savedNotes.get(selectedNoteIndex);
+            currentNote.setTitle(title);
+            currentNote.setText(note);
         }
     }
 
