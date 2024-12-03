@@ -1,11 +1,14 @@
 package client.scenes;
 
+import client.utils.undo.*;
 import commons.Note;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -39,6 +42,7 @@ public class MainCtrl {
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
+    private final UndoHandler undoHandler = new UndoHandler(10);
 
     private Stage primaryStage;
     private Scene mainView;
@@ -121,6 +125,16 @@ public class MainCtrl {
                         noteEditor.setText(selectedNote.getText());
                     }
                 });
+
+        mainView.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.Z) {
+                try {
+                    undoHandler.undoAction();
+                } catch (CannotUndoException e) {
+                    //TODO Show pop-up that the action could not be undone
+                }
+            }
+        });
     }
 
     /**
@@ -251,6 +265,12 @@ public class MainCtrl {
             Optional<ButtonType> result = alert.showAndWait();
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
+
+                undoHandler.pushAction(new DeleteNoteAction(
+                        savedNotes.get(index),
+                        selectedNoteIndex,
+                        this));
+
                 savedNotes.remove(index);
                 noteTitleInput.clear();
                 noteEditor.clear();
@@ -263,6 +283,26 @@ public class MainCtrl {
         } else {
             System.out.println("No note selected for deletion");
         }
+    }
+
+    /**
+     * Undoes the deletion of a note by reinstating it in the list of notes
+     * and selecting it.
+     *
+     * @param deletedNote The entity corresponding to the deleted note.
+     * @param noteIndex The position the deleted noted had in the list of notes.
+     */
+    public void handleUndoDelete(Note deletedNote, int noteIndex) {
+        if (selectedNoteIndex != -1) saveCurrentNote();
+
+        savedNotes.add(noteIndex, deletedNote);
+        notesList.getSelectionModel().select(noteIndex);
+        selectedNoteIndex = noteIndex;
+        noteTitleInput.setText(deletedNote.getTitle());
+        noteEditor.setText(deletedNote.getText());
+
+        renderedNoteTitleLabel.setText(deletedNote.getTitle());
+        renderedNoteView.getEngine().loadContent(deletedNote.getText());
     }
 
     /**
@@ -315,6 +355,16 @@ public class MainCtrl {
                 renderedNoteView.getEngine().loadContent(note);
             }
         }
+        saveCurrentNote();
+    }
+
+    /**
+     * Updates the contents of the note entity for the currently opened note.
+     * If no such entity exists, then it is created.
+     */
+    public void saveCurrentNote() {
+        String title = noteTitleInput.getText().trim();
+        String note = noteEditor.getText().trim();
 
         if (selectedNoteIndex == -1) {
             // If the note has not been created yet, create it
