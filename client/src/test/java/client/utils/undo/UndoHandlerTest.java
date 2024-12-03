@@ -20,12 +20,26 @@ public class UndoHandlerTest {
     }
 
     @Test
-    void pushActionClearsRemainderOfUndoStack() {
+    void pushActionLeavesNoRedoableActions() {
         try {
             sut.undoAction();
             testData.add("EF");
             sut.pushAction(new TestAction(testData, "EF"));
             assertThrows(CannotRedoException.class, () -> sut.redoAction());
+        } catch (Exception e) {
+            fail("Should be able to undo/redo");
+        }
+    }
+
+    @Test
+    void pushActionStillAllowsFurtherUndos() {
+        try {
+            sut.undoAction();
+            testData.add("EF");
+            sut.pushAction(new TestAction(testData, "EF"));
+            sut.undoAction();
+            sut.undoAction();
+            assertEquals(List.of(), testData);
         } catch (Exception e) {
             fail("Should be able to undo/redo");
         }

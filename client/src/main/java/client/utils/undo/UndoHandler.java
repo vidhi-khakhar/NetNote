@@ -36,8 +36,9 @@ public class UndoHandler {
             this.actions.removeFirst();
             currentIndex--;
         }
-        for (int i = currentIndex + 1; i < actions.size(); i++) {
-            actions.remove(i);
+        int numberActionsLeft = actions.size() - currentIndex - 1;
+        for (int i = 1; i <= numberActionsLeft; i++) {
+            actions.removeLast();
         }
         actions.add(action);
         currentIndex++;
