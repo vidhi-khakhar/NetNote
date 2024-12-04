@@ -385,15 +385,16 @@ public class MainCtrl {
         if (selectedNote != null) {
             selectedNote.setTitle(updatedTitle);
             notesList.refresh();
-        } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) {
-            Note newNote = savedNotes.getFirst();
-            newNote.setTitle(updatedTitle);
+        } else if (selectedNoteIndex == -1 && savedNotes.isEmpty()) {
+            String noteContent = noteEditor.getText();
+            Note firstNote = new Note(updatedTitle, noteContent);
+            savedNotes.add(firstNote);
             selectedNoteIndex = 0;
             notesList.getSelectionModel().select(0);
             notesList.refresh();
-        } else if (savedNotes.isEmpty()) {
-            Note firstNote = new Note(updatedTitle, "");
-            savedNotes.add(firstNote);
+        } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) {
+            Note firstNote = savedNotes.get(0);
+            firstNote.setTitle(updatedTitle);
             selectedNoteIndex = 0;
             notesList.getSelectionModel().select(0);
             notesList.refresh();
