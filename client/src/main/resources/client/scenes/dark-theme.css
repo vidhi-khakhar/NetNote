@@ -116,3 +116,22 @@
     -fx-background-color: #009900; /* Green background for add button hover */
     -fx-text-fill: white; /* Keep text white */
 }
+
+/* Styling for MenuButton */
+.menu-button {
+    -fx-background-color: #444444; /* Slightly lighter gray for the menu button */
+    -fx-text-fill: white; /* White text on the menu button */
+    -fx-border-color: #555555; /* Border color */
+    -fx-border-radius: 5px; /* Rounded corners */
+}
+
+/* Styling for the MenuItem */
+.menu-item {
+    -fx-background-color: #444444; /* Background color for menu items */
+    -fx-text-fill: white; /* White text for menu items */
+}
+
+.menu-item:hover {
+    -fx-background-color: #555555; /* Lighter gray when hovered */
+}
+

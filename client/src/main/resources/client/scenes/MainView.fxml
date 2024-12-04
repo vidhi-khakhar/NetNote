@@ -5,10 +5,13 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
@@ -104,6 +107,9 @@
                            </HBox.margin>
                         </Button>
                      </children>
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin>
                   </HBox>
                </children>
                <HBox.margin>
@@ -112,9 +118,9 @@
             </VBox>
             <VBox fx:id="rightPanel" layoutX="218.0" layoutY="10.0" opacity="0.61" prefHeight="500.0" prefWidth="300.0" spacing="10.0" styleClass="rightPanel" HBox.hgrow="ALWAYS">
                <children>
-                  <HBox maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
+                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                      <children>
-                        <Label style="-fx-font-weight: bold;" text="Rendered Note">
+                        <Label prefHeight="27.0" prefWidth="174.0" style="-fx-font-weight: bold;" text="Rendered Note">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -122,31 +128,48 @@
                               <Insets left="5.0" top="5.0" />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="hideEditorButton" maxHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#toggleEditor" prefHeight="27.0" prefWidth="27.0" text="👁️‍🗨️">
+                        <Region prefHeight="32.0" prefWidth="27.0" HBox.hgrow="ALWAYS" />
+                        <MenuButton fx:id="menuButton" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0" text="☰" HBox.hgrow="ALWAYS">
+                          <items>
+                            <MenuItem fx:id="hideEditorButton" mnemonicParsing="false" onAction="#toggleEditor" text="👁️‍🗨️" />
+                            <MenuItem fx:id="themeToggleButton" mnemonicParsing="false" onAction="#toggleTheme" text="☾" />
+                          </items>
                            <HBox.margin>
-                              <Insets left="10.0" right="5.0" top="5.0" />
+                              <Insets left="10.0" right="10.0" top="5.0" />
                            </HBox.margin>
                            <font>
                               <Font size="10.0" />
                            </font>
-                        </Button>
-                        <Button fx:id="themeToggleButton" maxHeight="27.0" maxWidth="32.0" minHeight="27.0" minWidth="32.0" mnemonicParsing="false" onAction="#toggleTheme" prefHeight="27.0" prefWidth="32.0" text="☾">
-                           <HBox.margin>
-                              <Insets left="5.0" right="3.0" top="5.0" />
-                           </HBox.margin>
-                        </Button>
+                        </MenuButton>
                      </children>
                   </HBox>
-                  <Label fx:id="renderedNoteTitleLabel" prefHeight="18.0" prefWidth="238.0" style="-fx-font-weight: bold;" text="Title of Note">
-                     <font>
-                        <Font size="13.0" />
-                     </font>
+                  <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="renderedNoteTitleLabel" prefHeight="19.0" prefWidth="122.0" style="-fx-font-weight: bold;" text="Title of Note">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets bottom="5.0" left="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Region prefHeight="24.0" prefWidth="34.0" HBox.hgrow="ALWAYS" />
+                        <CheckBox fx:id="problemsCheckbox" mnemonicParsing="false" onAction="#showProblems" text="Show Markdown Errors" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets bottom="5.0" left="10.0" right="10.0" />
+                           </HBox.margin>
+                        </CheckBox>
+                     </children>
+                  </HBox>
+                  <WebView fx:id="renderedNoteView" prefHeight="383.0" prefWidth="234.0" VBox.vgrow="ALWAYS">
                      <VBox.margin>
-                        <Insets left="5.0" right="5.0" />
+                        <Insets top="5.0" />
+                     </VBox.margin></WebView>
+                  <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
                      </VBox.margin>
-                  </Label>
-                  <CheckBox fx:id="problemsCheckbox" mnemonicParsing="false" onAction="#showProblems" text="Show Problems" />
-                  <WebView fx:id="renderedNoteView" prefHeight="383.0" prefWidth="234.0" />
+                  </HBox>
                </children>
             </VBox>
          </children>
