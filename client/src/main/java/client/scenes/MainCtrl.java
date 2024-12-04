@@ -111,16 +111,28 @@ public class MainCtrl {
                 }
             }
         });
-
         notesList
                 .getSelectionModel()
                 .selectedItemProperty()
-                .addListener((_, _, selectedNote) -> {
-                    if (selectedNote != null) {
-                        noteTitleInput.setText(selectedNote.getTitle());
-                        noteEditor.setText(selectedNote.getText());
+                .addListener((_, oldNote, newNote) -> {
+                    saveCurrentNote();
+                    if (newNote != null) {
+                        selectedNoteIndex = notesList.getSelectionModel().getSelectedIndex();
+                        noteTitleInput.setText(newNote.getTitle());
+                        noteEditor.setText(newNote.getText());
+                        renderedNoteTitleLabel.setText(newNote.getTitle());
+                        renderedNoteView.getEngine().loadContent(newNote.getText());
+                    } else {
+                        selectedNoteIndex = -1;
+                        noteTitleInput.clear();
+                        noteEditor.clear();
+                        renderedNoteTitleLabel.setText("The title is empty");
+                        renderedNoteView.getEngine().loadContent("The note is empty");
                     }
                 });
+        noteTitleInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateTitle();
+        });
     }
 
     /**
@@ -281,12 +293,34 @@ public class MainCtrl {
         if (index != -1) {
             Note selectedNote = savedNotes.get(index);
             selectedNoteIndex = index;
-
             noteTitleInput.setText(selectedNote.getTitle());
             noteEditor.setText(selectedNote.getText());
-
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
             renderedNoteView.getEngine().loadContent(selectedNote.getText());
+        } else {
+            selectedNoteIndex = -1;
+            noteTitleInput.clear();
+            noteEditor.clear();
+            renderedNoteTitleLabel.setText("The title is empty");
+            renderedNoteView.getEngine().loadContent("The note is empty");
+        }
+    }
+
+    /**
+     * Saves the currently edited note's content and title to the list.
+     */
+    private void saveCurrentNote() {
+        if (selectedNoteIndex != -1) {
+            Note currentNote = savedNotes.get(selectedNoteIndex);
+            String updatedTitle = noteTitleInput.getText().trim();
+            String updatedContent = noteEditor.getText().trim();
+
+            if(updatedTitle.isEmpty())
+                currentNote.setTitle("Untitled Note");
+            else
+                currentNote.setTitle(updatedTitle);
+            currentNote.setText(updatedContent);
+            notesList.refresh();
         }
     }
 
@@ -315,17 +349,18 @@ public class MainCtrl {
                 renderedNoteView.getEngine().loadContent(note);
             }
         }
-
         if (selectedNoteIndex == -1) {
-            // If the note has not been created yet, create it
-            Note savedNote = new Note(title, note);
-            savedNotes.add(savedNote);
+            Note newNote = new Note(title, note);
+            savedNotes.add(newNote);
             selectedNoteIndex = savedNotes.size() - 1;
+            notesList.getSelectionModel().select(selectedNoteIndex);
         } else {
-            // Otherwise, update the existing note
-            Note updatedNote = new Note(title, note);
-            savedNotes.set(selectedNoteIndex, updatedNote);
+            Note selectedNote = savedNotes.get(selectedNoteIndex);
+            selectedNote.setTitle(title);
+            selectedNote.setText(note);
+            notesList.refresh();
         }
+
     }
 
     /**
@@ -380,19 +415,21 @@ public class MainCtrl {
      */
     public void updateTitle() {
         String updatedTitle = noteTitleInput.getText();
+
+        if (updatedTitle.isEmpty()) {
+            renderedNoteTitleLabel.setText("Untitled Note");
+        } else {
+            renderedNoteTitleLabel.setText(updatedTitle);
+        }
+
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         if (selectedNote != null) {
             selectedNote.setTitle(updatedTitle);
             notesList.refresh();
-        } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) {
-            Note newNote = savedNotes.getFirst();
-            newNote.setTitle(updatedTitle);
-            selectedNoteIndex = 0;
-            notesList.getSelectionModel().select(0);
-            notesList.refresh();
-        } else if (savedNotes.isEmpty()) {
-            Note firstNote = new Note(updatedTitle, "");
+        } else if (selectedNoteIndex == -1 && savedNotes.isEmpty()) {
+            String noteContent = noteEditor.getText();
+            Note firstNote = new Note(updatedTitle, noteContent);
             savedNotes.add(firstNote);
             selectedNoteIndex = 0;
             notesList.getSelectionModel().select(0);
