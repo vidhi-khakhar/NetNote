@@ -315,17 +315,23 @@ public class MainCtrl {
                 renderedNoteView.getEngine().loadContent(note);
             }
         }
-
-        if (selectedNoteIndex == -1) {
-            // If the note has not been created yet, create it
-            Note savedNote = new Note(title, note);
-            savedNotes.add(savedNote);
-            selectedNoteIndex = savedNotes.size() - 1;
+        String finalTitle;
+        if (title.isEmpty()) {
+            finalTitle = "Untitled Note";
         } else {
-            // Otherwise, update the existing note
-            Note updatedNote = new Note(title, note);
-            savedNotes.set(selectedNoteIndex, updatedNote);
+            finalTitle = title;
         }
+        if (selectedNoteIndex == -1) {
+            Note newNote = new Note(finalTitle, note);
+            savedNotes.add(newNote);
+            selectedNoteIndex = savedNotes.size() - 1;
+            notesList.getSelectionModel().select(selectedNoteIndex);
+        } else {
+            Note selectedNote = savedNotes.get(selectedNoteIndex);
+            selectedNote.setTitle(finalTitle);
+            selectedNote.setText(note);
+        }
+
     }
 
     /**
