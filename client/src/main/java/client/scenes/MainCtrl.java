@@ -281,12 +281,34 @@ public class MainCtrl {
         if (index != -1) {
             Note selectedNote = savedNotes.get(index);
             selectedNoteIndex = index;
-
             noteTitleInput.setText(selectedNote.getTitle());
             noteEditor.setText(selectedNote.getText());
-
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
             renderedNoteView.getEngine().loadContent(selectedNote.getText());
+        } else {
+            selectedNoteIndex = -1;
+            noteTitleInput.clear();
+            noteEditor.clear();
+            renderedNoteTitleLabel.setText("The title is empty");
+            renderedNoteView.getEngine().loadContent("The note is empty");
+        }
+    }
+
+    /**
+     * Saves the currently edited note's content and title to the list.
+     */
+    private void saveCurrentNote() {
+        if (selectedNoteIndex != -1) {
+            Note currentNote = savedNotes.get(selectedNoteIndex);
+            String updatedTitle = noteTitleInput.getText().trim();
+            String updatedContent = noteEditor.getText().trim();
+
+            if(updatedTitle.isEmpty())
+                currentNote.setTitle("Untitled Note");
+            else
+                currentNote.setTitle(updatedTitle);
+            currentNote.setText(updatedContent);
+            notesList.refresh();
         }
     }
 
@@ -315,21 +337,16 @@ public class MainCtrl {
                 renderedNoteView.getEngine().loadContent(note);
             }
         }
-        String finalTitle;
-        if (title.isEmpty()) {
-            finalTitle = "Untitled Note";
-        } else {
-            finalTitle = title;
-        }
         if (selectedNoteIndex == -1) {
-            Note newNote = new Note(finalTitle, note);
+            Note newNote = new Note(title, note);
             savedNotes.add(newNote);
             selectedNoteIndex = savedNotes.size() - 1;
             notesList.getSelectionModel().select(selectedNoteIndex);
         } else {
             Note selectedNote = savedNotes.get(selectedNoteIndex);
-            selectedNote.setTitle(finalTitle);
+            selectedNote.setTitle(title);
             selectedNote.setText(note);
+            notesList.refresh();
         }
 
     }
