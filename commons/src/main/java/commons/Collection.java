@@ -30,7 +30,8 @@ public class Collection {
     /**
      * Default constructor is requested by JPA.
      */
-    public Collection() { }
+    @SuppressWarnings("unused")
+    protected Collection() { }
 
     /**
      * Recommended constructor for Collection.

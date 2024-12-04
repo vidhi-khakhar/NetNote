@@ -2,7 +2,7 @@
 
 /* Left Panel (VBox for List and Buttons) */
 .leftPanel {
-    -fx-background-color: #f0f0f0; /* Light gray background */
+    -fx-background-color: #f4f4f4; /* Light gray background */
     -fx-border-color: #dcdcdc; /* Border color */
     -fx-border-width: 1px;
     -fx-padding: 10px;
