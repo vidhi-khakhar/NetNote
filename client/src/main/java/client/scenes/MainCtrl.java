@@ -114,22 +114,13 @@ public class MainCtrl {
         notesList
                 .getSelectionModel()
                 .selectedItemProperty()
-                .addListener((_, oldNote, newNote) -> {
-                    saveCurrentNote();
-                    if (newNote != null) {
-                        selectedNoteIndex = notesList.getSelectionModel().getSelectedIndex();
-                        noteTitleInput.setText(newNote.getTitle());
-                        noteEditor.setText(newNote.getText());
-                        renderedNoteTitleLabel.setText(newNote.getTitle());
-                        renderedNoteView.getEngine().loadContent(newNote.getText());
-                    } else {
-                        selectedNoteIndex = -1;
-                        noteTitleInput.clear();
-                        noteEditor.clear();
-                        renderedNoteTitleLabel.setText("The title is empty");
-                        renderedNoteView.getEngine().loadContent("The note is empty");
+                .addListener((_, _, selectedNote) -> {
+                    if (selectedNote != null) {
+                        noteTitleInput.setText(selectedNote.getTitle());
+                        noteEditor.setText(selectedNote.getText());
                     }
                 });
+
         noteTitleInput.textProperty().addListener((observable, oldValue, newValue) -> {
             updateTitle();
         });
@@ -264,6 +255,14 @@ public class MainCtrl {
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 savedNotes.remove(index);
+                if (!savedNotes.isEmpty()) {
+                    if (index < savedNotes.size())
+                        notesList.getSelectionModel().select(index);
+                } else {
+                    notesList.getSelectionModel().select(index - 1);
+                }
+                displaySavedNote();
+            } else{
                 noteTitleInput.clear();
                 noteEditor.clear();
                 renderedNoteTitleLabel.setText("The title is empty");
