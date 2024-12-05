@@ -19,6 +19,9 @@ public record DeleteNoteAction(Note deletedNote,
 
     /**
      * Redoes the previously undone note deletion
+     *
+     * @throws CannotRedoException If the note to be re-deleted was modified
+     * after the delete operation was undone
      */
     @Override
     public void redo() throws CannotRedoException {
