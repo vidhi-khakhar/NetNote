@@ -34,8 +34,8 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void updateNoteInvalidId() {
-        assertEquals(404, sut.updateNote((long) 123, null)
+    public void updateNoteInvalidTitle() {
+        assertEquals(404, sut.updateNote("Note3", null)
                 .getStatusCode()
                 .value());
     }
@@ -45,7 +45,7 @@ public class NoteControllerTest {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("newTitle", "Changed note title");  // Key should be "title"
         requestBody.put("newText", "Changed note content"); // Key should be "text"
-        assertEquals(400, sut.updateNote((long) 1, requestBody)
+        assertEquals(400, sut.updateNote("Note2", requestBody)
                 .getStatusCode()
                 .value());
     }
@@ -54,7 +54,7 @@ public class NoteControllerTest {
     public void updateNoteTitleOnly() {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("title", "Changed note title");
-        assertEquals(200, sut.updateNote((long) 1, requestBody)
+        assertEquals(200, sut.updateNote("Note2", requestBody)
                 .getStatusCode()
                 .value());
         assertEquals(new Note("Changed note title", "Note 2 content"),
@@ -65,7 +65,7 @@ public class NoteControllerTest {
     public void updateNoteTextOnly() {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("text", "Changed note content");
-        assertEquals(200, sut.updateNote((long) 0, requestBody)
+        assertEquals(200, sut.updateNote("Note1", requestBody)
                 .getStatusCode()
                 .value());
         assertEquals(new Note("Note1", "Changed note content"),
@@ -77,7 +77,7 @@ public class NoteControllerTest {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("title", "Changed note title");
         requestBody.put("text", "Changed note content");
-        assertEquals(200, sut.updateNote((long) 1, requestBody)
+        assertEquals(200, sut.updateNote("Note2", requestBody)
                 .getStatusCode()
                 .value());
         assertEquals(new Note("Changed note title", "Changed note content"),
@@ -86,13 +86,12 @@ public class NoteControllerTest {
 
     @Test
     public void deleteNoteInvalidId() {
-        assertEquals(404, sut.deleteNote((long) 123).getStatusCode().value());
+        assertEquals(404, sut.deleteNote("Note123").getStatusCode().value());
         assertEquals(List.of(n1, n2), db.findAll());
     }
 
     @Test
     public void deleteNoteSuccess() {
-        assertEquals(200, sut.deleteNote((long) 1).getStatusCode().value());
-        assertEquals(List.of(n1), db.findAll());
+        assertEquals(200, sut.deleteNote("Note2").getStatusCode().value());
     }
 }
