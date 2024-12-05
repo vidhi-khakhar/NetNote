@@ -9,7 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +43,9 @@ public class MainCtrl {
     private Scene mainView;
 
     @FXML
+    private VBox leftPanel;
+
+    @FXML
     private ListView<Note> notesList;
 
     @FXML
@@ -70,17 +72,23 @@ public class MainCtrl {
     @FXML
     private VBox rightPanel;
 
+
     @FXML
-    private Button themeToggleButton;
+    private MenuButton menuButton;
+
+    @FXML
+    private MenuItem themeToggleButton;
+
+    @FXML
+    private MenuItem hideEditorButton;
+
+
 
     @FXML
     private WebView renderedNoteView;
 
     @FXML
     private Label renderedNoteTitleLabel;
-
-    @FXML
-    private Button hideEditorButton;
 
     @FXML
     private CheckBox problemsCheckbox;
@@ -398,20 +406,26 @@ public class MainCtrl {
     /**
      * Toggles the middle panel of the interface.
      */
+
     public void toggleEditor() {
-        middlePanel.setVisible(!middlePanel.isVisible());
+        boolean isVisible = middlePanel.isVisible();
+
+        // Toggle the visibility of the middle panel
+        middlePanel.setVisible(!isVisible);
     }
 
+
+
     /**
-     * Updates the title of the selected note with the text in the inputTitle field.<br>
-     * <br>
-     * This method is triggered whenever the user types or modifies the text
-     * in the inputTitle TextField.<br>
-     * <br>
-     * It checks if a note is currently selected in the ListView. If a note is selected,
-     * the title of the note is updated with the text entered by the user
-     * in the inputTitle field.<br>
-     */
+         * Updates the title of the selected note with the text in the inputTitle field.<br>
+         * <br>
+         * This method is triggered whenever the user types or modifies the text
+         * in the inputTitle TextField.<br>
+         * <br>
+         * It checks if a note is currently selected in the ListView. If a note is selected,
+         * the title of the note is updated with the text entered by the user
+         * in the inputTitle field.<br>
+         */
     public void updateTitle() {
         String updatedTitle = noteTitleInput.getText();
 
