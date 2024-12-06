@@ -47,7 +47,7 @@ public class NoteController {
     /**
      * Updates the title and text of a note
      *
-     * @param id The id of the note to update (part of URL)
+     * @param title The title of the note to update (part of URL)
      * @param noteData A list of key-value pairs which should have
      *                 one value for the "text" key
      *                 and/or one value for the "title" key.<br>
@@ -59,15 +59,19 @@ public class NoteController {
      *                 Updates both the title and the text<br>
      * @return Returns an HTTP response with a string message based on whether
      * the request is valid or not, and on whether there is a note
-     * with the specified id or not.
+     * with the specified title or not.
      */
-    @PatchMapping("/{id}")
-    public ResponseEntity<String> updateNote(@PathVariable("id") Long id,
+    @PatchMapping("/{title}")
+    public ResponseEntity<String> updateNote(@PathVariable("title") String title,
                                      @RequestBody Map<String, String> noteData) {
-        Optional<Note> noteOptional = db.findById(id);
+        Optional<Note> noteOptional = db
+                .findAll()
+                .stream()
+                .filter(n -> n.getTitle().equals(title))
+                .findFirst();
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("The note with the specified id does not exist");
+                    .body("The note with the specified title does not exist");
         }
         Note note = noteOptional.get();
 
@@ -98,24 +102,28 @@ public class NoteController {
     }
 
     /**
-     * Deletes the note with the specified id
+     * Deletes the note with the specified title
      * from the note repository
      *
-     * @param id The id of the note to be deleted (part of URL)
+     * @param title The title of the note to delete (part of URL)
      * @return Returns an HTTP response with the deleted note entity
-     * if the provided id was valid, otherwise returns a 404 not found response
+     * if the provided title was valid, otherwise returns a 404 not found response
      * with an empty body.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Note> deleteNote(@PathVariable("id") Long id) {
-        Optional<Note> noteOptional = db.findById(id);
+    @DeleteMapping("/{title}")
+    public ResponseEntity<Note> deleteNote(@PathVariable("title") String title) {
+        Optional<Note> noteOptional = db
+                .findAll()
+                .stream()
+                .filter(n -> n.getTitle().equals(title))
+                .findFirst();
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(null);
         }
         Note note = noteOptional.get();
 
-        db.deleteById(id);
+        db.deleteById(note.getNoteId());
 
         return ResponseEntity.ok(note);
     }

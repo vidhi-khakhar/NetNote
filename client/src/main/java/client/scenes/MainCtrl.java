@@ -49,6 +49,9 @@ public class MainCtrl {
     private Scene mainView;
 
     @FXML
+    private VBox leftPanel;
+
+    @FXML
     private ListView<Note> notesList;
 
     @FXML
@@ -76,16 +79,19 @@ public class MainCtrl {
     private VBox rightPanel;
 
     @FXML
-    private Button themeToggleButton;
+    private MenuButton menuButton;
+
+    @FXML
+    private MenuItem themeToggleButton;
+
+    @FXML
+    private MenuItem hideEditorButton;
 
     @FXML
     private WebView renderedNoteView;
 
     @FXML
     private Label renderedNoteTitleLabel;
-
-    @FXML
-    private Button hideEditorButton;
 
     @FXML
     private CheckBox problemsCheckbox;
@@ -126,6 +132,10 @@ public class MainCtrl {
                         noteEditor.setText(selectedNote.getText());
                     }
                 });
+
+        noteTitleInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateTitle();
+        });
 
         mainView.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.Z) {
@@ -276,7 +286,6 @@ public class MainCtrl {
             Optional<ButtonType> result = alert.showAndWait();
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-
                 Note deletedNote = savedNotes.get(index);
                 undoHandler.pushAction(new DeleteNoteAction(
                         deletedNote,
@@ -284,8 +293,15 @@ public class MainCtrl {
                         deletedNote.getText(),
                         selectedNoteIndex,
                         this));
-
                 commitDeleteNote(index);
+            } else {
+                noteTitleInput.clear();
+                noteEditor.clear();
+                renderedNoteTitleLabel.setText("The title is empty");
+                renderedNoteView.getEngine().loadContent("The note is empty");
+
+                // No note selected after deletion
+                selectedNoteIndex = -1;
             }
         } else {
             System.out.println("No note selected for deletion");
@@ -300,8 +316,6 @@ public class MainCtrl {
      * @param noteIndex The position the deleted noted had in the list of notes.
      */
     public void handleUndoDelete(Note deletedNote, int noteIndex) {
-        if (selectedNoteIndex != -1) saveCurrentNote();
-
         savedNotes.add(noteIndex, deletedNote);
         notesList.getSelectionModel().select(noteIndex);
         selectedNoteIndex = noteIndex;
@@ -319,11 +333,13 @@ public class MainCtrl {
      */
     public void commitDeleteNote(int noteIndex) {
         savedNotes.remove(noteIndex);
-        noteTitleInput.clear();
-        noteEditor.clear();
-        renderedNoteTitleLabel.setText("The title is empty");
-        renderedNoteView.getEngine().loadContent("The note is empty");
-        selectedNoteIndex = -1; // No selected note after deletion
+        if (!savedNotes.isEmpty()) {
+            if (noteIndex < savedNotes.size())
+                notesList.getSelectionModel().select(noteIndex - 1);
+        } else {
+            notesList.getSelectionModel().select(-1);
+        }
+        displaySavedNote();
     }
 
     /**
@@ -348,6 +364,30 @@ public class MainCtrl {
 
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
             renderedNoteView.getEngine().loadContent(selectedNote.getText());
+        } else {
+            selectedNoteIndex = -1;
+            noteTitleInput.clear();
+            noteEditor.clear();
+            renderedNoteTitleLabel.setText("The title is empty");
+            renderedNoteView.getEngine().loadContent("The note is empty");
+        }
+    }
+
+    /**
+     * Saves the currently edited note's content and title to the list.
+     */
+    private void saveCurrentNote() {
+        if (selectedNoteIndex != -1) {
+            Note currentNote = savedNotes.get(selectedNoteIndex);
+            String updatedTitle = noteTitleInput.getText().trim();
+            String updatedContent = noteEditor.getText().trim();
+
+            if(updatedTitle.isEmpty())
+                currentNote.setTitle("Untitled Note");
+            else
+                currentNote.setTitle(updatedTitle);
+            currentNote.setText(updatedContent);
+            notesList.refresh();
         }
     }
 
@@ -377,27 +417,6 @@ public class MainCtrl {
             }
         }
         saveCurrentNote();
-    }
-
-    /**
-     * Updates the contents of the note entity for the currently opened note.
-     * If no such entity exists, then it is created.
-     */
-    public void saveCurrentNote() {
-        String title = noteTitleInput.getText().trim();
-        String note = noteEditor.getText().trim();
-
-        if (selectedNoteIndex == -1) {
-            // If the note has not been created yet, create it
-            Note savedNote = new Note(title, note);
-            savedNotes.add(savedNote);
-            selectedNoteIndex = savedNotes.size() - 1;
-        } else {
-            // Otherwise, update the existing note
-            Note currentNote = savedNotes.get(selectedNoteIndex);
-            currentNote.setTitle(title);
-            currentNote.setText(note);
-        }
     }
 
     /**
@@ -452,19 +471,21 @@ public class MainCtrl {
      */
     public void updateTitle() {
         String updatedTitle = noteTitleInput.getText();
+
+        if (updatedTitle.isEmpty()) {
+            renderedNoteTitleLabel.setText("Untitled Note");
+        } else {
+            renderedNoteTitleLabel.setText(updatedTitle);
+        }
+
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         if (selectedNote != null) {
             selectedNote.setTitle(updatedTitle);
             notesList.refresh();
-        } else if (selectedNoteIndex == -1 && !savedNotes.isEmpty()) {
-            Note newNote = savedNotes.getFirst();
-            newNote.setTitle(updatedTitle);
-            selectedNoteIndex = 0;
-            notesList.getSelectionModel().select(0);
-            notesList.refresh();
-        } else if (savedNotes.isEmpty()) {
-            Note firstNote = new Note(updatedTitle, "");
+        } else if (selectedNoteIndex == -1 && savedNotes.isEmpty()) {
+            String noteContent = noteEditor.getText();
+            Note firstNote = new Note(updatedTitle, noteContent);
             savedNotes.add(firstNote);
             selectedNoteIndex = 0;
             notesList.getSelectionModel().select(0);
