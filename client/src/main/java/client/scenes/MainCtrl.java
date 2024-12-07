@@ -33,7 +33,6 @@ public class MainCtrl {
     private Stage primaryStage;
     private Scene mainView;
 
-    // Elements inside the left panel:
     @FXML
     private VBox leftPanel;
 
@@ -55,7 +54,6 @@ public class MainCtrl {
     @FXML
     private Button refreshButton;
 
-    // Elements inside the middle panel:
     @FXML
     private VBox middlePanel;
 
@@ -65,12 +63,11 @@ public class MainCtrl {
     @FXML
     private TextArea noteEditor;
 
-    // Elements inside the rightPanel
     @FXML
     private VBox rightPanel;
 
     @FXML
-    private Label renderedNoteTitleLabel;  // THIS IS THE RENDERED VIEW OF TITLE.
+    private Label renderedNoteTitleLabel;
 
     @FXML
     private MenuButton menuButton;
@@ -114,12 +111,11 @@ public class MainCtrl {
             }
         });
 
-        // this is a listener which updates the selected note to its proper content and title
         notesList
                 .getSelectionModel()
                 .selectedItemProperty()
                 .addListener((_, _, selectedNote) -> {
-                    selectedNoteIndex = notesList.getSelectionModel().getSelectedIndex(); // local variable to trac
+                    selectedNoteIndex = notesList.getSelectionModel().getSelectedIndex();
                     if (selectedNote != null) {
                         System.out.println("The selected note is on index:" + selectedNoteIndex);
                         noteTitleInput.setText(selectedNote.getTitle());
@@ -131,8 +127,6 @@ public class MainCtrl {
             updateTitle();
         });
         updateDisplay();
-
-        // SERBAN: YOU CAN DELETE THIS COMMENT AND ADD THE UNDO-REDO EVENT HANDLES HERE.
 
     }
 
@@ -344,9 +338,8 @@ public class MainCtrl {
             // If a note is selected, update the content of that note
             Note selectedNote = savedNotes.get(selectedNoteIndex);
             selectedNote.setText(content);
-            notesList.refresh();  // Refresh the list to show the updated note
+            notesList.refresh();
         } else {
-            // If no note is selected, ensure the rendered view shows "empty" content
             renderedNoteTitleLabel.setText("The title is empty");
             renderedNoteView.getEngine().loadContent("The note is empty");
         }
@@ -368,7 +361,6 @@ public class MainCtrl {
         String title = noteTitleInput.getText().trim();
         String note = noteEditor.getText().trim();
 
-        // Update the title using the existing method.
         updateTitle(); // This will update the title in the rendered view and the list.
 
         // If both the title and note are empty, set default content in the rendered view
