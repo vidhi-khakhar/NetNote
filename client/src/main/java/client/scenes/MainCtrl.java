@@ -17,24 +17,15 @@ public class MainCtrl {
 
     /**
      * The {@code selectedNoteIndex} variable tracks the index of the currently selected or
-     * edited note in the {@code savedNotes} list.<br>
+     * edited note in the {@code savedNotes} observable list.<br>
      * <br>
-     * When rendering a note (i.e., displaying its title and content in the display fields):<br>
      * If {@code selectedNoteIndex == -1},  no note is being edited, and thus a new note
      * is ADDED<br>
      * If {@code selectedNoteIndex != -1}, an existing note is being updated, and the note at the
      *   {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
-     * <br>
-     * When deleting a note:<br>
-     * The selected index is used to find the note to be removed from the list.<br>
-     * The note at that index gets removed from the list
-     *   ({@code savedNotes.remove()}).<br>
-     * <br>
-     * The {@code selectedNoteIndex} is reset to {@code -1} when no note is selected.
      **/
-    private int selectedNoteIndex  = -1; // Index of the note being edited
-    // (-1 means no note is selected).
-    private boolean isDarkTheme = false; // Track the current theme
+    private int selectedNoteIndex  = -1;
+    private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
@@ -42,8 +33,15 @@ public class MainCtrl {
     private Stage primaryStage;
     private Scene mainView;
 
+    // Elements inside the left panel:
     @FXML
     private VBox leftPanel;
+
+    @FXML
+    private TextField searchBar;
+
+    @FXML
+    private Button searchButton;
 
     @FXML
     private ListView<Note> notesList;
@@ -57,20 +55,22 @@ public class MainCtrl {
     @FXML
     private Button refreshButton;
 
+    // Elements inside the middle panel:
     @FXML
     private VBox middlePanel;
-
-    @FXML
-    private TextArea noteEditor;
 
     @FXML
     private TextField noteTitleInput;
 
     @FXML
-    private Button renderButton;
+    private TextArea noteEditor;
 
+    // Elements inside the rightPanel
     @FXML
     private VBox rightPanel;
+
+    @FXML
+    private Label renderedNoteTitleLabel;  // THIS IS THE RENDERED VIEW OF TITLE.
 
     @FXML
     private MenuButton menuButton;
@@ -83,9 +83,6 @@ public class MainCtrl {
 
     @FXML
     private WebView renderedNoteView;
-
-    @FXML
-    private Label renderedNoteTitleLabel;
 
     @FXML
     private CheckBox problemsCheckbox;
@@ -117,14 +114,14 @@ public class MainCtrl {
             }
         });
 
-
+        // this is a listener which updates the selected note to its proper content and title
         notesList
                 .getSelectionModel()
                 .selectedItemProperty()
                 .addListener((_, _, selectedNote) -> {
-                    int index = notesList.getSelectionModel().getSelectedIndex();
+                    selectedNoteIndex = notesList.getSelectionModel().getSelectedIndex(); // local variable to trac
                     if (selectedNote != null) {
-                        System.out.println("The selected note is on index:" + index);
+                        System.out.println("The selected note is on index:" + selectedNoteIndex);
                         noteTitleInput.setText(selectedNote.getTitle());
                         noteEditor.setText(selectedNote.getText());
                     }
@@ -134,6 +131,8 @@ public class MainCtrl {
             updateTitle();
         });
         updateDisplay();
+
+        // SERBAN: YOU CAN DELETE THIS COMMENT AND ADD THE UNDO-REDO EVENT HANDLES HERE.
 
     }
 
@@ -246,6 +245,8 @@ public class MainCtrl {
                 // Default message for empty note text
                 renderedNoteView.getEngine().loadContent("The note is empty");
                 selectedNoteIndex = savedNotes.size() - 1;
+
+                noteEditor.requestFocus();
             }
         });
     }
@@ -254,59 +255,67 @@ public class MainCtrl {
      * Deletes a note from the list of notes.
      */
     public void handleDeleteNote() {
-        int index = notesList.getSelectionModel().getSelectedIndex();
+        if (selectedNoteIndex == -1) {
+            showWarning("No Note Selected", "No note selected for deletion. Please select a note and try again.");
+            return;
+        }
 
-        if (index != -1) {
-            // Show confirmation before deletion
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Delete Note");
-            alert.setHeaderText(null);
-            alert.setContentText("Are you sure you want to delete this note?");
-
-            Optional<ButtonType> result = alert.showAndWait();
-
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                // Remove the selected note
-                savedNotes.remove(index);
-                selectedNoteIndex = -1; // Reset the selected index after deletion
-
-                // Update the notes list selection and display
-                if (savedNotes.isEmpty()) {
-                    // No notes left, reset everything
-                    noteTitleInput.clear();
-                    noteEditor.clear();
-                    renderedNoteTitleLabel.setText("The title is empty");
-                    renderedNoteView.getEngine().loadContent("The note is empty");
-                    notesList.getSelectionModel().clearSelection(); // Clear any selection
-                } else {
-                    // Adjust selection after deletion
-                    int newIndex = (index >= savedNotes.size()) ? index - 1 : index;
-                    notesList.getSelectionModel().select(newIndex);
-                }
-
-                // Refresh the list to show updated notes
-                notesList.refresh();
-                displaySavedNote(); // Update the display after deletion
-            } else {
-                // If the user cancels the deletion, just call updateDisplay to reflect the current state
-                updateDisplay();
-            }
+        if (showConfirmation("Delete Note", "Are you sure you want to delete this note?")) {
+            commitDeleteNote(selectedNoteIndex);
         } else {
-            System.out.println("No note selected for deletion");
+            updateDisplay();
         }
     }
+
+
+    /**
+     * A Warning pop-up message (only option is to say OK)
+     * A Confirmation pop=up message (Options: OK / CANCEL)
+     */
+    private void showWarning(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private boolean showConfirmation(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+    /**
+     * Modifies the note list by deleting the note at a given index.
+     *
+     * @param noteIndex The index (in the note list) of the note to be deleted.
+     */
+
+    public void commitDeleteNote(int noteIndex) {
+        savedNotes.remove(noteIndex);
+        if (!savedNotes.isEmpty()) {
+                int newIndex = Math.min(noteIndex, savedNotes.size() - 1);
+                notesList.getSelectionModel().select(newIndex);
+        } else {
+            notesList.getSelectionModel().clearSelection();
+        }
+        displaySavedNote();
+    }
+
 
     /**
      * Updates the contents of the editor and the rendered view
      * after the user select a different note to load.
      */
     public void displaySavedNote() {
-        int index = notesList.getSelectionModel().getSelectedIndex();
-
         // If there is a valid index (not -1) and the index is within the range of savedNotes
-        if (index != -1 && index < savedNotes.size()) {
-            Note selectedNote = savedNotes.get(index);
-            selectedNoteIndex = index;
+        if (selectedNoteIndex != -1 && selectedNoteIndex < savedNotes.size()) {
+            Note selectedNote = savedNotes.get(selectedNoteIndex);
             noteTitleInput.setText(selectedNote.getTitle());
             noteEditor.setText(selectedNote.getText());
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
@@ -417,10 +426,7 @@ public class MainCtrl {
      */
 
     public void toggleEditor() {
-        boolean isVisible = middlePanel.isVisible();
-
-        // Toggle the visibility of the middle panel
-        middlePanel.setVisible(!isVisible);
+        middlePanel.setVisible(!middlePanel.isVisible());
     }
 
 
