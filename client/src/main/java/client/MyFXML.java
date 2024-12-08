@@ -33,13 +33,28 @@ public class MyFXML {
 
     private Injector injector;
 
+    /**
+     * Constructor for the MyFXML object
+     * @param injector Reference to the Guice injector
+     */
     public MyFXML(Injector injector) {
         this.injector = injector;
     }
 
+    /**
+     * TODO
+     * @param c TODO
+     * @param parts TODO
+     * @return TODO
+     * @param <T> TODO
+     */
     public <T> Pair<T, Parent> load(Class<T> c, String... parts) {
         try {
-            var loader = new FXMLLoader(getLocation(parts), null, null, new MyFactory(), StandardCharsets.UTF_8);
+            var loader = new FXMLLoader(getLocation(parts),
+                    null,
+                    null,
+                    new MyFactory(),
+                    StandardCharsets.UTF_8);
             Parent parent = loader.load();
             T ctrl = loader.getController();
             return new Pair<>(ctrl, parent);
@@ -58,12 +73,7 @@ public class MyFXML {
         @Override
         @SuppressWarnings("rawtypes")
         public Builder<?> getBuilder(Class<?> type) {
-            return new Builder() {
-                @Override
-                public Object build() {
-                    return injector.getInstance(type);
-                }
-            };
+            return (Builder) () -> injector.getInstance(type);
         }
 
         @Override

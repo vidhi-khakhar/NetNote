@@ -250,7 +250,8 @@ public class MainCtrl {
      */
     public void handleDeleteNote() {
         if (selectedNoteIndex == -1) {
-            showWarning("No Note Selected", "No note selected for deletion. Please select a note and try again.");
+            showWarning("No Note Selected",
+                    "No note selected for deletion. Please select a note and try again.");
             return;
         }
 
@@ -293,8 +294,8 @@ public class MainCtrl {
     public void commitDeleteNote(int noteIndex) {
         savedNotes.remove(noteIndex);
         if (!savedNotes.isEmpty()) {
-                int newIndex = Math.min(noteIndex, savedNotes.size() - 1);
-                notesList.getSelectionModel().select(newIndex);
+            int newIndex = Math.min(noteIndex, savedNotes.size() - 1);
+            notesList.getSelectionModel().select(newIndex);
         } else {
             notesList.getSelectionModel().clearSelection();
         }
@@ -315,7 +316,8 @@ public class MainCtrl {
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
             renderedNoteView.getEngine().loadContent(selectedNote.getText());
         } else {
-            // Reset when no valid note is selected (i.e., when the list is empty or nothing is selected)
+            // Reset when no valid note is selected
+            // (i.e., when the list is empty or nothing is selected)
             selectedNoteIndex = -1;
             noteTitleInput.clear();
             noteEditor.clear();

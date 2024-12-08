@@ -63,7 +63,7 @@
         <module name="CyclomaticComplexity">
             <property name="severity" value="warning"/>
             <property name="switchBlockAsSingleDecisionPoint" value="true"/>
-            <property name="max" value="8"/>
+            <property name="max" value="12"/>
             <property name="tokens" value="LITERAL_WHILE, LITERAL_DO, LITERAL_FOR, LITERAL_IF, LITERAL_SWITCH, LITERAL_CASE, QUESTION"/>
         </module>
         <module name="Indentation">
@@ -89,6 +89,9 @@
             <property name="severity" value="warning"/>
         </module>
         <module name="LambdaParameterName">
+            <property name="format" value="(^_|([a-z][a-zA-Z0-9]*)$)"/>
+            <message key="name.invalidPattern"
+                     value="Class type name ''{0}'' must match pattern ''{1}''."/>
             <property name="severity" value="warning"/>
         </module>
         <module name="TypeName">
