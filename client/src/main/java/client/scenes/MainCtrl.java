@@ -1,15 +1,20 @@
 package client.scenes;
 
+import client.utils.undo.*;
 import commons.Note;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,13 +27,16 @@ public class MainCtrl {
      * If {@code selectedNoteIndex == -1},  no note is being edited, and thus a new note
      * is ADDED<br>
      * If {@code selectedNoteIndex != -1}, an existing note is being updated, and the note at the
-     *   {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
+     * {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
      **/
-    private int selectedNoteIndex  = -1;
+    private int selectedNoteIndex = -1;
     private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
+
+    // The capacity gives how many previous actions are stored.
+    private final UndoHandler undoHandler = new UndoHandler(100);
 
     private Stage primaryStage;
     private Scene mainView;
@@ -60,6 +68,9 @@ public class MainCtrl {
     @FXML
     private TextField noteTitleInput;
 
+    private final ChangeListener<String> noteTitleInputListener =
+            (_, _, _) -> updateTitle();
+
     @FXML
     private TextArea noteEditor;
 
@@ -88,7 +99,7 @@ public class MainCtrl {
      * Initializes the controller.
      *
      * @param primaryStage Reference to the primary stage.
-     * @param mainView Holds a reference to the mainView scene.
+     * @param mainView     Holds a reference to the mainView scene.
      */
     public void initialize(Stage primaryStage, Scene mainView) {
 
@@ -123,15 +134,39 @@ public class MainCtrl {
                     }
                 });
 
-        noteTitleInput.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateTitle();
-        });
+        noteTitleInput.textProperty().addListener(noteTitleInputListener);
         updateDisplay();
 
+
+        mainView.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            List<String> eventKeys = new ArrayList<>();
+            if (event.isControlDown()) eventKeys.add("Ctrl");
+            if (event.isAltDown()) eventKeys.add("Alt");
+            if (event.isShiftDown()) eventKeys.add("Shift");
+            eventKeys.add(event.getCode().getChar());
+
+            switch (String.join("+", eventKeys)) {
+                case "Ctrl+Z" -> {
+                    try {
+                        undoHandler.undoAction();
+                    } catch (CannotUndoException e) {
+                        //TODO Show pop-up that the action could not be undone
+                    }
+                }
+                case "Ctrl+Y" -> {
+                    try {
+                        undoHandler.redoAction();
+                    } catch (CannotRedoException e) {
+                        //TODO Show pop-up that the action could not be redone
+                    }
+                }
+            }
+        });
     }
 
     /**
      * Getter for the list of saved notes.
+     *
      * @return The list of saved notes.
      */
     public ObservableList<Note> getSavedNotes() {
@@ -140,6 +175,7 @@ public class MainCtrl {
 
     /**
      * Setter for the list of saved notes.
+     *
      * @param newNotes The new list of saved notes.
      */
     public void setSavedNotes(ObservableList<Note> newNotes) {
@@ -148,6 +184,7 @@ public class MainCtrl {
 
     /**
      * Getter for the note editor.
+     *
      * @return An instance of the note editor textarea.
      */
     public TextArea getNoteEditor() {
@@ -156,6 +193,7 @@ public class MainCtrl {
 
     /**
      * Getter for the note title input box.
+     *
      * @return An instance of the note title input box.
      */
     public TextField getNoteTitleInput() {
@@ -164,6 +202,7 @@ public class MainCtrl {
 
     /**
      * Getter for the rendered note webview.
+     *
      * @return An instance of the rendered note webview.
      */
     public WebView getRenderedNoteView() {
@@ -172,6 +211,7 @@ public class MainCtrl {
 
     /**
      * Getter for the rendered note title label.
+     *
      * @return An instance of the rendered note title label.
      */
     public Label getRenderedNoteTitleLabel() {
@@ -256,18 +296,44 @@ public class MainCtrl {
         }
 
         if (showConfirmation("Delete Note", "Are you sure you want to delete this note?")) {
+            Note deletedNote = savedNotes.get(selectedNoteIndex);
+            undoHandler.pushAction(new DeleteNoteAction(
+                    deletedNote,
+                    deletedNote.getTitle(),
+                    deletedNote.getText(),
+                    selectedNoteIndex,
+                    this));
             commitDeleteNote(selectedNoteIndex);
         } else {
             updateDisplay();
         }
     }
 
+    /**
+     * Undoes the deletion of a note by reinstating it in the list of notes
+     * and selecting it.
+     *
+     * @param deletedNote The entity corresponding to the deleted note.
+     * @param noteIndex   The position the deleted noted had in the list of notes.
+     */
+    public void handleUndoDelete(Note deletedNote, int noteIndex) {
+        savedNotes.add(noteIndex, deletedNote);
+        notesList.getSelectionModel().select(noteIndex);
+        selectedNoteIndex = noteIndex;
+        noteTitleInput.setText(deletedNote.getTitle());
+        noteEditor.setText(deletedNote.getText());
+
+        renderedNoteTitleLabel.setText(deletedNote.getTitle());
+        renderedNoteView.getEngine().loadContent(deletedNote.getText());
+    }
 
     /**
      * A Warning pop-up message (only option is to say OK)
-     * A Confirmation pop=up message (Options: OK / CANCEL)
+     *
+     * @param title   The title of the pop-up message
+     * @param message The body of the pop-up message
      */
-    private void showWarning(String title, String message) {
+    public void showWarning(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -275,7 +341,15 @@ public class MainCtrl {
         alert.showAndWait();
     }
 
-    private boolean showConfirmation(String title, String message) {
+    /**
+     * A Confirmation pop-up message (Options: OK / CANCEL)
+     *
+     * @param title   The title of the pop-up message
+     * @param message The body of the pop-up message
+     * @return True if the user pressed OK, false if the user pressed
+     * CANCEL or closed the pop-up
+     */
+    public boolean showConfirmation(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -302,7 +376,6 @@ public class MainCtrl {
         displaySavedNote();
     }
 
-
     /**
      * Updates the contents of the editor and the rendered view
      * after the user select a different note to load.
@@ -313,13 +386,20 @@ public class MainCtrl {
             Note selectedNote = savedNotes.get(selectedNoteIndex);
             noteTitleInput.setText(selectedNote.getTitle());
             noteEditor.setText(selectedNote.getText());
+
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
             renderedNoteView.getEngine().loadContent(selectedNote.getText());
         } else {
             // Reset when no valid note is selected
             // (i.e., when the list is empty or nothing is selected)
             selectedNoteIndex = -1;
+
+            // Prevents the triggering of `updateTitle()`, which would create
+            // a new note with no title and no text
+            noteTitleInput.textProperty().removeListener(noteTitleInputListener);
             noteTitleInput.clear();
+            noteTitleInput.textProperty().addListener(noteTitleInputListener);
+
             noteEditor.clear();
             renderedNoteTitleLabel.setText("The title is empty");
             renderedNoteView.getEngine().loadContent("The note is empty");
@@ -347,7 +427,6 @@ public class MainCtrl {
         }
     }
 
-
     /**
      * Fetches new data from the server
      */
@@ -355,61 +434,22 @@ public class MainCtrl {
         // TODO
     }
 
-
-    /**
-     * Provides the rendered view when the "Render!" button is pressed.
-     */
-    public void renderNote() {
-        String title = noteTitleInput.getText().trim();
-        String note = noteEditor.getText().trim();
-
-        updateTitle(); // This will update the title in the rendered view and the list.
-
-        // If both the title and note are empty, set default content in the rendered view
-        if (title.isEmpty() && note.isEmpty()) {
-            renderedNoteView.getEngine().loadContent("The note is empty");
-            return;
-        }
-
-        // Handle rendering note content (markdown processing or default message)
-        if (note.isEmpty()) {
-            renderedNoteView.getEngine().loadContent("The note is empty");
-        } else {
-            renderedNoteView.getEngine().loadContent(note);
-        }
-
-        // Handle adding/updating note in the saved notes list
-        if (selectedNoteIndex == -1) {
-            Note newNote = new Note(title, note);
-            savedNotes.add(newNote);
-            selectedNoteIndex = savedNotes.size() - 1;
-            notesList.getSelectionModel().select(selectedNoteIndex);
-        } else {
-            Note selectedNote = savedNotes.get(selectedNoteIndex);
-            selectedNote.setTitle(title);
-            selectedNote.setText(note);
-            notesList.refresh();
-        }
-    }
-
-
     /**
      * Displays the problems with Markdown rendering in the webview.
      */
     public void showProblems() {
         String renderedContent = markdownCtrl.markdownToHtml(content);
-        if(problemsCheckbox.isSelected()){
+        if (problemsCheckbox.isSelected()) {
             noteEditor.setEditable(false);
             List<String> problems = markdownCtrl.getProblems(content);
             StringBuilder result = new StringBuilder();
-            for(int i = 0; i < problems.size(); i++){
+            for (int i = 0; i < problems.size(); i++) {
                 result.append(problems.get(i));
-                if(i < problems.size() - 1)
+                if (i < problems.size() - 1)
                     result.append("\n");
             }
             renderedNoteView.getEngine().loadContent(result.toString());
-        }
-        else{
+        } else {
             noteEditor.setEditable(true);
             renderedNoteView.getEngine().loadContent(renderedContent);
         }
@@ -418,12 +458,9 @@ public class MainCtrl {
     /**
      * Toggles the middle panel of the interface.
      */
-
     public void toggleEditor() {
         middlePanel.setVisible(!middlePanel.isVisible());
     }
-
-
 
     /**
      * Updates the title of the selected note with the text in the inputTitle field.<br>
