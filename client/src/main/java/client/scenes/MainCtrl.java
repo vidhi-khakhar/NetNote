@@ -8,12 +8,13 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,9 +27,9 @@ public class MainCtrl {
      * If {@code selectedNoteIndex == -1},  no note is being edited, and thus a new note
      * is ADDED<br>
      * If {@code selectedNoteIndex != -1}, an existing note is being updated, and the note at the
-     *   {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
+     * {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
      **/
-    private int selectedNoteIndex  = -1;
+    private int selectedNoteIndex = -1;
     private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
@@ -98,7 +99,7 @@ public class MainCtrl {
      * Initializes the controller.
      *
      * @param primaryStage Reference to the primary stage.
-     * @param mainView Holds a reference to the mainView scene.
+     * @param mainView     Holds a reference to the mainView scene.
      */
     public void initialize(Stage primaryStage, Scene mainView) {
 
@@ -138,21 +139,26 @@ public class MainCtrl {
 
 
         mainView.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.isControlDown() && event.getCode() == KeyCode.Z) {
-                try {
-                    undoHandler.undoAction();
-                } catch (CannotUndoException e) {
-                    //TODO Show pop-up that the action could not be undone
-                }
-            }
-        });
+            List<String> eventKeys = new ArrayList<>();
+            if (event.isControlDown()) eventKeys.add("Ctrl");
+            if (event.isAltDown()) eventKeys.add("Alt");
+            if (event.isShiftDown()) eventKeys.add("Shift");
+            eventKeys.add(event.getCode().getChar());
 
-        mainView.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.isControlDown() && event.getCode() == KeyCode.Y) {
-                try {
-                    undoHandler.redoAction();
-                } catch (CannotRedoException e) {
-                    //TODO Show pop-up that the action could not be redone
+            switch (String.join("+", eventKeys)) {
+                case "Ctrl+Z" -> {
+                    try {
+                        undoHandler.undoAction();
+                    } catch (CannotUndoException e) {
+                        //TODO Show pop-up that the action could not be undone
+                    }
+                }
+                case "Ctrl+Y" -> {
+                    try {
+                        undoHandler.redoAction();
+                    } catch (CannotRedoException e) {
+                        //TODO Show pop-up that the action could not be redone
+                    }
                 }
             }
         });
@@ -160,6 +166,7 @@ public class MainCtrl {
 
     /**
      * Getter for the list of saved notes.
+     *
      * @return The list of saved notes.
      */
     public ObservableList<Note> getSavedNotes() {
@@ -168,6 +175,7 @@ public class MainCtrl {
 
     /**
      * Setter for the list of saved notes.
+     *
      * @param newNotes The new list of saved notes.
      */
     public void setSavedNotes(ObservableList<Note> newNotes) {
@@ -176,6 +184,7 @@ public class MainCtrl {
 
     /**
      * Getter for the note editor.
+     *
      * @return An instance of the note editor textarea.
      */
     public TextArea getNoteEditor() {
@@ -184,6 +193,7 @@ public class MainCtrl {
 
     /**
      * Getter for the note title input box.
+     *
      * @return An instance of the note title input box.
      */
     public TextField getNoteTitleInput() {
@@ -192,6 +202,7 @@ public class MainCtrl {
 
     /**
      * Getter for the rendered note webview.
+     *
      * @return An instance of the rendered note webview.
      */
     public WebView getRenderedNoteView() {
@@ -200,6 +211,7 @@ public class MainCtrl {
 
     /**
      * Getter for the rendered note title label.
+     *
      * @return An instance of the rendered note title label.
      */
     public Label getRenderedNoteTitleLabel() {
@@ -302,7 +314,7 @@ public class MainCtrl {
      * and selecting it.
      *
      * @param deletedNote The entity corresponding to the deleted note.
-     * @param noteIndex The position the deleted noted had in the list of notes.
+     * @param noteIndex   The position the deleted noted had in the list of notes.
      */
     public void handleUndoDelete(Note deletedNote, int noteIndex) {
         savedNotes.add(noteIndex, deletedNote);
@@ -318,7 +330,7 @@ public class MainCtrl {
     /**
      * A Warning pop-up message (only option is to say OK)
      *
-     * @param title The title of the pop-up message
+     * @param title   The title of the pop-up message
      * @param message The body of the pop-up message
      */
     public void showWarning(String title, String message) {
@@ -332,7 +344,7 @@ public class MainCtrl {
     /**
      * A Confirmation pop-up message (Options: OK / CANCEL)
      *
-     * @param title The title of the pop-up message
+     * @param title   The title of the pop-up message
      * @param message The body of the pop-up message
      * @return True if the user pressed OK, false if the user pressed
      * CANCEL or closed the pop-up
@@ -423,58 +435,21 @@ public class MainCtrl {
     }
 
     /**
-     * Provides the rendered view when the "Render!" button is pressed.
-     */
-    public void renderNote() {
-        String title = noteTitleInput.getText().trim();
-        String note = noteEditor.getText().trim();
-
-        updateTitle(); // This will update the title in the rendered view and the list.
-
-        // If both the title and note are empty, set default content in the rendered view
-        if (title.isEmpty() && note.isEmpty()) {
-            renderedNoteView.getEngine().loadContent("The note is empty");
-            return;
-        }
-
-        // Handle rendering note content (markdown processing or default message)
-        if (note.isEmpty()) {
-            renderedNoteView.getEngine().loadContent("The note is empty");
-        } else {
-            renderedNoteView.getEngine().loadContent(note);
-        }
-
-        // Handle adding/updating note in the saved notes list
-        if (selectedNoteIndex == -1) {
-            Note newNote = new Note(title, note);
-            savedNotes.add(newNote);
-            selectedNoteIndex = savedNotes.size() - 1;
-            notesList.getSelectionModel().select(selectedNoteIndex);
-        } else {
-            Note selectedNote = savedNotes.get(selectedNoteIndex);
-            selectedNote.setTitle(title);
-            selectedNote.setText(note);
-            notesList.refresh();
-        }
-    }
-
-    /**
      * Displays the problems with Markdown rendering in the webview.
      */
     public void showProblems() {
         String renderedContent = markdownCtrl.markdownToHtml(content);
-        if(problemsCheckbox.isSelected()){
+        if (problemsCheckbox.isSelected()) {
             noteEditor.setEditable(false);
             List<String> problems = markdownCtrl.getProblems(content);
             StringBuilder result = new StringBuilder();
-            for(int i = 0; i < problems.size(); i++){
+            for (int i = 0; i < problems.size(); i++) {
                 result.append(problems.get(i));
-                if(i < problems.size() - 1)
+                if (i < problems.size() - 1)
                     result.append("\n");
             }
             renderedNoteView.getEngine().loadContent(result.toString());
-        }
-        else{
+        } else {
             noteEditor.setEditable(true);
             renderedNoteView.getEngine().loadContent(renderedContent);
         }
