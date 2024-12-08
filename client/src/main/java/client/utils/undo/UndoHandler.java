@@ -70,8 +70,10 @@ public class UndoHandler {
             actions.get(currentIndex + 1).redo();
             currentIndex++;
         } catch (CannotRedoException e) {
-            actions.remove(currentIndex + 1);
-            redoAction();
+            int numberActionsLeft = actions.size() - currentIndex - 1;
+            for (int i = 1; i <= numberActionsLeft; i++) {
+                actions.removeLast();
+            }
         }
     }
 }

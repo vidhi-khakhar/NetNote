@@ -13,6 +13,7 @@ public class UndoHandlerTest {
     @BeforeEach
     void setUp() {
         sut = new UndoHandler(3);
+        testData = new ArrayList<>();
         testData.add("AB");
         sut.pushAction(new TestAction(testData, "AB"));
         testData.add("CD");
