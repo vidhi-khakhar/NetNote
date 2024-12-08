@@ -1,6 +1,0 @@
-2024-11-26 23:35:27.673533+01:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (user_id bigint not null, username varchar(255), primary key (user_id))"; expected "identifier"; SQL statement:
-create table user (user_id bigint not null, username varchar(255), primary key (user_id)) [42001-224]
-2024-11-26 23:35:27.695534+01:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists user_collection add constraint FKshern7tuf2w1689svq1fm88sw foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
-alter table if exists user_collection add constraint FKshern7tuf2w1689svq1fm88sw foreign key (user_id) references user [42001-224]
