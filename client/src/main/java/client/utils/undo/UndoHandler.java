@@ -53,10 +53,14 @@ public class UndoHandler {
         if (currentIndex == -1) throw new CannotUndoException();
         try {
             actions.get(currentIndex).undo();
+            currentIndex--;
         } catch (CannotUndoException e) {
-            actions.remove(currentIndex);
+            while (currentIndex > -1) {
+                actions.removeFirst();
+                currentIndex--;
+            }
+            throw new CannotUndoException();
         }
-        currentIndex--;
     }
 
     /**
@@ -74,6 +78,7 @@ public class UndoHandler {
             for (int i = 1; i <= numberActionsLeft; i++) {
                 actions.removeLast();
             }
+            throw new CannotRedoException();
         }
     }
 }

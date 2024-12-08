@@ -100,4 +100,47 @@ public class UndoHandlerTest {
     void redoActionWithoutPreviousUndoFails() {
         assertThrows(CannotRedoException.class, () -> sut.redoAction());
     }
+
+    @Test
+    void noUndoSkipping() {
+        try {
+            testData.add("ZZ");
+            sut.pushAction(new TestAction(testData, "ZZ", true, false));
+            assertThrows(CannotUndoException.class, () -> sut.undoAction());
+        } catch (Exception e) {
+            fail("Should be able to undo/redo");
+        }
+    }
+
+    @Test
+    void noRedoSkipping() {
+        try {
+            sut.undoAction();
+            sut.undoAction();
+            testData.add("ZZ");
+            sut.pushAction(new TestAction(testData, "ZZ", false, true));
+            testData.add("AA");
+            sut.pushAction(new TestAction(testData, "AA"));
+            sut.undoAction();
+            sut.undoAction();
+            assertThrows(CannotRedoException.class, () -> sut.redoAction());
+        } catch (Exception e) {
+            fail("Should be able to undo/redo");
+        }
+    }
+
+    @Test
+    void blockingUndoDoesNotBlockRedo() {
+        try {
+            testData.add("ZZ");
+            sut.pushAction(new TestAction(testData, "ZZ", true, false));
+            testData.add("AA");
+            sut.pushAction(new TestAction(testData, "AA"));
+            sut.undoAction();
+            assertThrows(CannotUndoException.class, () -> sut.undoAction());
+            assertDoesNotThrow(() -> sut.redoAction());
+        } catch (Exception e) {
+            fail("Should be able to undo/redo");
+        }
+    }
 }
