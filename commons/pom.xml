@@ -67,6 +67,8 @@
 					<sourceDirectories>${project.basedir}</sourceDirectories>
 					<includes>src/**/*.java,**/*.xml,**/*.yml</includes>
 					<excludes>**/target/**</excludes>
+					<failOnViolation>true</failOnViolation>
+					<violationSeverity>warning</violationSeverity>
 				</configuration>
 				<executions>
 					<execution>
