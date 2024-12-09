@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class MarkdownCtrl{
+public class MarkdownCtrl {
 
     /**
      * Method that parses a markdown string to html.
@@ -67,7 +67,9 @@ public class MarkdownCtrl{
                 problems.add(problem.toString());
             }
 
-            if((!line.isEmpty() && numberedListStarterCondition(line)) && !numberedListCheck(line)) {
+            if((!line.isEmpty() &&
+                    numberedListStarterCondition(line))
+                    && !numberedListCheck(line)) {
                 MarkdownProblem problem = new MarkdownProblem(lineNr,
                         MarkdownProblemType.INCORRECT_NUM_LIST);
                 problems.add(problem.toString());

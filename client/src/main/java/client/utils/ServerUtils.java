@@ -28,6 +28,10 @@ public class ServerUtils {
 
     private static final String SERVER = "http://localhost:8080/";
 
+    /**
+     * Checks if the server at the given URL can be connected to
+     * @return True if the server can be connected to, false otherwise
+     */
     public boolean isServerAvailable() {
         try {
             ClientBuilder.newClient(new ClientConfig()) //
