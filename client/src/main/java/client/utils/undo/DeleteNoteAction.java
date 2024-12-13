@@ -6,7 +6,7 @@ import commons.Note;
 public record DeleteNoteAction(Note deletedNote,
                                String originalTitle,
                                String originalText,
-                               int noteIndex,
+                               int selectedNoteIndex,
                                MainCtrl mainCtrl) implements ClientAction {
 
     /**
@@ -14,21 +14,20 @@ public record DeleteNoteAction(Note deletedNote,
      */
     @Override
     public void undo() {
-        mainCtrl.handleReAddNote(deletedNote, noteIndex);
+        mainCtrl.handleUndoDelete(deletedNote, selectedNoteIndex);
     }
 
     /**
      * Redoes the previously undone note deletion
      *
      * @throws CannotRedoException If the note to be re-deleted was modified
-     *                             after the delete operation was undone
+     * after the delete operation was undone
      */
     @Override
     public void redo() throws CannotRedoException {
         if (!deletedNote.getText().equals(originalText) ||
                 !deletedNote.getTitle().equals(originalTitle))
             throw new CannotRedoException();
-        if (!mainCtrl.handleDeleteNote(noteIndex, false))
-            throw new ActionAbortedException();
+        mainCtrl.commitDeleteNote(selectedNoteIndex);
     }
 }

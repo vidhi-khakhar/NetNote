@@ -280,76 +280,43 @@ public class MainCtrl {
                 renderedNoteView.getEngine().loadContent("The note is empty");
                 selectedNoteIndex = savedNotes.size() - 1;
 
-                undoHandler.pushAction(new CreateNoteAction(
-                        newNote,
-                        newNote.getTitle(),
-                        newNote.getText(),
-                        selectedNoteIndex,
-                        this));
-
                 noteEditor.requestFocus();
             }
         });
     }
 
     /**
-     * Deletes the currently selected note and stores this action in the
-     * undo stack.
-     * Parameterless overload used by the delete button.
-     *
-     * @return True if the deletion was successful, false if no note was selected
-     * or the user cancelled the operation.
-     */
-    public boolean handleDeleteNote() {
-        return handleDeleteNote(selectedNoteIndex, true);
-    }
-
-    /**
      * Deletes a note from the list of notes.
-     *
-     * @param index              The index of the note to delete in the list of notes.
-     * @param isAddedToUndoStack True if the delete action is added to the undo handler's stack,
-     *                           false if it is not added.
-     * @return True if the deletion was successful, false if the index was -1
-     * or the user cancelled the operation.
      */
-    public boolean handleDeleteNote(int index, boolean isAddedToUndoStack) {
-        if (index == -1) {
+    public void handleDeleteNote() {
+        if (selectedNoteIndex == -1) {
             showWarning("No Note Selected",
                     "No note selected for deletion. Please select a note and try again.");
-            return false;
+            return;
         }
 
-        Note deletedNote = savedNotes.get(index);
-
-        if (showConfirmation("Delete Note", "Are you sure you want to delete this note?\n" +
-                deletedNote.getTitle())) {
-
-
-            if (isAddedToUndoStack) {
-                undoHandler.pushAction(new DeleteNoteAction(
-                        deletedNote,
-                        deletedNote.getTitle(),
-                        deletedNote.getText(),
-                        index,
-                        this));
-            }
-            commitDeleteNote(index);
-            return true;
+        if (showConfirmation("Delete Note", "Are you sure you want to delete this note?")) {
+            Note deletedNote = savedNotes.get(selectedNoteIndex);
+            undoHandler.pushAction(new DeleteNoteAction(
+                    deletedNote,
+                    deletedNote.getTitle(),
+                    deletedNote.getText(),
+                    selectedNoteIndex,
+                    this));
+            commitDeleteNote(selectedNoteIndex);
         } else {
             updateDisplay();
-            return false;
         }
     }
 
     /**
-     * Undoes the deletion / redoes the creation of a note by
-     * reinstating it in the list of notes and selecting it.
+     * Undoes the deletion of a note by reinstating it in the list of notes
+     * and selecting it.
      *
      * @param deletedNote The entity corresponding to the deleted note.
      * @param noteIndex   The position the deleted noted had in the list of notes.
      */
-    public void handleReAddNote(Note deletedNote, int noteIndex) {
+    public void handleUndoDelete(Note deletedNote, int noteIndex) {
         savedNotes.add(noteIndex, deletedNote);
         notesList.getSelectionModel().select(noteIndex);
         selectedNoteIndex = noteIndex;
