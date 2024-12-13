@@ -1,12 +1,9 @@
 package client.utils;
 
 import commons.Note;
-import client.scenes.MainCtrl;
-import javafx.collections.FXCollections;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.api.NoteController;
 
 import java.util.HashMap;
 import java.util.List;
