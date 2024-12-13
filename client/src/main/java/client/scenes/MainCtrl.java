@@ -21,13 +21,13 @@ import java.util.Optional;
 public class MainCtrl {
 
     /**
-     * The {@code noteIndex} variable tracks the index of the currently selected or
+     * The {@code selectedNoteIndex} variable tracks the index of the currently selected or
      * edited note in the {@code savedNotes} observable list.<br>
      * <br>
-     * If {@code noteIndex == -1},  no note is being edited, and thus a new note
+     * If {@code selectedNoteIndex == -1},  no note is being edited, and thus a new note
      * is ADDED<br>
-     * If {@code noteIndex != -1}, an existing note is being updated, and the note at the
-     * {@code noteIndex} is modified ({@code savedNotes.set()}).<br>
+     * If {@code selectedNoteIndex != -1}, an existing note is being updated, and the note at the
+     * {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
      **/
     private int selectedNoteIndex = -1;
     private boolean isDarkTheme = false;
