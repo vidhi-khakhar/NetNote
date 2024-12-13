@@ -121,17 +121,25 @@ public class NoteServerUtils {
             String jsonData = new ObjectMapper()
                     .writeValueAsString(noteData);  // Convert Map to JSON
 
-            Response response = ClientBuilder.newClient()
-                    .target(SERVER + "api/notes/" + title)
-                    .request(MediaType.APPLICATION_JSON)
-                    .method("PATCH", Entity.entity(jsonData, MediaType.APPLICATION_JSON));
+            // Build the Jersey client
+            Client client = ClientBuilder.newClient();
 
+            // Perform the POST request with the X-HTTP-Method-Override header
+            Response response = client.target(SERVER)
+                    .path("api/notes/" + title)
+                    .request(MediaType.APPLICATION_JSON)
+                    .header("X-HTTP-Method-Override", "PATCH")
+                    .post(Entity.entity(jsonData, MediaType.APPLICATION_JSON));
+
+            // Handle the response
             if (response.getStatus() == 200) {
                 System.out.println("Note updated successfully.");
             } else {
                 System.out.println("Failed to update note. Status: " + response.getStatus());
+                System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
+            System.err.println("An error occurred while updating the note: " + e.getMessage());
             e.printStackTrace();
         }
     }
