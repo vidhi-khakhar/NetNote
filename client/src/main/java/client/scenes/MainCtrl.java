@@ -280,6 +280,13 @@ public class MainCtrl {
                 renderedNoteView.getEngine().loadContent("The note is empty");
                 selectedNoteIndex = savedNotes.size() - 1;
 
+                undoHandler.pushAction(new CreateNoteAction(
+                        newNote,
+                        newNote.getTitle(),
+                        newNote.getText(),
+                        selectedNoteIndex,
+                        this));
+
                 noteEditor.requestFocus();
             }
         });
