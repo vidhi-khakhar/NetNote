@@ -61,7 +61,7 @@ public class NoteController {
      * the request is valid or not, and on whether there is a note
      * with the specified title or not.
      */
-    @PatchMapping("/{title}")
+    @PostMapping("/{title}")
     public ResponseEntity<String> updateNote(@PathVariable("title") String title,
                                      @RequestBody Map<String, String> noteData) {
         Optional<Note> noteOptional = db
