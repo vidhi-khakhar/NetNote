@@ -381,7 +381,6 @@ public class MainCtrl {
      * after the user select a different note to load.
      */
     public void displaySavedNote() {
-        // If there is a valid index (not -1) and the index is within the range of savedNotes
         if (selectedNoteIndex != -1 && selectedNoteIndex < savedNotes.size()) {
             Note selectedNote = savedNotes.get(selectedNoteIndex);
             noteTitleInput.setText(selectedNote.getTitle());
@@ -390,21 +389,18 @@ public class MainCtrl {
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
             renderedNoteView.getEngine().loadContent(selectedNote.getText());
         } else {
-            // Reset when no valid note is selected
-            // (i.e., when the list is empty or nothing is selected)
             selectedNoteIndex = -1;
 
-            // Prevents the triggering of `updateTitle()`, which would create
-            // a new note with no title and no text
             noteTitleInput.textProperty().removeListener(noteTitleInputListener);
             noteTitleInput.clear();
             noteTitleInput.textProperty().addListener(noteTitleInputListener);
 
             noteEditor.clear();
-            renderedNoteTitleLabel.setText("The title is empty");
+            renderedNoteTitleLabel.setText("Untitled Note");
             renderedNoteView.getEngine().loadContent("The note is empty");
         }
     }
+
 
     /**
      * Adds a listener to the text editor to listen to changes made in the text,
@@ -413,7 +409,11 @@ public class MainCtrl {
     public void updateDisplay() {
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
-            renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
+            if (noteTitleInput.getText().isEmpty() && content.isEmpty()) {
+                renderedNoteView.getEngine().loadContent("The note is empty");
+            } else {
+                renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
+            }
         });
 
         if (selectedNoteIndex != -1) {
@@ -421,9 +421,8 @@ public class MainCtrl {
             Note selectedNote = savedNotes.get(selectedNoteIndex);
             selectedNote.setText(content);
             notesList.refresh();
-        } else {
-            renderedNoteTitleLabel.setText("The title is empty");
-            renderedNoteView.getEngine().loadContent("The note is empty");
+        } else if (!content.isEmpty()) {
+            renderedNoteTitleLabel.setText("Untitled Note");
         }
     }
 
@@ -486,7 +485,8 @@ public class MainCtrl {
         if (selectedNote != null) {
             selectedNote.setTitle(updatedTitle);
             notesList.refresh();
-        } else if (selectedNoteIndex == -1 && savedNotes.isEmpty()) {
+        } else if (selectedNoteIndex == -1 && (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
+            // Ensure the first note is created when only content exists
             String noteContent = noteEditor.getText();
             Note firstNote = new Note(updatedTitle, noteContent);
             savedNotes.add(firstNote);
@@ -496,3 +496,4 @@ public class MainCtrl {
         }
     }
 }
+
