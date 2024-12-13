@@ -424,11 +424,13 @@ public class MainCtrl {
         if (selectedNoteIndex != -1) {
             // If a note is selected, update the content of that note
             Note selectedNote = savedNotes.get(selectedNoteIndex);
-            noteServerUtils.updateNote(selectedNote.getTitle(), new HashMap<String, String>() {{
-             put("title",selectedNote.getTitle());
-             put("text",content);
-            }
-            });
+
+            //calling the noteServerUtils
+            HashMap<String, String> patch = new HashMap<>();
+            patch.put("title", selectedNote.getTitle());
+            patch.put("text",content);
+            noteServerUtils.updateNote(selectedNote.getTitle(), patch);
+
             selectedNote.setText(content);
             notesList.refresh();
         } else {
