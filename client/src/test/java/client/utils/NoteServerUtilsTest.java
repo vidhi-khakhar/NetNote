@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class NoteServerUtilsTest {
 
@@ -17,7 +18,12 @@ class NoteServerUtilsTest {
 
     @BeforeEach
     void setup() {
+
         noteServerUtils = new NoteServerUtils();
+
+        //allow the testing only if server is available
+        assumeTrue(noteServerUtils.isServerAvailable(), "Server is not available, skipping tests.");
+
         n1 = new Note("Note1Test1", "Note 1 content");
 
         // Store the notes before each test
@@ -79,7 +85,8 @@ class NoteServerUtilsTest {
 
     @AfterEach
     void cleanup() {
-        // Clean up: Delete the notes after each test
+        // Clean up: Delete the notes after each test, only if tests are available
+        assumeTrue(noteServerUtils.isServerAvailable());
         noteServerUtils.deleteNote(n1.getTitle());
     }
 }
