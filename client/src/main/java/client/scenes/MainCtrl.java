@@ -518,7 +518,8 @@ public class MainCtrl {
         if (selectedNote != null) {
             selectedNote.setTitle(updatedTitle);
             notesList.refresh();
-        } else if (selectedNoteIndex == -1 && (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
+        } else if (selectedNoteIndex == -1 &&
+                (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
             // Ensure the first note is created when only content exists
             String noteContent = noteEditor.getText();
             Note firstNote = new Note(updatedTitle, noteContent);
