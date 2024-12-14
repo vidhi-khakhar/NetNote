@@ -15,8 +15,11 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+
+import client.utils.NoteServerUtils;
 
 public class MainCtrl {
 
@@ -40,6 +43,8 @@ public class MainCtrl {
 
     private Stage primaryStage;
     private Scene mainView;
+
+    private NoteServerUtils noteServerUtils = new NoteServerUtils();
 
     @FXML
     private VBox leftPanel;
@@ -272,6 +277,7 @@ public class MainCtrl {
             } else {
                 Note newNote = new Note(title.trim(), "");
                 savedNotes.add(newNote);
+                noteServerUtils.storeNote(newNote);
                 notesList.getSelectionModel().select(savedNotes.size() - 1);
                 noteTitleInput.setText(newNote.getTitle());
                 noteEditor.setText(newNote.getText());
@@ -325,6 +331,7 @@ public class MainCtrl {
         if (showConfirmation("Delete Note", "Are you sure you want to delete this note?\n" +
                 deletedNote.getTitle())) {
 
+            noteServerUtils.deleteNote(deletedNote.getTitle());
 
             if (isAddedToUndoStack) {
                 undoHandler.pushAction(new DeleteNoteAction(
@@ -351,6 +358,7 @@ public class MainCtrl {
      */
     public void handleReAddNote(Note deletedNote, int noteIndex) {
         savedNotes.add(noteIndex, deletedNote);
+        noteServerUtils.storeNote(deletedNote);
         notesList.getSelectionModel().select(noteIndex);
         selectedNoteIndex = noteIndex;
         noteTitleInput.setText(deletedNote.getTitle());
@@ -452,6 +460,13 @@ public class MainCtrl {
         if (selectedNoteIndex != -1) {
             // If a note is selected, update the content of that note
             Note selectedNote = savedNotes.get(selectedNoteIndex);
+
+            //calling the noteServerUtils
+            HashMap<String, String> patch = new HashMap<>();
+            patch.put("title", selectedNote.getTitle());
+            patch.put("text",content);
+            noteServerUtils.updateNote(selectedNote.getTitle(), patch);
+
             selectedNote.setText(content);
             notesList.refresh();
         } else if (!content.isEmpty()) {
@@ -516,8 +531,15 @@ public class MainCtrl {
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         if (selectedNote != null) {
-            selectedNote.setTitle(updatedTitle);
             notesList.refresh();
+            boolean isTitlePresent = noteServerUtils.getAllNotes().stream()
+                    .anyMatch(note -> note.getTitle().equals(selectedNote.getTitle()));
+            if(isTitlePresent) {
+                HashMap<String, String> patch = new HashMap<>();
+                patch.put("title", updatedTitle);
+                noteServerUtils.updateNote(selectedNote.getTitle(), patch);
+            }
+            selectedNote.setTitle(updatedTitle);
         } else if (selectedNoteIndex == -1 &&
                 (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
             // Ensure the first note is created when only content exists
