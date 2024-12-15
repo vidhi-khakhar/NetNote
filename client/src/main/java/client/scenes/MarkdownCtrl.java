@@ -77,7 +77,8 @@ public class MarkdownCtrl {
      * @param lastBlank Whether the previous line was blank.
      * @param problems      The list to add problems to.
      */
-    private void checkParagraphSpacing(int lineNr, String line, String last, boolean lastBlank, List<String> problems) {
+    private void checkParagraphSpacing(int lineNr, String line, String last,
+                                       boolean lastBlank, List<String> problems) {
         if (lineNr != 1 && spaceBetweenParagraphs(line, last, lastBlank)) {
             MarkdownProblem problem = new MarkdownProblem(lineNr, MarkdownProblemType.NO_LINE);
             problems.add(problem.toString());
@@ -91,8 +92,9 @@ public class MarkdownCtrl {
      * @param problems The list to add problems to.
      */
     private void checkIncorrectList(int lineNr, String line, List<String> problems) {
-        if (!line.isEmpty() && line.charAt(0) == '-' && !listCheck(line)) {
-            MarkdownProblem problem = new MarkdownProblem(lineNr, MarkdownProblemType.INCORRECT_LIST);
+        if (!line.isEmpty() && line.charAt(0)=='-' && !listCheck(line)){
+            MarkdownProblem problem = new MarkdownProblem(lineNr,
+                    MarkdownProblemType.INCORRECT_LIST);
             problems.add(problem.toString());
         }
     }
@@ -104,8 +106,11 @@ public class MarkdownCtrl {
      * @param problems The list to add problems to.
      */
     private void checkNumberedList(int lineNr, String line, List<String> problems) {
-        if ((!line.isEmpty() && numberedListStarterCondition(line)) && !numberedListCheck(line)) {
-            MarkdownProblem problem = new MarkdownProblem(lineNr, MarkdownProblemType.INCORRECT_NUM_LIST);
+        if ((!line.isEmpty()
+                && numberedListStarterCondition(line))
+                && !numberedListCheck(line)){
+            MarkdownProblem problem = new MarkdownProblem(lineNr,
+                    MarkdownProblemType.INCORRECT_NUM_LIST);
             problems.add(problem.toString());
         }
     }
@@ -119,9 +124,10 @@ public class MarkdownCtrl {
      */
     private void checkSymbolClosing(int lineNr, String line, char symbol, List<String> problems) {
         if (!symbolClosedCorrectly(line, symbol)) {
-            MarkdownProblemType problemType = symbol == '*' ?
-                    MarkdownProblemType.INCORRECT_ASTERISKS : MarkdownProblemType.INCORRECT_UNDERLINES;
-            MarkdownProblem problem = new MarkdownProblem(lineNr, problemType);
+            MarkdownProblemType type = symbol == '*' ?
+                    MarkdownProblemType.INCORRECT_ASTERISKS :
+                    MarkdownProblemType.INCORRECT_UNDERLINES;
+            MarkdownProblem problem = new MarkdownProblem(lineNr, type);
             problems.add(problem.toString());
         }
     }
@@ -135,7 +141,8 @@ public class MarkdownCtrl {
      */
     private void checkUnderlinesSpacing(int lineNr, String line, List<String> problems) {
         if (!underlinesSpacedCorrectly(line)) {
-            MarkdownProblem problem = new MarkdownProblem(lineNr, MarkdownProblemType.NON_SEPARATED_UNDERLINES);
+            MarkdownProblem problem = new MarkdownProblem(lineNr,
+                    MarkdownProblemType.NON_SEPARATED_UNDERLINES);
             problems.add(problem.toString());
         }
     }
@@ -151,15 +158,18 @@ public class MarkdownCtrl {
     private void checkHashtags(int lineNr, String line, List<String> problems) {
         if (hashtagStarterCondition(line)) {
             if (hashtagsOnly(line)) {
-                MarkdownProblem problem = new MarkdownProblem(lineNr, MarkdownProblemType.HASHTAGS_ONLY);
+                MarkdownProblem problem = new MarkdownProblem(lineNr,
+                        MarkdownProblemType.HASHTAGS_ONLY);
                 problems.add(problem.toString());
             } else if (!spaceAfterHashTag(line)) {
-                MarkdownProblem problem = new MarkdownProblem(lineNr, MarkdownProblemType.HASHTAG_NO_SPACE);
+                MarkdownProblem problem = new MarkdownProblem(lineNr,
+                        MarkdownProblemType.HASHTAG_NO_SPACE);
                 problems.add(problem.toString());
             }
             Scanner lineScanner = new Scanner(line);
             if (hashtagSpacesHashtag(lineScanner)) {
-                MarkdownProblem problem = new MarkdownProblem(lineNr, MarkdownProblemType.HASHTAGS_SPACE_HASHTAGS);
+                MarkdownProblem problem = new MarkdownProblem(lineNr,
+                        MarkdownProblemType.HASHTAGS_SPACE_HASHTAGS);
                 problems.add(problem.toString());
             }
             lineScanner.close();
