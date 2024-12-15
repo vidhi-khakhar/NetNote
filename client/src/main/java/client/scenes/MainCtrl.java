@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
@@ -145,6 +146,10 @@ public class MainCtrl {
             if (event.isShiftDown()) eventKeys.add("Shift");
             eventKeys.add(event.getCode().getChar());
 
+            if (event.getCode() == KeyCode.ESCAPE) { searchBar.requestFocus();
+                event.consume();
+            }
+
             switch (String.join("+", eventKeys)) {
                 case "Ctrl+Z" -> {
                     try {
@@ -160,6 +165,11 @@ public class MainCtrl {
                         //TODO Show pop-up that the action could not be redone
                     }
                 }
+                case "Ctrl+N" -> handleAddNote();
+                case "Ctrl+D" -> handleDeleteNote();
+
+
+
             }
         });
     }
