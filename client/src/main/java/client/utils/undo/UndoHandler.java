@@ -60,6 +60,8 @@ public class UndoHandler {
                 currentIndex--;
             }
             throw new CannotUndoException();
+        } catch (ActionAbortedException _) {
+            // Caught before index is decremented, so the stack remains unchanged
         }
     }
 
@@ -79,6 +81,8 @@ public class UndoHandler {
                 actions.removeLast();
             }
             throw new CannotRedoException();
+        } catch (ActionAbortedException _) {
+            // Caught before index is incremented, so the stack remains unchanged
         }
     }
 }
