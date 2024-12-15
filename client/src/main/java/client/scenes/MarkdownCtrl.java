@@ -71,15 +71,15 @@ public class MarkdownCtrl {
     /**
      * Checks if there is no empty line between paragraphs.
      *
-     * @param lineNr        The current line number.
+     * @param Nr        The current line number.
      * @param line          The current line content.
-     * @param lastLine      The content of the previous line.
-     * @param lastLineBlank Whether the previous line was blank.
+     * @param last     The content of the previous line.
+     * @param lastBlank Whether the previous line was blank.
      * @param problems      The list to add problems to.
      */
-    private void checkParagraphSpacing(int lineNr, String line, String lastLine, boolean lastLineBlank, List<String> problems) {
-        if (lineNr != 1 && spaceBetweenParagraphs(line, lastLine, lastLineBlank)) {
-            MarkdownProblem problem = new MarkdownProblem(lineNr, MarkdownProblemType.NO_LINE);
+    private void checkParagraphSpacing(int Nr, String line, String last, boolean lastBlank, List<String> problems) {
+        if (Nr != 1 && spaceBetweenParagraphs(line, last, lastBlank)) {
+            MarkdownProblem problem = new MarkdownProblem(Nr, MarkdownProblemType.NO_LINE);
             problems.add(problem.toString());
         }
     }
