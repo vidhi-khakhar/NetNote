@@ -561,6 +561,15 @@ public class MainCtrl {
         }
     }
 
+
+    /**
+     * Allows the user to make their text bold.<br>
+     * <br>
+     * This method is triggered whenever the user presses Ctrl + B<br>
+     * <br>
+     * It checks if text is currently selected, if so then it wraps it with the Markdown syntax **.
+     * If not, then it adds **|** where | represents user's cursor <br>
+     */
     public void boldMarkdown() {
         String selectedText = noteEditor.getSelectedText();
         if (selectedText.isEmpty()) {
@@ -582,6 +591,14 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Allows the user to make their text italic.<br>
+     * <br>
+     * This method is triggered whenever the user presses Ctrl + I<br>
+     * <br>
+     * It checks if text is currently selected, if so then it wraps it with the Markdown syntax *.
+     * If not, then it adds *|* where | represents user's cursor <br>
+     */
     public void italicMarkdown() {
         String selectedText = noteEditor.getSelectedText();
         if (selectedText.isEmpty()) {
@@ -603,6 +620,13 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Allows the user to make their text underlined.<br>
+     * <br>
+     * This method is triggered whenever the user presses Ctrl + U<br>
+     * <br>
+     * It follows the same logic as bold and italic. <br>
+     */
     public void underlineMarkdown() {
         String selectedText = noteEditor.getSelectedText();
 
