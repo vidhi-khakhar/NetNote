@@ -149,7 +149,8 @@ public class MainCtrl {
             if (event.isShiftDown()) eventKeys.add("Shift");
             eventKeys.add(event.getCode().getChar());
 
-            if (event.getCode() == KeyCode.ESCAPE) { searchBar.requestFocus();
+            if (event.getCode() == KeyCode.ESCAPE) {
+                searchBar.requestFocus(); // fixed indents.
                 event.consume();
             }
 
