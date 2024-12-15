@@ -150,7 +150,6 @@ public class MarkdownCtrl {
     /**
      * Checks if a line starting with hashtags '#' is formatted correctly.
      * It checks for improperly spaced hashtags or lines with only hashtags.
-     *
      * @param lineNr   The current line number.
      * @param line     The current line content.
      * @param problems The list to add problems to.
@@ -373,7 +372,7 @@ public class MarkdownCtrl {
      * THis method finds the next valid underline.
      * @param line     The line being checked.
      * @param start    The starting index for the search.
-     * @param forward  Whether to search forward (true) or backward (false).
+     * @param forward  Whether to search forwards or backwards.
      * @return The position of the next valid underline, or -1 if none is found.
      */
     private int findNextUnderline(String line, int start, boolean forward) {
