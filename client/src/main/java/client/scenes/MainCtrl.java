@@ -14,10 +14,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import client.utils.NoteServerUtils;
 
@@ -111,6 +108,7 @@ public class MainCtrl {
         this.primaryStage = primaryStage;
         this.mainView = mainView;
 
+        savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
         notesList.setItems(savedNotes);
 
         // This part was created with the help of generative AI,
