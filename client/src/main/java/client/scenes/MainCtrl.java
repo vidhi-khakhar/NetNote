@@ -171,9 +171,9 @@ public class MainCtrl {
                 }
                 case "Ctrl+N" -> handleAddNote();
                 case "Ctrl+D" -> handleDeleteNote();
-
-
-
+                case "Ctrl+B" -> boldMarkdown();
+                case "Ctrl+I" -> italicMarkdown();
+                case "Ctrl+U" -> underlineMarkdown();
             }
         });
     }
@@ -560,5 +560,72 @@ public class MainCtrl {
             notesList.refresh();
         }
     }
+
+    public void boldMarkdown() {
+        String selectedText = noteEditor.getSelectedText();
+        if (selectedText.isEmpty()) {
+            int cursorPosition = noteEditor.getCaretPosition();
+            String textBeforeCursor = noteEditor.getText(0, cursorPosition);
+            String textAfterCursor = noteEditor.getText(cursorPosition, noteEditor.getLength());
+
+            noteEditor.setText(textBeforeCursor + "**" + textAfterCursor + "**");
+            noteEditor.positionCaret(cursorPosition + 2);
+
+            noteEditor.requestFocus();
+        } else {
+            if (selectedText.startsWith("**") && selectedText.endsWith("**")) {
+                selectedText = selectedText.substring(2, selectedText.length() - 2);
+                noteEditor.replaceSelection(selectedText);
+            } else {
+                noteEditor.replaceSelection("**" + selectedText + "**");
+            }
+        }
+    }
+
+    public void italicMarkdown() {
+        String selectedText = noteEditor.getSelectedText();
+        if (selectedText.isEmpty()) {
+            int cursorPosition = noteEditor.getCaretPosition();
+            String textBeforeCursor = noteEditor.getText(0, cursorPosition);
+            String textAfterCursor = noteEditor.getText(cursorPosition, noteEditor.getLength());
+
+            noteEditor.setText(textBeforeCursor + "*" + textAfterCursor + "*");
+            noteEditor.positionCaret(cursorPosition + 1);
+
+            noteEditor.requestFocus();
+        } else {
+            if (selectedText.startsWith("*") && selectedText.endsWith("*")) {
+                selectedText = selectedText.substring(1, selectedText.length() - 1);
+                noteEditor.replaceSelection(selectedText);
+            } else {
+                noteEditor.replaceSelection("*" + selectedText + "*");
+            }
+        }
+    }
+
+    public void underlineMarkdown() {
+        String selectedText = noteEditor.getSelectedText();
+
+        if (!selectedText.isEmpty()) {
+            if (selectedText.startsWith("<u>") && selectedText.endsWith("</u>")) {
+                selectedText = selectedText.substring(3, selectedText.length() - 4);
+                noteEditor.replaceSelection(selectedText);
+            } else {
+                noteEditor.replaceSelection("<u>" + selectedText + "</u>");
+            }
+        } else {
+            int cursorPos = noteEditor.getCaretPosition();
+            String textBeforeCursor = noteEditor.getText(0, cursorPos);
+            String textAfterCursor = noteEditor.getText(cursorPos, noteEditor.getLength());
+            noteEditor.setText(textBeforeCursor + "<u>" + textAfterCursor + "</u>");
+
+
+            noteEditor.positionCaret(cursorPos + 3);
+
+
+            noteEditor.requestFocus();
+        }
+    }
+
 }
 
