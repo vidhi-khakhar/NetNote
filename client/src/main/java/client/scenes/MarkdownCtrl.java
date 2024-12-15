@@ -39,13 +39,11 @@ public class MarkdownCtrl {
      *  make something italic, bold, or both.
      *  <br>8. checks if a sequenced that is between the symbol _ is separated from the rest
      *  of the text by whitespace on both sides.
-     *  <br>Doesn't check sublists yet(list within a list).
+     *  <br>Doesn't check sublists yet (list within a list).
      * @param content the String it is checking
      * @return List of the problems
-     *
      */
-
-    public List<String> getProblems(String content){
+    public List<String> getProblems(String content) {
         List<String> problems = new ArrayList<>();
         Scanner scanner = new Scanner(content);
         int lineNr = 0;
@@ -55,69 +53,128 @@ public class MarkdownCtrl {
             lineNr++;
             String line = scanner.nextLine();
 
-            if(lineNr != 1 && spaceBetweenParagraphs(line, lastLine, lastLineBlank)) {
-                MarkdownProblem problem = new MarkdownProblem(lineNr,
-                        MarkdownProblemType.NO_LINE);
-                problems.add(problem.toString());
-            }
+            checkParagraphSpacing(lineNr, line, lastLine, lastLineBlank, problems);
+            checkIncorrectList(lineNr, line, problems);
+            checkNumberedList(lineNr, line, problems);
+            checkSymbolClosing(lineNr, line, '*', problems);
+            checkSymbolClosing(lineNr, line, '_', problems);
+            checkUnderlinesSpacing(lineNr, line, problems);
+            checkHashtags(lineNr, line, problems);
 
-            if(!line.isEmpty() && (line.charAt(0) == '-' && !listCheck(line))) {
-                MarkdownProblem problem = new MarkdownProblem(lineNr,
-                        MarkdownProblemType.INCORRECT_LIST);
-                problems.add(problem.toString());
-            }
+            lastLineBlank = line.isBlank();
+            lastLine = line;
+        }
+        scanner.close();
+        return problems;
+    }
 
-            if((!line.isEmpty() &&
-                    numberedListStarterCondition(line))
-                    && !numberedListCheck(line)) {
-                MarkdownProblem problem = new MarkdownProblem(lineNr,
-                        MarkdownProblemType.INCORRECT_NUM_LIST);
-                problems.add(problem.toString());
-            }
+    /**
+     * Checks if there is no empty line between paragraphs.
+     *
+     * @param lineNr        The current line number.
+     * @param line          The current line content.
+     * @param last     The content of the previous line.
+     * @param lastBlank Whether the previous line was blank.
+     * @param problems      The list to add problems to.
+     */
+    private void checkParagraphSpacing(int lineNr, String line, String last,
+                                       boolean lastBlank, List<String> problems) {
+        if (lineNr != 1 && spaceBetweenParagraphs(line, last, lastBlank)) {
+            MarkdownProblem problem = new MarkdownProblem(lineNr, MarkdownProblemType.NO_LINE);
+            problems.add(problem.toString());
+        }
+    }
 
-            if(!symbolClosedCorrectly(line, '*')){
-                MarkdownProblem problem = new MarkdownProblem(lineNr,
-                        MarkdownProblemType.INCORRECT_ASTERISKS);
-                problems.add(problem.toString());
-            }
+    /**
+     * Checks if a list using '-' is written correctly.
+     * @param lineNr   The current line number.
+     * @param line     The current line content.
+     * @param problems The list to add problems to.
+     */
+    private void checkIncorrectList(int lineNr, String line, List<String> problems) {
+        if (!line.isEmpty() && line.charAt(0)=='-' && !listCheck(line)){
+            MarkdownProblem problem = new MarkdownProblem(lineNr,
+                    MarkdownProblemType.INCORRECT_LIST);
+            problems.add(problem.toString());
+        }
+    }
 
-            if(!symbolClosedCorrectly(line, '_')){
-                MarkdownProblem problem = new MarkdownProblem(lineNr,
-                        MarkdownProblemType.INCORRECT_UNDERLINES);
-                problems.add(problem.toString());
-            }
+    /**
+     * Checks if a ist using '1.' is written correctly.
+     * @param lineNr   The current line number.
+     * @param line     The current line content.
+     * @param problems The list to add problems to.
+     */
+    private void checkNumberedList(int lineNr, String line, List<String> problems) {
+        if ((!line.isEmpty()
+                && numberedListStarterCondition(line))
+                && !numberedListCheck(line)){
+            MarkdownProblem problem = new MarkdownProblem(lineNr,
+                    MarkdownProblemType.INCORRECT_NUM_LIST);
+            problems.add(problem.toString());
+        }
+    }
 
-            if(!underlinesSpacedCorrectly(line)){
-                MarkdownProblem problem = new MarkdownProblem(lineNr,
-                        MarkdownProblemType.NON_SEPARATED_UNDERLINES);
-                problems.add(problem.toString());
-            }
+    /**
+     * Checks if a symbol is closed correctly.
+     * @param lineNr   The current line number.
+     * @param line     The current line content.
+     * @param symbol   The symbol to check
+     * @param problems The list to add problems to.
+     */
+    private void checkSymbolClosing(int lineNr, String line, char symbol, List<String> problems) {
+        if (!symbolClosedCorrectly(line, symbol)) {
+            MarkdownProblemType type = symbol == '*' ?
+                    MarkdownProblemType.INCORRECT_ASTERISKS :
+                    MarkdownProblemType.INCORRECT_UNDERLINES;
+            MarkdownProblem problem = new MarkdownProblem(lineNr, type);
+            problems.add(problem.toString());
+        }
+    }
 
-            if(hashtagStarterCondition(line) && hashtagsOnly(line)) {
+    /**
+     * Checks if a sequence between underscores '_' is spaced correctly.
+     *
+     * @param lineNr   The current line number.
+     * @param line     The current line content.
+     * @param problems The list to add problems to.
+     */
+    private void checkUnderlinesSpacing(int lineNr, String line, List<String> problems) {
+        if (!underlinesSpacedCorrectly(line)) {
+            MarkdownProblem problem = new MarkdownProblem(lineNr,
+                    MarkdownProblemType.NON_SEPARATED_UNDERLINES);
+            problems.add(problem.toString());
+        }
+    }
+
+    /**
+     * Checks if a line starting with hashtags '#' is formatted correctly.
+     * It checks for improperly spaced hashtags or lines with only hashtags.
+     * @param lineNr   The current line number.
+     * @param line     The current line content.
+     * @param problems The list to add problems to.
+     */
+    private void checkHashtags(int lineNr, String line, List<String> problems) {
+        if (hashtagStarterCondition(line)) {
+            if (hashtagsOnly(line)) {
                 MarkdownProblem problem = new MarkdownProblem(lineNr,
                         MarkdownProblemType.HASHTAGS_ONLY);
                 problems.add(problem.toString());
+            } else if (!spaceAfterHashTag(line)) {
+                MarkdownProblem problem = new MarkdownProblem(lineNr,
+                        MarkdownProblemType.HASHTAG_NO_SPACE);
+                problems.add(problem.toString());
             }
-
             Scanner lineScanner = new Scanner(line);
-            if(hashtagStarterCondition(line) && hashtagSpacesHashtag(lineScanner)) {
+            if (hashtagSpacesHashtag(lineScanner)) {
                 MarkdownProblem problem = new MarkdownProblem(lineNr,
                         MarkdownProblemType.HASHTAGS_SPACE_HASHTAGS);
                 problems.add(problem.toString());
             }
             lineScanner.close();
-
-            if(hashtagStarterCondition(line) && !spaceAfterHashTag(line)) {
-                MarkdownProblem problem = new MarkdownProblem(lineNr,
-                        MarkdownProblemType.HASHTAG_NO_SPACE);
-                problems.add(problem.toString());
-
-            }
-            lastLineBlank = line.isBlank();
-            lastLine = line;
         }
-        return problems;
     }
+
 
     /**
      * Starter condition for lines that start with #
@@ -298,28 +355,9 @@ public class MarkdownCtrl {
 
     private boolean underlinesSpacedCorrectly(String line){
         while(true){
-            boolean ok = true;
-            int first = -1;
-            int lastUnderline = 0;
-            while(ok){
-                first = line.indexOf('_', lastUnderline);
-                if(first == -1 || first == 0 || line.charAt(first - 1) != '\\') {
-                    ok = false;
-                }
-                else
-                    lastUnderline = first + 1;
-            }
-            ok = true;
-            int second = -1;
-            lastUnderline = line.length() - 1;
-            while(ok){
-                second = line.lastIndexOf('_', lastUnderline);
-                if(second == -1 || second == 0 || line.charAt(second - 1) != '\\') {
-                    ok = false;
-                }
-                else
-                    lastUnderline = second - 1;
-            }
+            int first = findNextUnderline(line, 0, true);
+            int second = findNextUnderline(line, line.length() - 1, false);
+
             if(first == second)
                 return true;
             if((first + 1 != line.length() && first != 0) && line.charAt(first - 1) != ' ')
@@ -328,5 +366,32 @@ public class MarkdownCtrl {
                 return false;
             line = line.substring(first + 1, second);
         }
+    }
+
+    /**
+     * THis method finds the next valid underline.
+     * @param line     The line being checked.
+     * @param start    The starting index for the search.
+     * @param forward  Whether to search forwards or backwards.
+     * @return The position of the next valid underline, or -1 if none is found.
+     */
+    private int findNextUnderline(String line, int start, boolean forward) {
+        boolean ok = true;
+        int pos = -1;
+        while (ok) {
+            if (forward)
+                pos = line.indexOf('_', start);
+            else
+                pos = line.lastIndexOf('_', start);
+            if (pos == -1 || pos == 0 || line.charAt(pos - 1) != '\\')
+                ok = false;
+            else {
+                if (forward)
+                    start = pos + 1;
+                else
+                    start = pos - 1;
+            }
+        }
+        return pos;
     }
 }
