@@ -42,7 +42,7 @@ public class MainCtrl {
     private Stage primaryStage;
     private Scene mainView;
 
-    private NoteServerUtils noteServerUtils = new NoteServerUtils();
+    private final NoteServerUtils noteServerUtils = new NoteServerUtils();
 
     @FXML
     private VBox leftPanel;
@@ -484,10 +484,25 @@ public class MainCtrl {
     }
 
     /**
-     * Fetches new data from the server
+     * Checks the server to see if there are any notes
+     * that have a different title to the ones stored locally
+     * and adds them to the list.
      */
     public void handleRefreshNote() {
-        // TODO
+        List<String> titlesOfCurrentNotes = savedNotes
+                .stream()
+                .map(Note::getTitle)
+                .toList();
+        List<Note> serverNotes = noteServerUtils.getAllNotes();
+        serverNotes.forEach(note -> {
+
+            // This ignores the case in which the server has a different
+            // version of a note with the same title.
+            if (!titlesOfCurrentNotes.contains(note.getTitle())) {
+                savedNotes.add(note);
+            }
+        });
+        notesList.refresh();
     }
 
     /**
