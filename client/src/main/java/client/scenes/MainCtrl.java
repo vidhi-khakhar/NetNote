@@ -2,7 +2,7 @@ package client.scenes;
 
 import client.UserConfigLoader;
 import client.utils.undo.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import commons.Note;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -38,38 +38,26 @@ public class MainCtrl {
     private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
-    private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
 
-    // The capacity gives how many previous actions are stored.
-    private final UndoHandler undoHandler = new UndoHandler(100);
-
-    private Stage primaryStage;
     private Scene mainView;
 
-    private final NoteServerUtils noteServerUtils = new NoteServerUtils();
-    private final ObjectMapper om = new ObjectMapper();
-    private final UserConfigLoader configLoader = new UserConfigLoader();
+    @Inject
+    private MarkdownCtrl markdownCtrl;
 
-    @FXML
-    private VBox leftPanel;
+    @Inject
+    private UndoHandler undoHandler;
+
+    @Inject
+    private NoteServerUtils noteServerUtils;
+
+    @Inject
+    private UserConfigLoader configLoader;
 
     @FXML
     private TextField searchBar;
 
     @FXML
-    private Button searchButton;
-
-    @FXML
     private ListView<Note> notesList;
-
-    @FXML
-    private Button addButton;
-
-    @FXML
-    private Button deleteButton;
-
-    @FXML
-    private Button refreshButton;
 
     @FXML
     private VBox middlePanel;
@@ -84,22 +72,13 @@ public class MainCtrl {
     private TextArea noteEditor;
 
     @FXML
-    private VBox rightPanel;
-
-    @FXML
     private Label renderedNoteTitleLabel;
-
-    @FXML
-    private MenuButton menuButton;
 
     @FXML
     private ImageView selectedLanguageImage;
 
     @FXML
     private MenuItem themeToggleButton;
-
-    @FXML
-    private MenuItem hideEditorButton;
 
     @FXML
     private WebView renderedNoteView;
@@ -110,12 +89,11 @@ public class MainCtrl {
     /**
      * Initializes the controller.
      *
-     * @param primaryStage Reference to the primary stage.
+     * @param stage Reference to the primary stage.
      * @param mainView     Holds a reference to the mainView scene.
      */
-    public void initialize(Stage primaryStage, Scene mainView) {
+    public void initialize(Stage stage, Scene mainView) {
 
-        this.primaryStage = primaryStage;
         this.mainView = mainView;
 
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
@@ -205,42 +183,6 @@ public class MainCtrl {
      */
     public void setSavedNotes(ObservableList<Note> newNotes) {
         this.savedNotes = newNotes;
-    }
-
-    /**
-     * Getter for the note editor.
-     *
-     * @return An instance of the note editor textarea.
-     */
-    public TextArea getNoteEditor() {
-        return noteEditor;
-    }
-
-    /**
-     * Getter for the note title input box.
-     *
-     * @return An instance of the note title input box.
-     */
-    public TextField getNoteTitleInput() {
-        return noteTitleInput;
-    }
-
-    /**
-     * Getter for the rendered note webview.
-     *
-     * @return An instance of the rendered note webview.
-     */
-    public WebView getRenderedNoteView() {
-        return renderedNoteView;
-    }
-
-    /**
-     * Getter for the rendered note title label.
-     *
-     * @return An instance of the rendered note title label.
-     */
-    public Label getRenderedNoteTitleLabel() {
-        return renderedNoteTitleLabel;
     }
 
     /**
