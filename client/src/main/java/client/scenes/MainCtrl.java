@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
@@ -148,6 +149,11 @@ public class MainCtrl {
             if (event.isShiftDown()) eventKeys.add("Shift");
             eventKeys.add(event.getCode().getChar());
 
+            if (event.getCode() == KeyCode.ESCAPE) {
+                searchBar.requestFocus(); // fixed indents.
+                event.consume();
+            }
+
             switch (String.join("+", eventKeys)) {
                 case "Ctrl+Z" -> {
                     try {
@@ -163,6 +169,11 @@ public class MainCtrl {
                         //TODO Show pop-up that the action could not be redone
                     }
                 }
+                case "Ctrl+N" -> handleAddNote();
+                case "Ctrl+D" -> handleDeleteNote();
+                case "Ctrl+B" -> boldMarkdown();
+                case "Ctrl+I" -> italicMarkdown();
+                case "Ctrl+U" -> underlineMarkdown();
             }
         });
     }
@@ -564,5 +575,96 @@ public class MainCtrl {
             notesList.refresh();
         }
     }
+
+
+    /**
+     * Allows the user to make their text bold.<br>
+     * <br>
+     * This method is triggered whenever the user presses Ctrl + B<br>
+     * <br>
+     * It checks if text is currently selected, if so then it wraps it with the Markdown syntax **.
+     * If not, then it adds **|** where | represents user's cursor <br>
+     */
+    public void boldMarkdown() {
+        String selectedText = noteEditor.getSelectedText();
+        if (selectedText.isEmpty()) {
+            int cursorPosition = noteEditor.getCaretPosition();
+            String textBeforeCursor = noteEditor.getText(0, cursorPosition);
+            String textAfterCursor = noteEditor.getText(cursorPosition, noteEditor.getLength());
+
+            noteEditor.setText(textBeforeCursor + "**" + textAfterCursor + "**");
+            noteEditor.positionCaret(cursorPosition + 2);
+
+            noteEditor.requestFocus();
+        } else {
+            if (selectedText.startsWith("**") && selectedText.endsWith("**")) {
+                selectedText = selectedText.substring(2, selectedText.length() - 2);
+                noteEditor.replaceSelection(selectedText);
+            } else {
+                noteEditor.replaceSelection("**" + selectedText + "**");
+            }
+        }
+    }
+
+    /**
+     * Allows the user to make their text italic.<br>
+     * <br>
+     * This method is triggered whenever the user presses Ctrl + I<br>
+     * <br>
+     * It checks if text is currently selected, if so then it wraps it with the Markdown syntax *.
+     * If not, then it adds *|* where | represents user's cursor <br>
+     */
+    public void italicMarkdown() {
+        String selectedText = noteEditor.getSelectedText();
+        if (selectedText.isEmpty()) {
+            int cursorPosition = noteEditor.getCaretPosition();
+            String textBeforeCursor = noteEditor.getText(0, cursorPosition);
+            String textAfterCursor = noteEditor.getText(cursorPosition, noteEditor.getLength());
+
+            noteEditor.setText(textBeforeCursor + "*" + textAfterCursor + "*");
+            noteEditor.positionCaret(cursorPosition + 1);
+
+            noteEditor.requestFocus();
+        } else {
+            if (selectedText.startsWith("*") && selectedText.endsWith("*")) {
+                selectedText = selectedText.substring(1, selectedText.length() - 1);
+                noteEditor.replaceSelection(selectedText);
+            } else {
+                noteEditor.replaceSelection("*" + selectedText + "*");
+            }
+        }
+    }
+
+    /**
+     * Allows the user to make their text underlined.<br>
+     * <br>
+     * This method is triggered whenever the user presses Ctrl + U<br>
+     * <br>
+     * It follows the same logic as bold and italic. <br>
+     */
+    public void underlineMarkdown() {
+        String selectedText = noteEditor.getSelectedText();
+
+        if (!selectedText.isEmpty()) {
+            if (selectedText.startsWith("<u>") && selectedText.endsWith("</u>")) {
+                selectedText = selectedText.substring(3, selectedText.length() - 4);
+                noteEditor.replaceSelection(selectedText);
+            } else {
+                noteEditor.replaceSelection("<u>" + selectedText + "</u>");
+            }
+        } else {
+            int cursorPos = noteEditor.getCaretPosition();
+            String textBeforeCursor = noteEditor.getText(0, cursorPos);
+            String textAfterCursor = noteEditor.getText(cursorPos, noteEditor.getLength());
+            noteEditor.setText(textBeforeCursor + "<u>" + textAfterCursor + "</u>");
+
+
+            noteEditor.positionCaret(cursorPos + 3);
+
+
+            noteEditor.requestFocus();
+        }
+    }
+
 }
 
