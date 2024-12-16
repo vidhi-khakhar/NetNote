@@ -35,7 +35,7 @@
 
 #### - < Discuss what about the meeting during IP resits (2 min)
 
-#### - < Task and Planning Feedback -> What should we doing more ? (3 min)
+#### - < Task and Planning Feedback -> What should we be doing more ? (3 min)
 
 #### - < Searching algorithm (3 min)
 
