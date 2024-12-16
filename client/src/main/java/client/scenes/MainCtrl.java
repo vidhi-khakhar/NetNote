@@ -1,10 +1,7 @@
 package client.scenes;
 
-import client.Main;
 import client.UserConfigLoader;
 import client.utils.undo.*;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Note;
 import javafx.beans.value.ChangeListener;
@@ -21,8 +18,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -683,7 +678,6 @@ public class MainCtrl {
     }
 
     public void setLocale(Locale l) {
-        System.out.println(l);
         URL imageURL = getClass().getResource("/images/" + l.toString() + ".png");
         if (imageURL == null) {
             System.err.println("Could not load the image of the flag");

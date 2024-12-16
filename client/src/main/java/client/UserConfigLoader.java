@@ -17,6 +17,11 @@ public class UserConfigLoader {
         data = new HashMap<>();
         try {
             TypeReference<Map<String, String>> typeRef = new TypeReference<>() {};
+            File configFile = new File("config.json");
+            if (!configFile.exists()) {
+                System.out.println("Config file not present. Creating a new config file");
+                save();
+            }
             data = om.readValue(new File("config.json"), typeRef);
         } catch (DatabindException e) {
             System.err.println("Could not bind to the given class.");
@@ -29,7 +34,7 @@ public class UserConfigLoader {
         String savedLocale = data.get("locale");
         if (savedLocale == null) return Main.DEFAULT_LOCALE;
         if (savedLocale.equals("en")) return Locale.ENGLISH;
-        else if (savedLocale.equals("nl-NL")) return Locale.forLanguageTag("nl-NL");
+        else if (savedLocale.equals("nl_NL")) return Locale.forLanguageTag("nl-NL");
         return Main.DEFAULT_LOCALE;
     }
 
