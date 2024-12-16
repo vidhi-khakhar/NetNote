@@ -13,6 +13,11 @@ public class UserConfigLoader {
     private final ObjectMapper om = new ObjectMapper();
     private Map<String, String> data;
 
+    /**
+     * Constructor for the UserConfigLoader object.
+     * Tries to load the pre-existing configurations and creates a new
+     * config.json file in the root of the project if it doesn't exist yet.
+     */
     public UserConfigLoader() {
         data = new HashMap<>();
         try {
@@ -30,6 +35,11 @@ public class UserConfigLoader {
         }
     }
 
+    /**
+     * Getter for the application locale specified in the configuration.
+     *
+     * @return The application locale specified in the configuration.
+     */
     public Locale getLocale() {
         String savedLocale = data.get("locale");
         if (savedLocale == null) return Main.DEFAULT_LOCALE;
@@ -38,11 +48,20 @@ public class UserConfigLoader {
         return Main.DEFAULT_LOCALE;
     }
 
+    /**
+     * Setter for the application locale specified in the configuration.
+     * Writes the new value to the file.
+     *
+     * @param l The new locale of the application.
+     */
     public void setLocale(Locale l) {
         data.put("locale", l.toString());
         save();
     }
 
+    /**
+     * Writes the current state of the configuration object to the config.json file.
+     */
     private void save() {
         try {
             om.writer(new DefaultPrettyPrinter()).writeValue(new File("config.json"), data);

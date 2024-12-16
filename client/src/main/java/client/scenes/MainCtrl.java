@@ -619,6 +619,10 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Updates the application locale.
+     * @param l The new locale of the application.
+     */
     public void setLocale(Locale l) {
         URL imageURL = getClass().getResource("/images/" + l.toString() + ".png");
         if (imageURL == null) {
@@ -629,10 +633,16 @@ public class MainCtrl {
         configLoader.setLocale(l);
     }
 
+    /**
+     * Sets the application locale to English.
+     */
     public void setEN() {
         setLocale(Locale.ENGLISH);
     }
 
+    /**
+     * Sets the application locale to Dutch.
+     */
     public void setNL() {
         setLocale(Locale.forLanguageTag("nl-NL"));
     }
