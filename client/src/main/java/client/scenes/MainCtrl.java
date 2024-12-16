@@ -1,6 +1,11 @@
 package client.scenes;
 
+import client.Main;
+import client.UserConfigLoader;
 import client.utils.undo.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Note;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -16,6 +21,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -45,6 +52,8 @@ public class MainCtrl {
     private Scene mainView;
 
     private final NoteServerUtils noteServerUtils = new NoteServerUtils();
+    private final ObjectMapper om = new ObjectMapper();
+    private final UserConfigLoader configLoader = new UserConfigLoader();
 
     @FXML
     private VBox leftPanel;
@@ -181,6 +190,8 @@ public class MainCtrl {
                 case "Ctrl+U" -> underlineMarkdown();
             }
         });
+
+        setLocale(configLoader.getLocale());
     }
 
     /**
@@ -672,26 +683,21 @@ public class MainCtrl {
     }
 
     public void setLocale(Locale l) {
-
-    }
-
-    public void setEN() {
-        URL imageURL = getClass().getResource("/images/uk.png");
+        System.out.println(l);
+        URL imageURL = getClass().getResource("/images/" + l.toString() + ".png");
         if (imageURL == null) {
-            System.err.println("Could not load the image of the UK flag");
+            System.err.println("Could not load the image of the flag");
         } else {
             selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
         }
+        configLoader.setLocale(l);
+    }
+
+    public void setEN() {
         setLocale(Locale.ENGLISH);
     }
 
     public void setNL() {
-        URL imageURL = getClass().getResource("/images/nl.png");
-        if (imageURL == null) {
-            System.err.println("Could not load the image of the Dutch flag");
-        } else {
-            selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
-        }
         setLocale(Locale.forLanguageTag("nl-NL"));
     }
 }
