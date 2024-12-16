@@ -125,7 +125,7 @@
                         </Label>
                         <MenuButton fx:id="languageDropdown" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0">
                            <items>
-                              <MenuItem fx:id="selectEnglish" mnemonicParsing="false">
+                              <MenuItem fx:id="englishMenuItem" mnemonicParsing="false" onAction="#setEN">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -134,11 +134,11 @@
                                     </ImageView>
                                  </graphic>
                               </MenuItem>
-                              <MenuItem fx:id="selectDutch" mnemonicParsing="false">
+                              <MenuItem fx:id="dutchMenuItem" mnemonicParsing="false" onAction="#setNL">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
-                                          <Image url="@/images/ne.png" />
+                                          <Image url="@/images/nl.png" />
                                        </image>
                                     </ImageView>
                                  </graphic></MenuItem>

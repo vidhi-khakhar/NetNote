@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -670,5 +671,28 @@ public class MainCtrl {
         }
     }
 
+    public void setLocale(Locale l) {
+
+    }
+
+    public void setEN() {
+        URL imageURL = getClass().getResource("/images/uk.png");
+        if (imageURL == null) {
+            System.err.println("Could not load the image of the UK flag");
+        } else {
+            selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
+        }
+        setLocale(Locale.ENGLISH);
+    }
+
+    public void setNL() {
+        URL imageURL = getClass().getResource("/images/nl.png");
+        if (imageURL == null) {
+            System.err.println("Could not load the image of the Dutch flag");
+        } else {
+            selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
+        }
+        setLocale(Locale.forLanguageTag("nl-NL"));
+    }
 }
 
