@@ -1,9 +1,12 @@
 package client.scenes;
 
+import client.Main;
 import client.UserConfigLoader;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,6 +41,8 @@ public class MainCtrl {
     private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
+
+    private final StringProperty propertyEditorPlaceholder = new SimpleStringProperty();
 
     private Scene mainView;
 
@@ -163,6 +168,8 @@ public class MainCtrl {
                 case "Ctrl+U" -> underlineMarkdown();
             }
         });
+
+        noteEditor.promptTextProperty().bind(propertyEditorPlaceholder);
 
         setLocale(configLoader.getLocale());
     }
@@ -631,6 +638,10 @@ public class MainCtrl {
             selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
         }
         configLoader.setLocale(l);
+
+        var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, l);
+        var text = rb.getString("label.editorPlaceholder");
+        propertyEditorPlaceholder.set(text);
     }
 
     /**
