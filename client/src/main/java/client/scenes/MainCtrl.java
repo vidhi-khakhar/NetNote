@@ -48,6 +48,7 @@ public class MainCtrl {
     private final StringProperty propertyRenderedViewName = new SimpleStringProperty();
     private final StringProperty propertyMarkdownCheckboxLabel = new SimpleStringProperty();
     private final StringProperty propertySearchPlaceholder = new SimpleStringProperty();
+    private final StringProperty propertyRenderedNoteTitleDefaultLabel = new SimpleStringProperty();
 
     private Scene mainView;
 
@@ -105,8 +106,8 @@ public class MainCtrl {
     /**
      * Initializes the controller.
      *
-     * @param stage Reference to the primary stage.
-     * @param mainView     Holds a reference to the mainView scene.
+     * @param stage    Reference to the primary stage.
+     * @param mainView Holds a reference to the mainView scene.
      */
     public void initialize(Stage stage, Scene mainView) {
 
@@ -189,6 +190,7 @@ public class MainCtrl {
         renderedNoteLabel.textProperty().bind(propertyRenderedViewName);
         problemsCheckbox.textProperty().bind(propertyMarkdownCheckboxLabel);
         searchBar.promptTextProperty().bind(propertySearchPlaceholder);
+        renderedNoteTitleLabel.textProperty().bind(propertyRenderedNoteTitleDefaultLabel);
 
         setLocale(configLoader.getLocale());
     }
@@ -247,10 +249,14 @@ public class MainCtrl {
      */
     public void handleAddNote() {
 
+        Locale currentLocale = configLoader.getLocale();
+
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Add Note");
+        dialog.setTitle(currentLocale.equals(Locale.ENGLISH) ? "Add Note" : "Voeg een notitie toe");
         dialog.setHeaderText(null);
-        dialog.setContentText("Please enter the title of your note:");
+        dialog.setContentText(currentLocale.equals(Locale.ENGLISH) ?
+                "Please enter the title of your note:" :
+                "Voer de titel van de notitie in:");
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(title -> {
@@ -258,9 +264,13 @@ public class MainCtrl {
 
                 // Handling the invalid inputs
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Invalid Title");
+                alert.setTitle(currentLocale.equals(Locale.ENGLISH) ?
+                        "Invalid Title" :
+                        "Ongeldige titel");
                 alert.setHeaderText(null);
-                alert.setContentText("The title cannot be empty!");
+                alert.setContentText(currentLocale.equals(Locale.ENGLISH) ?
+                        "The title cannot be empty!" :
+                        "De titel mag niet leeg zijn!");
                 alert.showAndWait();
             } else {
                 Note newNote = new Note(title.trim(), "");
@@ -271,7 +281,10 @@ public class MainCtrl {
                 noteEditor.setText(newNote.getText());
 
                 // Default message for empty note text
-                renderedNoteView.getEngine().loadContent("The note is empty");
+                renderedNoteView.getEngine().loadContent(
+                        currentLocale.equals(Locale.ENGLISH) ?
+                                "The note is empty" :
+                                "De notitie is leeg");
                 selectedNoteIndex = savedNotes.size() - 1;
 
                 undoHandler.pushAction(new CreateNoteAction(
@@ -308,16 +321,28 @@ public class MainCtrl {
      * or the user cancelled the operation.
      */
     public boolean handleDeleteNote(int index, boolean isAddedToUndoStack) {
+        Locale currentLocale = configLoader.getLocale();
+
         if (index == -1) {
-            showWarning("No Note Selected",
-                    "No note selected for deletion. Please select a note and try again.");
+            showWarning(currentLocale.equals(Locale.ENGLISH) ?
+                            "No Note Selected" :
+                            "Geen noot geselecteerd",
+                    currentLocale.equals(Locale.ENGLISH) ?
+                            "No note selected for deletion. Please select a note and try again." :
+                            "Geen notitie geselecteerd voor verwijdering. " +
+                                    "Selecteer een notitie en probeer het opnieuw.");
             return false;
         }
 
         Note deletedNote = savedNotes.get(index);
 
-        if (showConfirmation("Delete Note", "Are you sure you want to delete this note?\n" +
-                deletedNote.getTitle())) {
+        if (showConfirmation(currentLocale.equals(Locale.ENGLISH) ?
+                        "Delete Note" :
+                        "Notitie verwijderen",
+                (currentLocale.equals(Locale.ENGLISH) ?
+                        "Are you sure you want to delete this note?\n" :
+                        "Weet u zeker dat u deze notitie wilt verwijderen?\n") +
+                        deletedNote.getTitle())) {
 
             noteServerUtils.deleteNote(deletedNote.getTitle());
 
@@ -352,6 +377,7 @@ public class MainCtrl {
         noteTitleInput.setText(deletedNote.getTitle());
         noteEditor.setText(deletedNote.getText());
 
+        renderedNoteTitleLabel.textProperty().unbind();
         renderedNoteTitleLabel.setText(deletedNote.getTitle());
         renderedNoteView.getEngine().loadContent(deletedNote.getText());
     }
@@ -410,11 +436,14 @@ public class MainCtrl {
      * after the user select a different note to load.
      */
     public void displaySavedNote() {
+        Locale currentLocale = configLoader.getLocale();
+
         if (selectedNoteIndex != -1 && selectedNoteIndex < savedNotes.size()) {
             Note selectedNote = savedNotes.get(selectedNoteIndex);
             noteTitleInput.setText(selectedNote.getTitle());
             noteEditor.setText(selectedNote.getText());
 
+            renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
             renderedNoteView.getEngine().loadContent(selectedNote.getText());
         } else {
@@ -425,8 +454,12 @@ public class MainCtrl {
             noteTitleInput.textProperty().addListener(noteTitleInputListener);
 
             noteEditor.clear();
-            renderedNoteTitleLabel.setText("Untitled Note");
-            renderedNoteView.getEngine().loadContent("The note is empty");
+            renderedNoteTitleLabel.textProperty().unbind();
+            renderedNoteTitleLabel.setText(currentLocale.equals(Locale.ENGLISH) ? "Untitled Note" :
+                    "Naamloze notitie");
+            renderedNoteView.getEngine().loadContent(currentLocale.equals(Locale.ENGLISH) ?
+                    "The note is empty" :
+                    "De notitie is leeg");
         }
     }
 
@@ -436,10 +469,15 @@ public class MainCtrl {
      * so that they are automatically propagated in the rendered view.
      */
     public void updateDisplay() {
+
+        Locale currentLocale = configLoader.getLocale();
+
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
             if (noteTitleInput.getText().isEmpty() && content.isEmpty()) {
-                renderedNoteView.getEngine().loadContent("The note is empty");
+                renderedNoteView.getEngine().loadContent(currentLocale.equals(Locale.ENGLISH) ?
+                        "The note is empty" :
+                        "De notitie is leeg");
             } else {
                 renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
             }
@@ -452,13 +490,15 @@ public class MainCtrl {
             //calling the noteServerUtils
             HashMap<String, String> patch = new HashMap<>();
             patch.put("title", selectedNote.getTitle());
-            patch.put("text",content);
+            patch.put("text", content);
             noteServerUtils.updateNote(selectedNote.getTitle(), patch);
 
             selectedNote.setText(content);
             notesList.refresh();
         } else if (!content.isEmpty()) {
-            renderedNoteTitleLabel.setText("Untitled Note");
+            renderedNoteTitleLabel.textProperty().unbind();
+            renderedNoteTitleLabel.setText(currentLocale.equals(Locale.ENGLISH) ? "Untitled Note" :
+                    "Naamloze notitie");
         }
     }
 
@@ -523,11 +563,15 @@ public class MainCtrl {
      * in the inputTitle field.<br>
      */
     public void updateTitle() {
+        Locale currentLocale = configLoader.getLocale();
         String updatedTitle = noteTitleInput.getText();
 
         if (updatedTitle.isEmpty()) {
-            renderedNoteTitleLabel.setText("Untitled Note");
+            renderedNoteTitleLabel.textProperty().unbind();
+            renderedNoteTitleLabel.setText(currentLocale.equals(Locale.ENGLISH) ? "Untitled Note" :
+                    "Naamloze notitie");
         } else {
+            renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(updatedTitle);
         }
 
@@ -537,7 +581,7 @@ public class MainCtrl {
             notesList.refresh();
             boolean isTitlePresent = noteServerUtils.getAllNotes().stream()
                     .anyMatch(note -> note.getTitle().equals(selectedNote.getTitle()));
-            if(isTitlePresent) {
+            if (isTitlePresent) {
                 HashMap<String, String> patch = new HashMap<>();
                 patch.put("title", updatedTitle);
                 noteServerUtils.updateNote(selectedNote.getTitle(), patch);
@@ -647,6 +691,7 @@ public class MainCtrl {
 
     /**
      * Updates the application locale.
+     *
      * @param l The new locale of the application.
      */
     public void setLocale(Locale l) {
@@ -672,6 +717,8 @@ public class MainCtrl {
         propertyMarkdownCheckboxLabel.set(text);
         text = rb.getString("label.searchPlaceholder");
         propertySearchPlaceholder.set(text);
+        text = rb.getString("label.renderedNoteTitleDefaultLabel");
+        propertyRenderedNoteTitleDefaultLabel.set(text);
     }
 
     /**

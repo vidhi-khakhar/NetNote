@@ -172,7 +172,7 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
                      <children>
-                        <Label fx:id="renderedNoteTitleLabel" prefHeight="22.0" prefWidth="178.0" style="-fx-font-weight: bold;" text="Title of Note">
+                        <Label fx:id="renderedNoteTitleLabel" prefHeight="22.0" prefWidth="178.0" style="-fx-font-weight: bold;" text="%label.renderedNoteTitleDefaultLabel">
                            <font>
                               <Font size="15.0" />
                            </font>
