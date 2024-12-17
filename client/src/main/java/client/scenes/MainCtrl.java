@@ -1,6 +1,8 @@
 package client.scenes;
 
+import client.UserConfigLoader;
 import client.utils.undo.*;
+import com.google.inject.Inject;
 import commons.Note;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -8,6 +10,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
@@ -34,36 +38,26 @@ public class MainCtrl {
     private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
-    private final MarkdownCtrl markdownCtrl = new MarkdownCtrl();
 
-    // The capacity gives how many previous actions are stored.
-    private final UndoHandler undoHandler = new UndoHandler(100);
-
-    private Stage primaryStage;
     private Scene mainView;
 
-    private final NoteServerUtils noteServerUtils = new NoteServerUtils();
+    @Inject
+    private MarkdownCtrl markdownCtrl;
 
-    @FXML
-    private VBox leftPanel;
+    @Inject
+    private UndoHandler undoHandler;
+
+    @Inject
+    private NoteServerUtils noteServerUtils;
+
+    @Inject
+    private UserConfigLoader configLoader;
 
     @FXML
     private TextField searchBar;
 
     @FXML
-    private Button searchButton;
-
-    @FXML
     private ListView<Note> notesList;
-
-    @FXML
-    private Button addButton;
-
-    @FXML
-    private Button deleteButton;
-
-    @FXML
-    private Button refreshButton;
 
     @FXML
     private VBox middlePanel;
@@ -78,19 +72,13 @@ public class MainCtrl {
     private TextArea noteEditor;
 
     @FXML
-    private VBox rightPanel;
-
-    @FXML
     private Label renderedNoteTitleLabel;
 
     @FXML
-    private MenuButton menuButton;
+    private ImageView selectedLanguageImage;
 
     @FXML
     private MenuItem themeToggleButton;
-
-    @FXML
-    private MenuItem hideEditorButton;
 
     @FXML
     private WebView renderedNoteView;
@@ -101,12 +89,11 @@ public class MainCtrl {
     /**
      * Initializes the controller.
      *
-     * @param primaryStage Reference to the primary stage.
+     * @param stage Reference to the primary stage.
      * @param mainView     Holds a reference to the mainView scene.
      */
-    public void initialize(Stage primaryStage, Scene mainView) {
+    public void initialize(Stage stage, Scene mainView) {
 
-        this.primaryStage = primaryStage;
         this.mainView = mainView;
 
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
@@ -176,6 +163,8 @@ public class MainCtrl {
                 case "Ctrl+U" -> underlineMarkdown();
             }
         });
+
+        setLocale(configLoader.getLocale());
     }
 
     /**
@@ -194,42 +183,6 @@ public class MainCtrl {
      */
     public void setSavedNotes(ObservableList<Note> newNotes) {
         this.savedNotes = newNotes;
-    }
-
-    /**
-     * Getter for the note editor.
-     *
-     * @return An instance of the note editor textarea.
-     */
-    public TextArea getNoteEditor() {
-        return noteEditor;
-    }
-
-    /**
-     * Getter for the note title input box.
-     *
-     * @return An instance of the note title input box.
-     */
-    public TextField getNoteTitleInput() {
-        return noteTitleInput;
-    }
-
-    /**
-     * Getter for the rendered note webview.
-     *
-     * @return An instance of the rendered note webview.
-     */
-    public WebView getRenderedNoteView() {
-        return renderedNoteView;
-    }
-
-    /**
-     * Getter for the rendered note title label.
-     *
-     * @return An instance of the rendered note title label.
-     */
-    public Label getRenderedNoteTitleLabel() {
-        return renderedNoteTitleLabel;
     }
 
     /**
@@ -666,5 +619,32 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Updates the application locale.
+     * @param l The new locale of the application.
+     */
+    public void setLocale(Locale l) {
+        URL imageURL = getClass().getResource("/images/" + l.toString() + ".png");
+        if (imageURL == null) {
+            System.err.println("Could not load the image of the flag");
+        } else {
+            selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
+        }
+        configLoader.setLocale(l);
+    }
+
+    /**
+     * Sets the application locale to English.
+     */
+    public void setEN() {
+        setLocale(Locale.ENGLISH);
+    }
+
+    /**
+     * Sets the application locale to Dutch.
+     */
+    public void setNL() {
+        setLocale(Locale.forLanguageTag("nl-NL"));
+    }
 }
 

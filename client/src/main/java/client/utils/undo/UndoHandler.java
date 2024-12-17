@@ -7,6 +7,16 @@ public class UndoHandler {
     private final int capacity;
     private int currentIndex;
     private final List<ClientAction> actions;
+    public static final int DEFAULT_CAPACITY = 100;
+
+    /**
+     * Parameterless constructor uses the default stack capacity.
+     * Used for dependency injection with Guice.
+     */
+    @SuppressWarnings("unused")
+    protected UndoHandler() {
+        this(DEFAULT_CAPACITY);
+    }
 
     /**
      * Constructor for the undo handler

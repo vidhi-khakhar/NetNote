@@ -43,3 +43,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### User config file ###
+config.json
