@@ -43,6 +43,11 @@ public class MainCtrl {
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
 
     private final StringProperty propertyEditorPlaceholder = new SimpleStringProperty();
+    private final StringProperty propertyTitlePlaceholder = new SimpleStringProperty();
+    private final StringProperty propertyNoteEditorName = new SimpleStringProperty();
+    private final StringProperty propertyRenderedViewName = new SimpleStringProperty();
+    private final StringProperty propertyMarkdownCheckboxLabel = new SimpleStringProperty();
+    private final StringProperty propertySearchPlaceholder = new SimpleStringProperty();
 
     private Scene mainView;
 
@@ -90,6 +95,12 @@ public class MainCtrl {
 
     @FXML
     private CheckBox problemsCheckbox;
+
+    @FXML
+    private Label noteEditorLabel;
+
+    @FXML
+    private Label renderedNoteLabel;
 
     /**
      * Initializes the controller.
@@ -168,8 +179,16 @@ public class MainCtrl {
                 case "Ctrl+U" -> underlineMarkdown();
             }
         });
+        initializeTextProperties();
+    }
 
+    private void initializeTextProperties() {
         noteEditor.promptTextProperty().bind(propertyEditorPlaceholder);
+        noteTitleInput.promptTextProperty().bind(propertyTitlePlaceholder);
+        noteEditorLabel.textProperty().bind(propertyNoteEditorName);
+        renderedNoteLabel.textProperty().bind(propertyRenderedViewName);
+        problemsCheckbox.textProperty().bind(propertyMarkdownCheckboxLabel);
+        searchBar.promptTextProperty().bind(propertySearchPlaceholder);
 
         setLocale(configLoader.getLocale());
     }
@@ -640,8 +659,19 @@ public class MainCtrl {
         configLoader.setLocale(l);
 
         var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, l);
-        var text = rb.getString("label.editorPlaceholder");
+
+        String text = rb.getString("label.editorPlaceholder");
         propertyEditorPlaceholder.set(text);
+        text = rb.getString("label.titlePlaceholder");
+        propertyTitlePlaceholder.set(text);
+        text = rb.getString("label.noteEditorName");
+        propertyNoteEditorName.set(text);
+        text = rb.getString("label.renderedViewName");
+        propertyRenderedViewName.set(text);
+        text = rb.getString("label.markdownCheckboxLabel");
+        propertyMarkdownCheckboxLabel.set(text);
+        text = rb.getString("label.searchPlaceholder");
+        propertySearchPlaceholder.set(text);
     }
 
     /**

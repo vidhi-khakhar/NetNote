@@ -115,7 +115,7 @@
                <children>
                   <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                      <children>
-                        <Label maxWidth="1.7976931348623157E308" prefHeight="27.0" style="-fx-font-weight: bold;" text="%label.renderedViewName" HBox.hgrow="ALWAYS">
+                        <Label fx:id="renderedNoteLabel" maxWidth="1.7976931348623157E308" prefHeight="27.0" style="-fx-font-weight: bold;" text="%label.renderedViewName" HBox.hgrow="ALWAYS">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -172,7 +172,7 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
                      <children>
-                        <Label fx:id="renderedNoteTitleLabel" prefHeight="22.0" prefWidth="178.0" style="-fx-font-weight: bold;" text="%label.noteTitlePlaceholder">
+                        <Label fx:id="renderedNoteTitleLabel" prefHeight="22.0" prefWidth="178.0" style="-fx-font-weight: bold;" text="Title of Note">
                            <font>
                               <Font size="15.0" />
                            </font>
