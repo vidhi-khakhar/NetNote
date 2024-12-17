@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ResourceBundle;
 
 import com.google.inject.Injector;
 
@@ -42,19 +43,22 @@ public class MyFXML {
     }
 
     /**
-     * TODO
-     * @param c TODO
-     * @param parts TODO
-     * @return TODO
-     * @param <T> TODO
+     * Loads the FXML from a specified file into a specified controller.
+     *
+     * @param c The controller class.
+     * @param parts Path elements.
+     * @return A pair of the controller and the loaded scene.
+     * @param <T> The controller type.
      */
     public <T> Pair<T, Parent> load(Class<T> c, String... parts) {
         try {
+            var bundle = ResourceBundle.getBundle(Main.BUNDLE_NAME, Main.DEFAULT_LOCALE);
             var loader = new FXMLLoader(getLocation(parts),
                     null,
                     null,
                     new MyFactory(),
                     StandardCharsets.UTF_8);
+            loader.setResources(bundle);
             Parent parent = loader.load();
             T ctrl = loader.getController();
             return new Pair<>(ctrl, parent);
