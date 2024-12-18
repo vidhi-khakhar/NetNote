@@ -49,7 +49,17 @@ public class MainCtrl {
     private final StringProperty propertyMarkdownCheckboxLabel = new SimpleStringProperty();
     private final StringProperty propertySearchPlaceholder = new SimpleStringProperty();
     private final StringProperty propertyRenderedNoteTitleDefaultLabel = new SimpleStringProperty();
-
+    private final StringProperty propertyRenderedNoteViewEmpty = new SimpleStringProperty();
+    private final StringProperty propertyRenderedNoteTitleLabelUntitled =
+            new SimpleStringProperty();
+    private final StringProperty propertyAddDialogTitle = new SimpleStringProperty();
+    private final StringProperty propertyAddDialogText = new SimpleStringProperty();
+    private final StringProperty propertyInvalidTitleAlertTitle = new SimpleStringProperty();
+    private final StringProperty propertyInvalidTitleAlertText = new SimpleStringProperty();
+    private final StringProperty propertyDeleteNoteWarningTitle = new SimpleStringProperty();
+    private final StringProperty propertyDeleteNoteWarningText = new SimpleStringProperty();
+    private final StringProperty propertyDeleteNoteConfirmationTitle = new SimpleStringProperty();
+    private final StringProperty propertyDeleteNoteConfirmationText = new SimpleStringProperty();
     private Scene mainView;
 
     @Inject
@@ -252,11 +262,9 @@ public class MainCtrl {
         Locale currentLocale = configLoader.getLocale();
 
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle(currentLocale.equals(Locale.ENGLISH) ? "Add Note" : "Voeg een notitie toe");
+        dialog.titleProperty().bind(propertyAddDialogTitle);
+        dialog.contentTextProperty().bind(propertyAddDialogText);
         dialog.setHeaderText(null);
-        dialog.setContentText(currentLocale.equals(Locale.ENGLISH) ?
-                "Please enter the title of your note:" :
-                "Voer de titel van de notitie in:");
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(title -> {
@@ -264,13 +272,9 @@ public class MainCtrl {
 
                 // Handling the invalid inputs
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(currentLocale.equals(Locale.ENGLISH) ?
-                        "Invalid Title" :
-                        "Ongeldige titel");
+                alert.titleProperty().bind(propertyInvalidTitleAlertTitle);
+                alert.contentTextProperty().bind(propertyInvalidTitleAlertText);
                 alert.setHeaderText(null);
-                alert.setContentText(currentLocale.equals(Locale.ENGLISH) ?
-                        "The title cannot be empty!" :
-                        "De titel mag niet leeg zijn!");
                 alert.showAndWait();
             } else {
                 Note newNote = new Note(title.trim(), "");
@@ -497,8 +501,7 @@ public class MainCtrl {
             notesList.refresh();
         } else if (!content.isEmpty()) {
             renderedNoteTitleLabel.textProperty().unbind();
-            renderedNoteTitleLabel.setText(currentLocale.equals(Locale.ENGLISH) ? "Untitled Note" :
-                    "Naamloze notitie");
+            renderedNoteTitleLabel.textProperty().bind(propertyRenderedNoteTitleLabelUntitled);
         }
     }
 
@@ -566,12 +569,10 @@ public class MainCtrl {
         Locale currentLocale = configLoader.getLocale();
         String updatedTitle = noteTitleInput.getText();
 
+        renderedNoteTitleLabel.textProperty().unbind();
         if (updatedTitle.isEmpty()) {
-            renderedNoteTitleLabel.textProperty().unbind();
-            renderedNoteTitleLabel.setText(currentLocale.equals(Locale.ENGLISH) ? "Untitled Note" :
-                    "Naamloze notitie");
+            renderedNoteTitleLabel.textProperty().bind(propertyRenderedNoteTitleLabelUntitled);
         } else {
-            renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(updatedTitle);
         }
 
@@ -719,6 +720,26 @@ public class MainCtrl {
         propertySearchPlaceholder.set(text);
         text = rb.getString("label.renderedNoteTitleDefaultLabel");
         propertyRenderedNoteTitleDefaultLabel.set(text);
+        text = rb.getString("label.renderedNoteViewEmpty");
+        propertyRenderedNoteViewEmpty.set(text);
+        text = rb.getString("label.renderedNoteTitleLabelUntitled");
+        propertyRenderedNoteTitleLabelUntitled.set(text);
+        text = rb.getString("label.addDialogTitle");
+        propertyAddDialogTitle.set(text);
+        text = rb.getString("label.addDialogText");
+        propertyAddDialogText.set(text);
+        text = rb.getString("label.invalidTitleAlertTitle");
+        propertyInvalidTitleAlertTitle.set(text);
+        text = rb.getString("label.invalidTitleAlertText");
+        propertyInvalidTitleAlertText.set(text);
+        text = rb.getString("label.deleteNoteWarningTitle");
+        propertyDeleteNoteWarningTitle.set(text);
+        text = rb.getString("label.deleteNoteWarningText");
+        propertyDeleteNoteWarningText.set(text);
+        text = rb.getString("label.deleteNoteConfirmationTitle");
+        propertyDeleteNoteConfirmationTitle.set(text);
+        text = rb.getString("label.deleteNoteConfirmationText");
+        propertyDeleteNoteConfirmationText.set(text);
     }
 
     /**
