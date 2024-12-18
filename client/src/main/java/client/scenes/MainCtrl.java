@@ -113,6 +113,10 @@ public class MainCtrl {
     @FXML
     private Label renderedNoteLabel;
 
+    private final ChangeListener<String> webViewContentPropertyListener =
+            (_, _, newValue) ->
+                    renderedNoteView.getEngine().loadContent(newValue);
+
     /**
      * Initializes the controller.
      *
@@ -259,8 +263,6 @@ public class MainCtrl {
      */
     public void handleAddNote() {
 
-        Locale currentLocale = configLoader.getLocale();
-
         TextInputDialog dialog = new TextInputDialog();
         dialog.titleProperty().bind(propertyAddDialogTitle);
         dialog.contentTextProperty().bind(propertyAddDialogText);
@@ -285,10 +287,8 @@ public class MainCtrl {
                 noteEditor.setText(newNote.getText());
 
                 // Default message for empty note text
-                renderedNoteView.getEngine().loadContent(
-                        currentLocale.equals(Locale.ENGLISH) ?
-                                "The note is empty" :
-                                "De notitie is leeg");
+                propertyRenderedNoteViewEmpty.addListener(webViewContentPropertyListener);
+                renderedNoteView.getEngine().loadContent(propertyRenderedNoteViewEmpty.get());
                 selectedNoteIndex = savedNotes.size() - 1;
 
                 undoHandler.pushAction(new CreateNoteAction(
@@ -325,28 +325,18 @@ public class MainCtrl {
      * or the user cancelled the operation.
      */
     public boolean handleDeleteNote(int index, boolean isAddedToUndoStack) {
-        Locale currentLocale = configLoader.getLocale();
-
         if (index == -1) {
-            showWarning(currentLocale.equals(Locale.ENGLISH) ?
-                            "No Note Selected" :
-                            "Geen noot geselecteerd",
-                    currentLocale.equals(Locale.ENGLISH) ?
-                            "No note selected for deletion. Please select a note and try again." :
-                            "Geen notitie geselecteerd voor verwijdering. " +
-                                    "Selecteer een notitie en probeer het opnieuw.");
+            showPopUp(propertyDeleteNoteWarningTitle.get(),
+                    propertyDeleteNoteWarningText.get(),
+                    Alert.AlertType.WARNING);
             return false;
         }
 
         Note deletedNote = savedNotes.get(index);
 
-        if (showConfirmation(currentLocale.equals(Locale.ENGLISH) ?
-                        "Delete Note" :
-                        "Notitie verwijderen",
-                (currentLocale.equals(Locale.ENGLISH) ?
-                        "Are you sure you want to delete this note?\n" :
-                        "Weet u zeker dat u deze notitie wilt verwijderen?\n") +
-                        deletedNote.getTitle())) {
+        if (showPopUp(propertyDeleteNoteConfirmationTitle.get(),
+                propertyDeleteNoteConfirmationText.get() + '\n' + deletedNote.getTitle(),
+                Alert.AlertType.CONFIRMATION)) {
 
             noteServerUtils.deleteNote(deletedNote.getTitle());
 
@@ -383,6 +373,7 @@ public class MainCtrl {
 
         renderedNoteTitleLabel.textProperty().unbind();
         renderedNoteTitleLabel.setText(deletedNote.getTitle());
+        propertyRenderedNoteViewEmpty.removeListener(webViewContentPropertyListener);
         renderedNoteView.getEngine().loadContent(deletedNote.getText());
     }
 
@@ -391,25 +382,11 @@ public class MainCtrl {
      *
      * @param title   The title of the pop-up message
      * @param message The body of the pop-up message
+     * @param type    The type of the alert object
+     * @return True if the user presses 'OK', false otherwise
      */
-    public void showWarning(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    /**
-     * A Confirmation pop-up message (Options: OK / CANCEL)
-     *
-     * @param title   The title of the pop-up message
-     * @param message The body of the pop-up message
-     * @return True if the user pressed OK, false if the user pressed
-     * CANCEL or closed the pop-up
-     */
-    public boolean showConfirmation(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    public boolean showPopUp(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -440,8 +417,6 @@ public class MainCtrl {
      * after the user select a different note to load.
      */
     public void displaySavedNote() {
-        Locale currentLocale = configLoader.getLocale();
-
         if (selectedNoteIndex != -1 && selectedNoteIndex < savedNotes.size()) {
             Note selectedNote = savedNotes.get(selectedNoteIndex);
             noteTitleInput.setText(selectedNote.getTitle());
@@ -449,6 +424,7 @@ public class MainCtrl {
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
+            propertyRenderedNoteViewEmpty.removeListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(selectedNote.getText());
         } else {
             selectedNoteIndex = -1;
@@ -459,11 +435,10 @@ public class MainCtrl {
 
             noteEditor.clear();
             renderedNoteTitleLabel.textProperty().unbind();
-            renderedNoteTitleLabel.setText(currentLocale.equals(Locale.ENGLISH) ? "Untitled Note" :
-                    "Naamloze notitie");
-            renderedNoteView.getEngine().loadContent(currentLocale.equals(Locale.ENGLISH) ?
-                    "The note is empty" :
-                    "De notitie is leeg");
+            renderedNoteTitleLabel.textProperty().bind(propertyRenderedNoteTitleLabelUntitled);
+
+            propertyRenderedNoteViewEmpty.addListener(webViewContentPropertyListener);
+            renderedNoteView.getEngine().loadContent(propertyRenderedNoteViewEmpty.get());
         }
     }
 
@@ -473,16 +448,13 @@ public class MainCtrl {
      * so that they are automatically propagated in the rendered view.
      */
     public void updateDisplay() {
-
-        Locale currentLocale = configLoader.getLocale();
-
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
             if (noteTitleInput.getText().isEmpty() && content.isEmpty()) {
-                renderedNoteView.getEngine().loadContent(currentLocale.equals(Locale.ENGLISH) ?
-                        "The note is empty" :
-                        "De notitie is leeg");
+                propertyRenderedNoteViewEmpty.addListener(webViewContentPropertyListener);
+                renderedNoteView.getEngine().loadContent(propertyRenderedNoteViewEmpty.get());
             } else {
+                propertyRenderedNoteViewEmpty.removeListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
             }
         });
@@ -541,9 +513,11 @@ public class MainCtrl {
                 if (i < problems.size() - 1)
                     result.append("\n");
             }
+            propertyRenderedNoteViewEmpty.removeListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(result.toString());
         } else {
             noteEditor.setEditable(true);
+            propertyRenderedNoteViewEmpty.removeListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(renderedContent);
         }
     }
@@ -566,7 +540,6 @@ public class MainCtrl {
      * in the inputTitle field.<br>
      */
     public void updateTitle() {
-        Locale currentLocale = configLoader.getLocale();
         String updatedTitle = noteTitleInput.getText();
 
         renderedNoteTitleLabel.textProperty().unbind();
