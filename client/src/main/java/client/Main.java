@@ -32,6 +32,7 @@ public class Main extends Application {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
     public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+    public static final String BUNDLE_NAME = "labels";
 
     /**
      * Launches the client application

@@ -1,9 +1,12 @@
 package client.scenes;
 
+import client.Main;
 import client.UserConfigLoader;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,6 +42,7 @@ public class MainCtrl {
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
 
+    private final Map<String, StringProperty> props = new HashMap<>();
     private Scene mainView;
 
     @Inject
@@ -86,11 +90,21 @@ public class MainCtrl {
     @FXML
     private CheckBox problemsCheckbox;
 
+    @FXML
+    private Label noteEditorLabel;
+
+    @FXML
+    private Label renderedNoteLabel;
+
+    private final ChangeListener<String> webViewContentPropertyListener =
+            (_, _, newValue) ->
+                    renderedNoteView.getEngine().loadContent(newValue);
+
     /**
      * Initializes the controller.
      *
-     * @param stage Reference to the primary stage.
-     * @param mainView     Holds a reference to the mainView scene.
+     * @param stage    Reference to the primary stage.
+     * @param mainView Holds a reference to the mainView scene.
      */
     public void initialize(Stage stage, Scene mainView) {
 
@@ -163,6 +177,26 @@ public class MainCtrl {
                 case "Ctrl+U" -> underlineMarkdown();
             }
         });
+        initializeTextProperties();
+    }
+
+    private void initializeTextProperties() {
+        var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, configLoader.getLocale());
+
+        rb.keySet()
+                .forEach(key -> {
+                    String shortKey = key.split("\\.")[1];
+                    StringProperty newProp = new SimpleStringProperty();
+                    props.put(shortKey, newProp);
+                });
+
+        noteEditor.promptTextProperty().bind(props.get("editorPlaceholder"));
+        noteTitleInput.promptTextProperty().bind(props.get("titlePlaceholder"));
+        noteEditorLabel.textProperty().bind(props.get("noteEditorName"));
+        renderedNoteLabel.textProperty().bind(props.get("renderedViewName"));
+        problemsCheckbox.textProperty().bind(props.get("markdownCheckboxLabel"));
+        searchBar.promptTextProperty().bind(props.get("searchPlaceholder"));
+        renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
 
         setLocale(configLoader.getLocale());
     }
@@ -222,9 +256,9 @@ public class MainCtrl {
     public void handleAddNote() {
 
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Add Note");
+        dialog.titleProperty().bind(props.get("addDialogTitle"));
+        dialog.contentTextProperty().bind(props.get("addDialogText"));
         dialog.setHeaderText(null);
-        dialog.setContentText("Please enter the title of your note:");
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(title -> {
@@ -232,9 +266,9 @@ public class MainCtrl {
 
                 // Handling the invalid inputs
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Invalid Title");
+                alert.titleProperty().bind(props.get("invalidTitleAlertTitle"));
+                alert.contentTextProperty().bind(props.get("invalidTitleAlertText"));
                 alert.setHeaderText(null);
-                alert.setContentText("The title cannot be empty!");
                 alert.showAndWait();
             } else {
                 Note newNote = new Note(title.trim(), "");
@@ -245,7 +279,8 @@ public class MainCtrl {
                 noteEditor.setText(newNote.getText());
 
                 // Default message for empty note text
-                renderedNoteView.getEngine().loadContent("The note is empty");
+                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
+                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
                 selectedNoteIndex = savedNotes.size() - 1;
 
                 undoHandler.pushAction(new CreateNoteAction(
@@ -283,15 +318,17 @@ public class MainCtrl {
      */
     public boolean handleDeleteNote(int index, boolean isAddedToUndoStack) {
         if (index == -1) {
-            showWarning("No Note Selected",
-                    "No note selected for deletion. Please select a note and try again.");
+            showPopUp(props.get("deleteNoteWarningTitle").get(),
+                    props.get("deleteNoteWarningText").get(),
+                    Alert.AlertType.WARNING);
             return false;
         }
 
         Note deletedNote = savedNotes.get(index);
 
-        if (showConfirmation("Delete Note", "Are you sure you want to delete this note?\n" +
-                deletedNote.getTitle())) {
+        if (showPopUp(props.get("deleteNoteConfirmationTitle").get(),
+                props.get("deleteNoteConfirmationText").get() + '\n' + deletedNote.getTitle(),
+                Alert.AlertType.CONFIRMATION)) {
 
             noteServerUtils.deleteNote(deletedNote.getTitle());
 
@@ -326,7 +363,9 @@ public class MainCtrl {
         noteTitleInput.setText(deletedNote.getTitle());
         noteEditor.setText(deletedNote.getText());
 
+        renderedNoteTitleLabel.textProperty().unbind();
         renderedNoteTitleLabel.setText(deletedNote.getTitle());
+        props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
         renderedNoteView.getEngine().loadContent(deletedNote.getText());
     }
 
@@ -335,25 +374,11 @@ public class MainCtrl {
      *
      * @param title   The title of the pop-up message
      * @param message The body of the pop-up message
+     * @param type    The type of the alert object
+     * @return True if the user presses 'OK', false otherwise
      */
-    public void showWarning(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    /**
-     * A Confirmation pop-up message (Options: OK / CANCEL)
-     *
-     * @param title   The title of the pop-up message
-     * @param message The body of the pop-up message
-     * @return True if the user pressed OK, false if the user pressed
-     * CANCEL or closed the pop-up
-     */
-    public boolean showConfirmation(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    public boolean showPopUp(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -389,7 +414,9 @@ public class MainCtrl {
             noteTitleInput.setText(selectedNote.getTitle());
             noteEditor.setText(selectedNote.getText());
 
+            renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
+            props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(selectedNote.getText());
         } else {
             selectedNoteIndex = -1;
@@ -399,8 +426,11 @@ public class MainCtrl {
             noteTitleInput.textProperty().addListener(noteTitleInputListener);
 
             noteEditor.clear();
-            renderedNoteTitleLabel.setText("Untitled Note");
-            renderedNoteView.getEngine().loadContent("The note is empty");
+            renderedNoteTitleLabel.textProperty().unbind();
+            renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleLabelUntitled"));
+
+            props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
+            renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
         }
     }
 
@@ -413,8 +443,10 @@ public class MainCtrl {
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
             if (noteTitleInput.getText().isEmpty() && content.isEmpty()) {
-                renderedNoteView.getEngine().loadContent("The note is empty");
+                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
+                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             } else {
+                props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
             }
         });
@@ -426,13 +458,14 @@ public class MainCtrl {
             //calling the noteServerUtils
             HashMap<String, String> patch = new HashMap<>();
             patch.put("title", selectedNote.getTitle());
-            patch.put("text",content);
+            patch.put("text", content);
             noteServerUtils.updateNote(selectedNote.getTitle(), patch);
 
             selectedNote.setText(content);
             notesList.refresh();
         } else if (!content.isEmpty()) {
-            renderedNoteTitleLabel.setText("Untitled Note");
+            renderedNoteTitleLabel.textProperty().unbind();
+            renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleLabelUntitled"));
         }
     }
 
@@ -472,9 +505,11 @@ public class MainCtrl {
                 if (i < problems.size() - 1)
                     result.append("\n");
             }
+            props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(result.toString());
         } else {
             noteEditor.setEditable(true);
+            props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(renderedContent);
         }
     }
@@ -499,8 +534,9 @@ public class MainCtrl {
     public void updateTitle() {
         String updatedTitle = noteTitleInput.getText();
 
+        renderedNoteTitleLabel.textProperty().unbind();
         if (updatedTitle.isEmpty()) {
-            renderedNoteTitleLabel.setText("Untitled Note");
+            renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleLabelUntitled"));
         } else {
             renderedNoteTitleLabel.setText(updatedTitle);
         }
@@ -511,7 +547,7 @@ public class MainCtrl {
             notesList.refresh();
             boolean isTitlePresent = noteServerUtils.getAllNotes().stream()
                     .anyMatch(note -> note.getTitle().equals(selectedNote.getTitle()));
-            if(isTitlePresent) {
+            if (isTitlePresent) {
                 HashMap<String, String> patch = new HashMap<>();
                 patch.put("title", updatedTitle);
                 noteServerUtils.updateNote(selectedNote.getTitle(), patch);
@@ -621,6 +657,7 @@ public class MainCtrl {
 
     /**
      * Updates the application locale.
+     *
      * @param l The new locale of the application.
      */
     public void setLocale(Locale l) {
@@ -631,6 +668,14 @@ public class MainCtrl {
             selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
         }
         configLoader.setLocale(l);
+
+        var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, l);
+
+        rb.keySet()
+                .forEach(key -> {
+                    String shortKey = key.split("\\.")[1];
+                    props.get(shortKey).set(rb.getString(key));
+                });
     }
 
     /**
