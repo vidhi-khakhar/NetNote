@@ -33,7 +33,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest() {
+    void correctTextTest() {
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "Hello World!";
         List<String> problems = mc.getProblems(test);
@@ -41,7 +41,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest2() {
+    void incorrectlySpacedUnderlinesTest() {
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "Hello_World!_";
         List<String> problems = mc.getProblems(test);
@@ -49,7 +49,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest3(){
+    void wronglyWrittenUnderlineTest(){
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "Hello_World!";
         List<String> problems = mc.getProblems(test);
@@ -57,7 +57,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest4(){
+    void missingEmptyLineTest(){
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "Hello\nWorld!";
         List<String> problems = mc.getProblems(test);
@@ -65,7 +65,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest5(){
+    void asterisksNotClosedProperlyTest(){
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "Hello*World!**";
         List<String> problems = mc.getProblems(test);
@@ -73,7 +73,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest6(){
+    void wronglyWrittenNumberedListTest(){
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "1.Hello World!";
         List<String> problems = mc.getProblems(test);
@@ -81,7 +81,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest7(){
+    void wronglyWrittenListTest(){
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "-Hello World!";
         List<String> problems = mc.getProblems(test);
@@ -89,7 +89,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest8(){
+    void hashtagsOnlyTest(){
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "#";
         List<String> problems = mc.getProblems(test);
@@ -97,7 +97,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest9(){
+    void noSpaceAfterHashtagTest(){
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "#Hello World!";
         List<String> problems = mc.getProblems(test);
@@ -105,7 +105,7 @@ class MarkdownCtrlTest {
     }
 
     @Test
-    void markdownProblemsTest10(){
+    void hashtagSpacesHashtagTest(){
         MarkdownCtrl mc = new MarkdownCtrl();
         String test = "#   #";
         List<String> problems = mc.getProblems(test);
