@@ -28,7 +28,7 @@ public class Notification {
         text.setFont(Font.font("Bold", 12));
         text.setFill(Color.WHITESMOKE);
 
-        Scene scene = setScene(text);
+        Scene scene = createScene(text);
         notificatonStage.setScene(scene);
 
         notificatonStage.setOnShown(event -> {
@@ -43,10 +43,10 @@ public class Notification {
 
         notificatonStage.show();
 
-        Timeline fadeInTimeline = new Timeline();
+        Timeline timelineIN = new Timeline();
         KeyFrame fadeInKey1 = new KeyFrame(Duration.millis(fadeIn), new KeyValue (notificatonStage.getScene().getRoot().opacityProperty(), 1));
-        fadeInTimeline.getKeyFrames().add(fadeInKey1);
-        fadeInTimeline.setOnFinished((ae) ->
+        timelineIN.getKeyFrames().add(fadeInKey1);
+        timelineIN.setOnFinished((ae) ->
         {
             new Thread(() -> {
                 try
@@ -58,17 +58,18 @@ public class Notification {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                Timeline fadeOutTimeline = new Timeline();
-                KeyFrame fadeOutKey1 = new KeyFrame(Duration.millis(fadeOut), new KeyValue (notificatonStage.getScene().getRoot().opacityProperty(), 0));
-                fadeOutTimeline.getKeyFrames().add(fadeOutKey1);
-                fadeOutTimeline.setOnFinished((aeb) -> notificatonStage.close());
-                fadeOutTimeline.play();
+                Timeline timelineOut = new Timeline();
+                KeyFrame fadeOutKey1 = new KeyFrame(Duration.millis(fadeOut),
+                        new KeyValue (notificatonStage.getScene().getRoot().opacityProperty(), 0));
+                timelineOut.getKeyFrames().add(fadeOutKey1);
+                timelineOut.setOnFinished((aeb) -> notificatonStage.close());
+                timelineOut.play();
             }).start();
         });
-        fadeInTimeline.play();
+        timelineIN.play();
     }
 
-    public static Scene setScene(Text text) {
+    public static Scene createScene(Text text) {
         StackPane root = new StackPane(text);
         root.setStyle("-fx-background-radius: 10; " +
                 "-fx-background-color: #DB4455; " +
