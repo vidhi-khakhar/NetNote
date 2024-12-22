@@ -1,11 +1,9 @@
 package client.scenes;
 
 import client.Main;
-import client.MyModule;
 import client.UserConfigLoader;
 import client.utils.undo.*;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import commons.Note;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -23,14 +21,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
-import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.*;
 
 import client.utils.NoteServerUtils;
-
-import static com.google.inject.Guice.createInjector;
 
 public class MainCtrl {
 
@@ -47,7 +41,6 @@ public class MainCtrl {
     private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
-    private static final Injector INJECTOR = createInjector(new MyModule());
 
     private final Map<String, StringProperty> props = new HashMap<>();
     private Scene mainView;
@@ -500,21 +493,16 @@ public class MainCtrl {
 
     public void handleConfigureIP() {
         TextInputDialog dialog = new TextInputDialog();
-        String localAddressText = "\nLocal address: ";
-        try {
-            localAddressText += "https://" + InetAddress.getLocalHost().getHostAddress() + ":8080/";
-        } catch (UnknownHostException e) {
-            System.out.println("Unknown host");
-        }
-        dialog.setTitle("Server configuration");
-        dialog.setContentText("Current address: " + NoteServerUtils.getServerAddress() +
+        String localAddressText = "\nLocal address: " + NoteServerUtils.getLocalAddress();
+        dialog.setTitle("Change server address");
+        dialog.setContentText("Current address: " + noteServerUtils.getServerAddress() +
                 localAddressText);
         dialog.setHeaderText(null);
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
             String newAddress = result.get();
-            if (INJECTOR.getInstance(NoteServerUtils.class).isServerAvailable(newAddress)) {
-                NoteServerUtils.setServerAddress(newAddress);
+            if (noteServerUtils.isServerAvailable(newAddress)) {
+                noteServerUtils.setServerAddress(newAddress);
                 showPopUp("Success",
                         "Server address updated successfully",
                         Alert.AlertType.INFORMATION);

@@ -22,7 +22,7 @@ class NoteServerUtilsTest {
         noteServerUtils = new NoteServerUtils();
 
         //allow the testing only if server is available
-        assumeTrue(noteServerUtils.isServerAvailable(NoteServerUtils.getServerAddress()), "Server is not available, skipping tests.");
+        assumeTrue(noteServerUtils.isServerAvailable(noteServerUtils.getServerAddress()), "Server is not available, skipping tests.");
 
         n1 = new Note("Note1Test1", "Note 1 content");
 
@@ -86,7 +86,7 @@ class NoteServerUtilsTest {
     @AfterEach
     void cleanup() {
         // Clean up: Delete the notes after each test, only if tests are available
-        assumeTrue(noteServerUtils.isServerAvailable(NoteServerUtils.getServerAddress()));
+        assumeTrue(noteServerUtils.isServerAvailable(noteServerUtils.getServerAddress()));
         noteServerUtils.deleteNote(n1.getTitle());
     }
 }

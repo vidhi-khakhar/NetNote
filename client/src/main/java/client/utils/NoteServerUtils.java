@@ -17,6 +17,8 @@ package client.utils;
 
 import commons.Note;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.*;
 
@@ -26,10 +28,7 @@ import jakarta.ws.rs.core.Response;
 
 import jakarta.ws.rs.client.*;
 import jakarta.ws.rs.core.*;
-import jakarta.ws.rs.*;
 import org.glassfish.jersey.client.ClientConfig;
-
-import java.net.ConnectException;
 
 /**
  * A client utility class for making HTTP requests to a REST API.
@@ -37,33 +36,47 @@ import java.net.ConnectException;
  */
 public class NoteServerUtils {
 
-    private static String serverAddress = "http://localhost:8080/";
+    private String serverAddress;
 
-    public static String getServerAddress() {
-        return serverAddress;
+    public NoteServerUtils() {
+        this.serverAddress = getLocalAddress();
     }
 
-    public static void setServerAddress(String serverAddress) {
-        NoteServerUtils.serverAddress = serverAddress;
+    public String getServerAddress() {
+        return this.serverAddress;
+    }
+
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
+    }
+
+    public static String getLocalAddress() {
+        try {
+            return "http://" + InetAddress.getLocalHost().getHostAddress() + ":8080/";
+        } catch (UnknownHostException e) {
+            System.out.println("Unknown host");
+            return "";
+        }
     }
 
     /**
      * Method to check if an address corresponds to an available server.
+     * The server must send a 200 OK response containing JSON when a
+     * GET request is made to /api/notes for it to be considered available.
      *
      * @param address The address of the server to try to connect to.
-     * @return {@code true} if the server is reachable and
-     * {@code false} if the server is unavailable
+     * @return {@code true} if the server is reachable and valid and
+     * {@code false} otherwise
      */
     public boolean isServerAvailable(String address) {
         try {
-            ClientBuilder.newClient(new ClientConfig())
-                    .target(address)
+            if (ClientBuilder.newClient(new ClientConfig())
+                    .target(address + "api/notes/")
                     .request(MediaType.APPLICATION_JSON)
-                    .get();
-        } catch (ProcessingException e) {
-            if (e.getCause() instanceof ConnectException) {
-                return false;
-            }
+                    .get()
+                    .getStatus() != 200) return false;
+        } catch (Exception e) {
+            return false;
         }
         return true;
     }
@@ -120,7 +133,7 @@ public class NoteServerUtils {
     /**
      * Sends a PATCH requestUpdates to update the details of an existing note on the server.
      *
-     * @param title   - The title of the note to be updated.
+     * @param title    - The title of the note to be updated.
      * @param noteData - A map containing the fields to update and their new values.
      *                 The keys in the map are "title" or "text", and their values
      *                 are the corresponding updated values for the note.
