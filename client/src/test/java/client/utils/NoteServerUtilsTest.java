@@ -31,6 +31,24 @@ class NoteServerUtilsTest {
     }
 
     @Test
+    void cannotConnectToServerWithInvalidAddressTest() {
+        String serverAddress = "test://test.test:test/";
+        assertFalse(noteServerUtils.isServerAvailable(serverAddress));
+    }
+
+    @Test
+    void cannotConnectToServerWithIncompatibleAPITest() {
+        String serverAddress = "https://www.google.com/";
+        assertFalse(noteServerUtils.isServerAvailable(serverAddress));
+    }
+
+    @Test
+    void canConnectToLocalHostTest() {
+        String serverAddress = "http://localhost:8080/";
+        assertTrue(noteServerUtils.isServerAvailable(serverAddress));
+    }
+
+    @Test
     void getAllNotes() {
         // Retrieve all notes
         List<Note> notes = noteServerUtils.getAllNotes();
