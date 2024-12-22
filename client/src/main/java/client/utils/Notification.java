@@ -35,6 +35,17 @@ public class Notification {
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
         notificatonStage.setScene(scene);
+
+        notificatonStage.setOnShown(event -> {
+            double screenWidth = main.getScene().getWindow().getWidth();
+            double screenHeight = main.getScene().getWindow().getHeight();
+            double notificationWidth = notificatonStage.getWidth();
+            double notificationHeight = notificatonStage.getHeight();
+
+            notificatonStage.setX(main.getX() + screenWidth - notificationWidth - 20);
+            notificatonStage.setY(main.getY() + screenHeight - notificationHeight - 50);
+        });
+
         notificatonStage.show();
 
         Timeline fadeInTimeline = new Timeline();
