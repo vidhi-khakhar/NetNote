@@ -15,7 +15,7 @@ import javafx.util.Duration;
 public class Notification {
     public static void makeText(Stage main, String description)
     {
-        int messageTime = 4000;
+        int messageTime = 2000;
         int fadeIn = 500;
         int fadeOut = 500;
 
@@ -25,11 +25,17 @@ public class Notification {
         notificatonStage.initStyle(StageStyle.TRANSPARENT);
 
         Text text = new Text(description);
-        text.setFont(Font.font("Verdana", 40));
-        text.setFill(Color.RED);
+        text.setFont(Font.font("Bold", 18));
+        text.setFill(Color.WHITESMOKE);
 
         StackPane root = new StackPane(text);
-        root.setStyle("-fx-background-radius: 20; -fx-background-color: rgba(0, 0, 0, 0.2); -fx-padding: 50px;");
+        root.setStyle("-fx-background-radius: 10; " +
+                "-fx-background-color: #DB4455; " +
+                "-fx-border-color: rgba(255, 255, 255, 0.6); " +
+                "-fx-border-width: 1px; " +
+                "-fx-border-radius: 10; " +
+                "-fx-padding: 25px; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);");
         root.setOpacity(0);
 
         Scene scene = new Scene(root);
