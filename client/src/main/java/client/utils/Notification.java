@@ -13,7 +13,12 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class Notification {
-    public static void makeText(Stage main, String description)
+    /**
+     * Creates a pop-up notification that lasts 3 seconds.
+     * @param main the Stage on which the notification will be displayed.
+     * @param description the text of the notification
+     */
+    public static void create(Stage main, String description)
     {
         int messageTime = 2000;
         int fadeIn = 500;
@@ -31,21 +36,14 @@ public class Notification {
         Scene scene = createScene(text);
         notificatonStage.setScene(scene);
 
-        notificatonStage.setOnShown(event -> {
-            double screenWidth = main.getScene().getWindow().getWidth();
-            double screenHeight = main.getScene().getWindow().getHeight();
-            double notificationWidth = notificatonStage.getWidth();
-            double notificationHeight = notificatonStage.getHeight();
-
-            notificatonStage.setX(main.getX() + screenWidth - notificationWidth - 20);
-            notificatonStage.setY(main.getY() + screenHeight - notificationHeight - 50);
-        });
+        setPosition(main, notificatonStage);
 
         notificatonStage.show();
 
         Timeline timelineIN = new Timeline();
-        KeyFrame fadeInKey1 = new KeyFrame(Duration.millis(fadeIn), new KeyValue (notificatonStage.getScene().getRoot().opacityProperty(), 1));
-        timelineIN.getKeyFrames().add(fadeInKey1);
+        KeyFrame fadeInKey = new KeyFrame(Duration.millis(fadeIn),
+                new KeyValue (notificatonStage.getScene().getRoot().opacityProperty(), 1));
+        timelineIN.getKeyFrames().add(fadeInKey);
         timelineIN.setOnFinished((ae) ->
         {
             new Thread(() -> {
@@ -55,13 +53,12 @@ public class Notification {
                 }
                 catch (InterruptedException e)
                 {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 Timeline timelineOut = new Timeline();
-                KeyFrame fadeOutKey1 = new KeyFrame(Duration.millis(fadeOut),
+                KeyFrame fadeOutKey = new KeyFrame(Duration.millis(fadeOut),
                         new KeyValue (notificatonStage.getScene().getRoot().opacityProperty(), 0));
-                timelineOut.getKeyFrames().add(fadeOutKey1);
+                timelineOut.getKeyFrames().add(fadeOutKey);
                 timelineOut.setOnFinished((aeb) -> notificatonStage.close());
                 timelineOut.play();
             }).start();
@@ -69,6 +66,29 @@ public class Notification {
         timelineIN.play();
     }
 
+    /**
+     * Sets the position of the notification in the bottom right
+     * of the main stage.
+     * @param main the stage on which the notification will be displayed
+     * @param notificationStage the stage of the notification
+     */
+    private static void setPosition(Stage main, Stage notificationStage) {
+        notificationStage.setOnShown(event -> {
+            double screenWidth = main.getScene().getWindow().getWidth();
+            double screenHeight = main.getScene().getWindow().getHeight();
+            double notificationWidth = notificationStage.getWidth();
+            double notificationHeight = notificationStage.getHeight();
+
+            notificationStage.setX(main.getX() + screenWidth - notificationWidth - 20);
+            notificationStage.setY(main.getY() + screenHeight - notificationHeight - 50);
+        });
+    }
+
+    /**
+     * Creates a red notification scene.
+     * @param text The description on the notification with updated font and size.
+     * @return created notification Scene.
+     */
     public static Scene createScene(Text text) {
         StackPane root = new StackPane(text);
         root.setStyle("-fx-background-radius: 10; " +

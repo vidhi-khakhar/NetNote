@@ -161,14 +161,14 @@ public class MainCtrl {
                     try {
                         undoHandler.undoAction();
                     } catch (CannotUndoException e) {
-                        Notification.makeText((Stage) mainView.getWindow(),  e.getMessage());
+                        Notification.create((Stage) mainView.getWindow(),  e.getMessage());
                     }
                 }
                 case "Ctrl+Y" -> {
                     try {
                         undoHandler.redoAction();
                     } catch (CannotRedoException e) {
-                        Notification.makeText((Stage) mainView.getWindow(),  e.getMessage());
+                        Notification.create((Stage) mainView.getWindow(),  e.getMessage());
                     }
                 }
                 case "Ctrl+N" -> handleAddNote();
