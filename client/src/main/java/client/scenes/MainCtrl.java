@@ -491,6 +491,10 @@ public class MainCtrl {
         notesList.refresh();
     }
 
+    /**
+     * Shows a dialog where the user can change the address of the server.
+     * The user is notified whether the change was successful or unsuccessful.
+     */
     public void handleConfigureIP() {
         TextInputDialog dialog = new TextInputDialog();
         String localAddressText = "\nLocal address: " + NoteServerUtils.getLocalAddress();

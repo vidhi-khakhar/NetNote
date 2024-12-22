@@ -38,18 +38,34 @@ public class NoteServerUtils {
 
     private String serverAddress;
 
+    /**
+     * Default constructor for NoteServerUtils used by Guice
+     * Sets the default server address to the address of the current device.
+     */
     public NoteServerUtils() {
         this.serverAddress = getLocalAddress();
     }
 
+    /**
+     * Getter for the server address
+     * @return Getter for the server address
+     */
     public String getServerAddress() {
         return this.serverAddress;
     }
 
+    /**
+     * Setter for the server address
+     * @param serverAddress The new server address
+     */
     public void setServerAddress(String serverAddress) {
         this.serverAddress = serverAddress;
     }
 
+    /**
+     * Getter for the local address of the current device in the network.
+     * @return The local address of the current device.
+     */
     public static String getLocalAddress() {
         try {
             return "http://" + InetAddress.getLocalHost().getHostAddress() + ":8080/";
