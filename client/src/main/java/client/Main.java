@@ -52,7 +52,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
 
         var serverUtils = INJECTOR.getInstance(NoteServerUtils.class);
-        if (!serverUtils.isServerAvailable()) {
+        if (!serverUtils.isServerAvailable(NoteServerUtils.getServerAddress())) {
             var msg = "Server needs to be started before the client, " +
                     "but it does not seem to be available. Shutting down.";
             System.err.println(msg);

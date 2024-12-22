@@ -37,18 +37,27 @@ import java.net.ConnectException;
  */
 public class NoteServerUtils {
 
-    private static final String SERVER = "http://localhost:8080/";
+    private static String serverAddress = "http://localhost:8080/";
+
+    public static String getServerAddress() {
+        return serverAddress;
+    }
+
+    public static void setServerAddress(String serverAddress) {
+        NoteServerUtils.serverAddress = serverAddress;
+    }
 
     /**
-     * Method to check if the server is available.
+     * Method to check if an address corresponds to an available server.
      *
+     * @param address The address of the server to try to connect to.
      * @return {@code true} if the server is reachable and
      * {@code false} if the server is unavailable
      */
-    public boolean isServerAvailable() {
+    public boolean isServerAvailable(String address) {
         try {
             ClientBuilder.newClient(new ClientConfig())
-                    .target(SERVER)
+                    .target(address)
                     .request(MediaType.APPLICATION_JSON)
                     .get();
         } catch (ProcessingException e) {
@@ -69,7 +78,7 @@ public class NoteServerUtils {
         List<Note> notes = new ArrayList<>();
         try {
             Response response = ClientBuilder.newClient()
-                    .target(SERVER + "api/notes/")
+                    .target(serverAddress + "api/notes/")
                     .request(MediaType.APPLICATION_JSON)
                     .get();
 
@@ -94,7 +103,7 @@ public class NoteServerUtils {
     public void storeNote(Note note) {
         try {
             Response response = ClientBuilder.newClient()
-                    .target(SERVER).path("api/notes/")
+                    .target(serverAddress).path("api/notes/")
                     .request(MediaType.APPLICATION_JSON)
                     .post(Entity.entity(note, MediaType.APPLICATION_JSON));
 
@@ -125,7 +134,7 @@ public class NoteServerUtils {
             Client client = ClientBuilder.newClient();
 
             // Perform the POST request with the X-HTTP-Method-Override header
-            Response response = client.target(SERVER)
+            Response response = client.target(serverAddress)
                     .path("api/notes/" + title)
                     .request(MediaType.APPLICATION_JSON)
                     .header("X-HTTP-Method-Override", "PATCH")
@@ -153,7 +162,7 @@ public class NoteServerUtils {
     public void deleteNote(String title) {
         try {
             Response response = ClientBuilder.newClient()
-                    .target(SERVER + "api/notes/" + title)
+                    .target(serverAddress + "api/notes/" + title)
                     .request(MediaType.APPLICATION_JSON)
                     .delete();
 

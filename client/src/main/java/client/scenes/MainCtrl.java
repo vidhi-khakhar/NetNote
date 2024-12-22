@@ -1,9 +1,11 @@
 package client.scenes;
 
 import client.Main;
+import client.MyModule;
 import client.UserConfigLoader;
 import client.utils.undo.*;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import commons.Note;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -21,10 +23,14 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.*;
 
 import client.utils.NoteServerUtils;
+
+import static com.google.inject.Guice.createInjector;
 
 public class MainCtrl {
 
@@ -41,6 +47,7 @@ public class MainCtrl {
     private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
+    private static final Injector INJECTOR = createInjector(new MyModule());
 
     private final Map<String, StringProperty> props = new HashMap<>();
     private Scene mainView;
@@ -491,6 +498,34 @@ public class MainCtrl {
         notesList.refresh();
     }
 
+    public void handleConfigureIP() {
+        TextInputDialog dialog = new TextInputDialog();
+        String localAddressText = "\nLocal address: ";
+        try {
+            localAddressText += "https://" + InetAddress.getLocalHost().getHostAddress() + ":8080/";
+        } catch (UnknownHostException e) {
+            System.out.println("Unknown host");
+        }
+        dialog.setTitle("Server configuration");
+        dialog.setContentText("Current address: " + NoteServerUtils.getServerAddress() +
+                localAddressText);
+        dialog.setHeaderText(null);
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            String newAddress = result.get();
+            if (INJECTOR.getInstance(NoteServerUtils.class).isServerAvailable(newAddress)) {
+                NoteServerUtils.setServerAddress(newAddress);
+                showPopUp("Success",
+                        "Server address updated successfully",
+                        Alert.AlertType.INFORMATION);
+            } else {
+                showPopUp("Invalid address",
+                        "Could not connect to the server you provided",
+                        Alert.AlertType.ERROR);
+            }
+        }
+    }
+
     /**
      * Displays the problems with Markdown rendering in the webview.
      */
@@ -646,11 +681,7 @@ public class MainCtrl {
             String textBeforeCursor = noteEditor.getText(0, cursorPos);
             String textAfterCursor = noteEditor.getText(cursorPos, noteEditor.getLength());
             noteEditor.setText(textBeforeCursor + "<u>" + textAfterCursor + "</u>");
-
-
             noteEditor.positionCaret(cursorPos + 3);
-
-
             noteEditor.requestFocus();
         }
     }
