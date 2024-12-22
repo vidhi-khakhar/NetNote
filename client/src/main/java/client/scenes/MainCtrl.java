@@ -497,9 +497,14 @@ public class MainCtrl {
      */
     public void handleConfigureIP() {
         TextInputDialog dialog = new TextInputDialog();
-        String localAddressText = "\nLocal address: " + NoteServerUtils.getLocalAddress();
-        dialog.setTitle("Change server address");
-        dialog.setContentText("Current address: " + noteServerUtils.getServerAddress() +
+        String localAddressText = "\n" +
+                props.get("addressConfigLocalAddress").get() +
+                ": " +
+                NoteServerUtils.getLocalAddress();
+        dialog.titleProperty().bind(props.get("addressConfigDialogName"));
+        dialog.setContentText(props.get("addressConfigCurrentAddress").get() +
+                ": " +
+                noteServerUtils.getServerAddress() +
                 localAddressText);
         dialog.setHeaderText(null);
         Optional<String> result = dialog.showAndWait();
@@ -507,12 +512,12 @@ public class MainCtrl {
             String newAddress = result.get();
             if (noteServerUtils.isServerAvailable(newAddress)) {
                 noteServerUtils.setServerAddress(newAddress);
-                showPopUp("Success",
-                        "Server address updated successfully",
+                showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
+                        props.get("addressConfigSuccessAlertText").get(),
                         Alert.AlertType.INFORMATION);
             } else {
-                showPopUp("Invalid address",
-                        "Could not connect to the server you provided",
+                showPopUp(props.get("addressConfigAddressErrorTitle").get(),
+                        props.get("addressConfigAddressErrorText").get(),
                         Alert.AlertType.ERROR);
             }
         }
