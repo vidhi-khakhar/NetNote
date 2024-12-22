@@ -25,21 +25,10 @@ public class Notification {
         notificatonStage.initStyle(StageStyle.TRANSPARENT);
 
         Text text = new Text(description);
-        text.setFont(Font.font("Bold", 18));
+        text.setFont(Font.font("Bold", 12));
         text.setFill(Color.WHITESMOKE);
 
-        StackPane root = new StackPane(text);
-        root.setStyle("-fx-background-radius: 10; " +
-                "-fx-background-color: #DB4455; " +
-                "-fx-border-color: rgba(255, 255, 255, 0.6); " +
-                "-fx-border-width: 1px; " +
-                "-fx-border-radius: 10; " +
-                "-fx-padding: 25px; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);");
-        root.setOpacity(0);
-
-        Scene scene = new Scene(root);
-        scene.setFill(Color.TRANSPARENT);
+        Scene scene = setScene(text);
         notificatonStage.setScene(scene);
 
         notificatonStage.setOnShown(event -> {
@@ -77,5 +66,21 @@ public class Notification {
             }).start();
         });
         fadeInTimeline.play();
+    }
+
+    public static Scene setScene(Text text) {
+        StackPane root = new StackPane(text);
+        root.setStyle("-fx-background-radius: 10; " +
+                "-fx-background-color: #DB4455; " +
+                "-fx-border-color: rgba(255, 255, 255, 0.6); " +
+                "-fx-border-width: 1px; " +
+                "-fx-border-radius: 10; " +
+                "-fx-padding: 25px; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);");
+        root.setOpacity(0);
+
+        Scene scene = new Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        return scene;
     }
 }
