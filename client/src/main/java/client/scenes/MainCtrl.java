@@ -263,13 +263,14 @@ public class MainCtrl {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(title -> {
             if (title.trim().isEmpty()) {
+                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                        props.get("invalidTitleAlertText").get(),
+                        Alert.AlertType.ERROR);
+            } else if(isTitlePresent(title)) {
 
-                // Handling the invalid inputs
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.titleProperty().bind(props.get("invalidTitleAlertTitle"));
-                alert.contentTextProperty().bind(props.get("invalidTitleAlertText"));
-                alert.setHeaderText(null);
-                alert.showAndWait();
+                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                        props.get("invalidTitleAlertTitleExists").get(),
+                        Alert.AlertType.ERROR);
             } else {
                 Note newNote = new Note(title.trim(), "");
                 savedNotes.add(newNote);
@@ -533,26 +534,32 @@ public class MainCtrl {
      */
     public void updateTitle() {
         String updatedTitle = noteTitleInput.getText();
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         renderedNoteTitleLabel.textProperty().unbind();
         if (updatedTitle.isEmpty()) {
-            renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleLabelUntitled"));
+            showPopUp(props.get("invalidTitleAlertTitle").get(),
+                    props.get("invalidTitleAlertText").get(),
+                    Alert.AlertType.ERROR);
+            return;
         } else {
             renderedNoteTitleLabel.setText(updatedTitle);
         }
 
-        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
-
         if (selectedNote != null) {
             notesList.refresh();
-            boolean isTitlePresent = noteServerUtils.getAllNotes().stream()
-                    .anyMatch(note -> note.getTitle().equals(selectedNote.getTitle()));
-            if (isTitlePresent) {
-                HashMap<String, String> patch = new HashMap<>();
-                patch.put("title", updatedTitle);
-                noteServerUtils.updateNote(selectedNote.getTitle(), patch);
+            if (isTitlePresent(selectedNote.getTitle())) {
+                if (!isTitlePresent(updatedTitle)) {
+                    HashMap<String, String> patch = new HashMap<>();
+                    patch.put("title", updatedTitle);
+                    noteServerUtils.updateNote(selectedNote.getTitle(), patch);
+                    selectedNote.setTitle(updatedTitle);
+                } else if (!updatedTitle.equals(selectedNote.getTitle())) {
+                    showPopUp(props.get("invalidTitleAlertTitle").get(),
+                            props.get("invalidTitleAlertTitleExists").get(),
+                            Alert.AlertType.ERROR);
+                }
             }
-            selectedNote.setTitle(updatedTitle);
         } else if (selectedNoteIndex == -1 &&
                 (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
             // Ensure the first note is created when only content exists
@@ -565,6 +572,17 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Check for duplicate title
+     * @param title title to check
+     * @return whether the title already exists in the database
+     */
+    public boolean isTitlePresent(String title) {
+        return noteServerUtils.
+                getAllNotes().
+                stream().
+                anyMatch(note -> note.getTitle().equals(title));
+    }
 
     /**
      * Allows the user to make their text bold.<br>
