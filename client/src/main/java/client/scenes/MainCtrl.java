@@ -45,6 +45,7 @@ public class MainCtrl {
 
     private final Map<String, StringProperty> props = new HashMap<>();
     private Scene mainView;
+    private Stage stage;
 
     @Inject
     private MarkdownCtrl markdownCtrl;
@@ -109,6 +110,7 @@ public class MainCtrl {
      */
     public void initialize(Stage stage, Scene mainView) {
 
+        this.stage = stage;
         this.mainView = mainView;
 
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
@@ -161,14 +163,14 @@ public class MainCtrl {
                     try {
                         undoHandler.undoAction();
                     } catch (CannotUndoException e) {
-                        Notification.create((Stage) mainView.getWindow(),  e.getMessage());
+                        Notification.create(stage,  e.getMessage());
                     }
                 }
                 case "Ctrl+Y" -> {
                     try {
                         undoHandler.redoAction();
                     } catch (CannotRedoException e) {
-                        Notification.create((Stage) mainView.getWindow(),  e.getMessage());
+                        Notification.create(stage,  e.getMessage());
                     }
                 }
                 case "Ctrl+N" -> handleAddNote();
