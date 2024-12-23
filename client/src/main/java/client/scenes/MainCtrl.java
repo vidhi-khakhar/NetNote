@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.Main;
 import client.UserConfigLoader;
+import client.components.Notification;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;
@@ -44,6 +45,7 @@ public class MainCtrl {
 
     private final Map<String, StringProperty> props = new HashMap<>();
     private Scene mainView;
+    private Stage stage;
 
     @Inject
     private MarkdownCtrl markdownCtrl;
@@ -108,6 +110,7 @@ public class MainCtrl {
      */
     public void initialize(Stage stage, Scene mainView) {
 
+        this.stage = stage;
         this.mainView = mainView;
 
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
@@ -160,14 +163,14 @@ public class MainCtrl {
                     try {
                         undoHandler.undoAction();
                     } catch (CannotUndoException e) {
-                        //TODO Show pop-up that the action could not be undone
+                        Notification.create(stage,  e.getMessage());
                     }
                 }
                 case "Ctrl+Y" -> {
                     try {
                         undoHandler.redoAction();
                     } catch (CannotRedoException e) {
-                        //TODO Show pop-up that the action could not be redone
+                        Notification.create(stage,  e.getMessage());
                     }
                 }
                 case "Ctrl+N" -> handleAddNote();
