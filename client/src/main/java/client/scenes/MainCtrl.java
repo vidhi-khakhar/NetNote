@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.Main;
 import client.UserConfigLoader;
+import client.components.Notification;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;
@@ -44,6 +45,7 @@ public class MainCtrl {
 
     private final Map<String, StringProperty> props = new HashMap<>();
     private Scene mainView;
+    private Stage stage;
 
     @Inject
     private MarkdownCtrl markdownCtrl;
@@ -108,6 +110,7 @@ public class MainCtrl {
      */
     public void initialize(Stage stage, Scene mainView) {
 
+        this.stage = stage;
         this.mainView = mainView;
 
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
@@ -160,14 +163,14 @@ public class MainCtrl {
                     try {
                         undoHandler.undoAction();
                     } catch (CannotUndoException e) {
-                        //TODO Show pop-up that the action could not be undone
+                        Notification.create(stage,  e.getMessage());
                     }
                 }
                 case "Ctrl+Y" -> {
                     try {
                         undoHandler.redoAction();
                     } catch (CannotRedoException e) {
-                        //TODO Show pop-up that the action could not be redone
+                        Notification.create(stage,  e.getMessage());
                     }
                 }
                 case "Ctrl+N" -> handleAddNote();
@@ -493,6 +496,38 @@ public class MainCtrl {
     }
 
     /**
+     * Shows a dialog where the user can change the address of the server.
+     * The user is notified whether the change was successful or unsuccessful.
+     */
+    public void handleConfigureIP() {
+        TextInputDialog dialog = new TextInputDialog();
+        String localAddressText = "\n" +
+                props.get("addressConfigLocalAddress").get() +
+                ": " +
+                NoteServerUtils.getLocalAddress();
+        dialog.titleProperty().bind(props.get("addressConfigDialogName"));
+        dialog.setContentText(props.get("addressConfigCurrentAddress").get() +
+                ": " +
+                noteServerUtils.getServerAddress() +
+                localAddressText);
+        dialog.setHeaderText(null);
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            String newAddress = result.get();
+            if (noteServerUtils.isServerAvailable(newAddress)) {
+                noteServerUtils.setServerAddress(newAddress);
+                showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
+                        props.get("addressConfigSuccessAlertText").get(),
+                        Alert.AlertType.INFORMATION);
+            } else {
+                showPopUp(props.get("addressConfigAddressErrorTitle").get(),
+                        props.get("addressConfigAddressErrorText").get(),
+                        Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    /**
      * Displays the problems with Markdown rendering in the webview.
      */
     public void showProblems() {
@@ -664,11 +699,7 @@ public class MainCtrl {
             String textBeforeCursor = noteEditor.getText(0, cursorPos);
             String textAfterCursor = noteEditor.getText(cursorPos, noteEditor.getLength());
             noteEditor.setText(textBeforeCursor + "<u>" + textAfterCursor + "</u>");
-
-
             noteEditor.positionCaret(cursorPos + 3);
-
-
             noteEditor.requestFocus();
         }
     }

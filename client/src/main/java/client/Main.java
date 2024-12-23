@@ -18,9 +18,9 @@ package client;
 import static com.google.inject.Guice.createInjector;
 
 import client.scenes.MainCtrl;
+import client.utils.NoteServerUtils;
 import com.google.inject.Injector;
 
-import client.utils.ServerUtils;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -51,8 +51,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        var serverUtils = INJECTOR.getInstance(ServerUtils.class);
-        if (!serverUtils.isServerAvailable()) {
+        var serverUtils = INJECTOR.getInstance(NoteServerUtils.class);
+        if (!serverUtils.isServerAvailable(serverUtils.getServerAddress())) {
             var msg = "Server needs to be started before the client, " +
                     "but it does not seem to be available. Shutting down.";
             System.err.println(msg);
