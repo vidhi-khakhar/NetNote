@@ -2,7 +2,7 @@ package client.scenes;
 
 import client.Main;
 import client.UserConfigLoader;
-import client.components.notification.Notification;
+import client.components.Notification;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;

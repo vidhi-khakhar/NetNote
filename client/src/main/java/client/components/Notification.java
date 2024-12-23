@@ -1,4 +1,4 @@
-package client.components.notification;
+package client.components;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -98,7 +98,8 @@ public class Notification {
 
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
-        scene.getStylesheets().add(Notification.class.getResource("/client/components/notification/notification.css").toExternalForm());
+        scene.getStylesheets().add(Notification.class.
+                getResource("/components/notification.css").toExternalForm());
         return scene;
     }
 }
