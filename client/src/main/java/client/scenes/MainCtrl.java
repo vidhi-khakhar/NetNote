@@ -492,6 +492,38 @@ public class MainCtrl {
     }
 
     /**
+     * Shows a dialog where the user can change the address of the server.
+     * The user is notified whether the change was successful or unsuccessful.
+     */
+    public void handleConfigureIP() {
+        TextInputDialog dialog = new TextInputDialog();
+        String localAddressText = "\n" +
+                props.get("addressConfigLocalAddress").get() +
+                ": " +
+                NoteServerUtils.getLocalAddress();
+        dialog.titleProperty().bind(props.get("addressConfigDialogName"));
+        dialog.setContentText(props.get("addressConfigCurrentAddress").get() +
+                ": " +
+                noteServerUtils.getServerAddress() +
+                localAddressText);
+        dialog.setHeaderText(null);
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            String newAddress = result.get();
+            if (noteServerUtils.isServerAvailable(newAddress)) {
+                noteServerUtils.setServerAddress(newAddress);
+                showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
+                        props.get("addressConfigSuccessAlertText").get(),
+                        Alert.AlertType.INFORMATION);
+            } else {
+                showPopUp(props.get("addressConfigAddressErrorTitle").get(),
+                        props.get("addressConfigAddressErrorText").get(),
+                        Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    /**
      * Displays the problems with Markdown rendering in the webview.
      */
     public void showProblems() {
@@ -646,11 +678,7 @@ public class MainCtrl {
             String textBeforeCursor = noteEditor.getText(0, cursorPos);
             String textAfterCursor = noteEditor.getText(cursorPos, noteEditor.getLength());
             noteEditor.setText(textBeforeCursor + "<u>" + textAfterCursor + "</u>");
-
-
             noteEditor.positionCaret(cursorPos + 3);
-
-
             noteEditor.requestFocus();
         }
     }

@@ -22,12 +22,30 @@ class NoteServerUtilsTest {
         noteServerUtils = new NoteServerUtils();
 
         //allow the testing only if server is available
-        assumeTrue(noteServerUtils.isServerAvailable(), "Server is not available, skipping tests.");
+        assumeTrue(noteServerUtils.isServerAvailable(noteServerUtils.getServerAddress()), "Server is not available, skipping tests.");
 
         n1 = new Note("Note1Test1", "Note 1 content");
 
         // Store the notes before each test
         noteServerUtils.storeNote(n1);
+    }
+
+    @Test
+    void cannotConnectToServerWithInvalidAddressTest() {
+        String serverAddress = "test://test.test:test/";
+        assertFalse(noteServerUtils.isServerAvailable(serverAddress));
+    }
+
+    @Test
+    void cannotConnectToServerWithIncompatibleAPITest() {
+        String serverAddress = "https://www.google.com/";
+        assertFalse(noteServerUtils.isServerAvailable(serverAddress));
+    }
+
+    @Test
+    void canConnectToLocalHostTest() {
+        String serverAddress = "http://localhost:8080/";
+        assertTrue(noteServerUtils.isServerAvailable(serverAddress));
     }
 
     @Test
@@ -86,7 +104,7 @@ class NoteServerUtilsTest {
     @AfterEach
     void cleanup() {
         // Clean up: Delete the notes after each test, only if tests are available
-        assumeTrue(noteServerUtils.isServerAvailable());
+        assumeTrue(noteServerUtils.isServerAvailable(noteServerUtils.getServerAddress()));
         noteServerUtils.deleteNote(n1.getTitle());
     }
 }
