@@ -13,6 +13,11 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class Notification {
+
+    public static final int messageTime = 2000;
+    public static final int fadeIn = 500;
+    public static final int fadeOut = 500;
+
     /**
      * Creates a pop-up notification that lasts 3 seconds.
      * @param main the Stage on which the notification will be displayed.
@@ -20,9 +25,7 @@ public class Notification {
      */
     public static void create(Stage main, String description)
     {
-        int messageTime = 2000;
-        int fadeIn = 500;
-        int fadeOut = 500;
+
 
         Stage notificatonStage=new Stage();
         notificatonStage.initOwner(main);
