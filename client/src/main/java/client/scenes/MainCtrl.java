@@ -740,5 +740,12 @@ public class MainCtrl {
     public void setNL() {
         setLocale(Locale.forLanguageTag("nl-NL"));
     }
+
+    /**
+     * Sets the application locale to Romanian.
+     */
+    public void setRO() {
+        setLocale(Locale.forLanguageTag("ro-RO"));
+    }
 }
 

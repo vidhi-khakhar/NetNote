@@ -147,6 +147,14 @@
                                        </image>
                                     </ImageView>
                                  </graphic></MenuItem>
+                              <MenuItem fx:id="romanianMenuItem" mnemonicParsing="false" onAction="#setRO">
+                                 <graphic>
+                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@/images/ro_RO.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic></MenuItem>
                            </items>
                            <font>
                               <Font size="10.0" />
