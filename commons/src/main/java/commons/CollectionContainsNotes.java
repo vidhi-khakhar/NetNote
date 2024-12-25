@@ -84,7 +84,8 @@ public class CollectionContainsNotes {
     }
 
     /**
-     * Computes the hash code for this entity based on its composite primary key.
+     * Computes the hash code for this entity
+     * based on its composite primary key.
      *
      * @return The hash code of this entity.
      */

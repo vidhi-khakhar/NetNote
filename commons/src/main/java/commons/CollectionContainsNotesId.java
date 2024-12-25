@@ -12,14 +12,24 @@ import java.util.Objects;
 @Embeddable
 public class CollectionContainsNotesId implements Serializable {
 
+    /**
+     * collectionId is part of the composite key.
+     */
     private Long collectionId;
+    /**
+     * noteId is part of the composite key.
+     */
     private Long noteId;
 
-    // Default constructor
+    /**
+     * Default constructor is requested by JPA.
+     */
+    @SuppressWarnings("unused")
     public CollectionContainsNotesId() {}
 
     /**
-     * Constructor to create a composite primary key with a collection ID and a note ID.
+     * Constructor to create a composite primary key
+     * with a collection ID and a note ID.
      *
      * @param collectionId The ID of the Collection.
      * @param noteId The ID of the Note.
@@ -48,7 +58,8 @@ public class CollectionContainsNotesId implements Serializable {
     }
 
     /**
-     * Determines equality of two CollectionContainsNotesId objects based on their field values.
+     * Determines equality of two CollectionContainsNotesId
+     * objects based on their field values.
      *
      * @param o The object to compare to.
      * @return True if both objects are equal, otherwise false.
@@ -58,7 +69,8 @@ public class CollectionContainsNotesId implements Serializable {
         if (this == o) return true;
         if (!(o instanceof CollectionContainsNotesId)) return false;
         CollectionContainsNotesId that = (CollectionContainsNotesId) o;
-        return Objects.equals(collectionId, that.collectionId) && Objects.equals(noteId, that.noteId);
+        return Objects.equals(collectionId, that.collectionId)
+                && Objects.equals(noteId, that.noteId);
     }
 
     /**
