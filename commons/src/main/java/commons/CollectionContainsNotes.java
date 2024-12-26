@@ -1,7 +1,11 @@
 package commons;
 
 import jakarta.persistence.*;
-import java.util.Objects;
+
+import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Moderating table between the Collection and Note entities.
@@ -69,28 +73,27 @@ public class CollectionContainsNotes {
     }
 
     /**
-     * Checks the equality of this entity with another object. Two instances
-     * are considered equal if their composite primary keys are equal.
-     *
-     * @param o The object to compare with.
-     * @return {@code true} if the objects are equal, {@code false} otherwise.
+     * @param anotherCollectionContainsNotes another anotherCollectionContainsNotes
+     * @return whether two anotherCollectionContainsNotes are equal
      */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CollectionContainsNotes that = (CollectionContainsNotes) o;
-        return Objects.equals(id, that.id);
+    public boolean equals(Object anotherCollectionContainsNotes) {
+        return EqualsBuilder.reflectionEquals(this,anotherCollectionContainsNotes);
     }
 
     /**
-     * Computes the hash code for this entity
-     * based on its composite primary key.
-     *
-     * @return The hash code of this entity.
+     * @return hashcode
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    /**
+     * @return String representation
+     */
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
     }
 }

@@ -1,8 +1,13 @@
 package commons;
 
 import jakarta.persistence.Embeddable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
-import java.util.Objects;
+
+import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 /**
  * Composite primary key class for CollectionContainsNotes.
@@ -58,28 +63,27 @@ public class CollectionContainsNotesId implements Serializable {
     }
 
     /**
-     * Determines equality of two CollectionContainsNotesId
-     * objects based on their field values.
-     *
-     * @param o The object to compare to.
-     * @return True if both objects are equal, otherwise false.
+     * @param anotherCollectionContainsNotesId another anotherCollectionContainsNotesId
+     * @return whether two anotherCollectionContainsNotesIds are equal
      */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CollectionContainsNotesId)) return false;
-        CollectionContainsNotesId that = (CollectionContainsNotesId) o;
-        return Objects.equals(collectionId, that.collectionId)
-                && Objects.equals(noteId, that.noteId);
+    public boolean equals(Object anotherCollectionContainsNotesId) {
+        return EqualsBuilder.reflectionEquals(this,anotherCollectionContainsNotesId);
     }
 
     /**
-     * Generates a hash code based on the field values of the composite key.
-     *
-     * @return A hash code representing the composite key.
+     * @return hashcode
      */
     @Override
     public int hashCode() {
-        return Objects.hash(collectionId, noteId);
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    /**
+     * @return String representation
+     */
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
     }
 }
