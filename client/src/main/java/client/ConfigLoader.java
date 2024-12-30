@@ -1,37 +1,44 @@
 package client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Injector;
 
 import java.io.*;
 import java.util.*;
 
-public class UserConfigLoader {
+import static com.google.inject.Guice.createInjector;
 
-    private final ObjectMapper om = new ObjectMapper();
-    private Map<String, String> data;
+public class ConfigLoader {
+
+    private static final Injector INJECTOR = createInjector(new MyModule());
+
+    private Config data;
 
     /**
      * Constructor for the UserConfigLoader object.
      * Tries to load the pre-existing configurations and creates a new
      * config.json file in the root of the project if it doesn't exist yet.
      */
-    public UserConfigLoader() {
-        data = new HashMap<>();
+    public ConfigLoader() {
         try {
-            TypeReference<Map<String, String>> typeRef = new TypeReference<>() {};
             File configFile = new File("config.json");
             if (!configFile.exists()) {
                 System.out.println("Config file not present. Creating a new config file");
                 save();
             }
-            data = om.readValue(new File("config.json"), typeRef);
+            data = INJECTOR
+                    .getInstance(ObjectMapper.class)
+                    .readValue(new File("config.json"), Config.class);
         } catch (DatabindException e) {
             System.err.println("Could not bind to the given class.");
         } catch (IOException e) {
             System.err.println("Could not open the user config file.");
+        } finally {
+            if (data == null) data = new Config(
+                    Main.DEFAULT_LOCALE.toLanguageTag(),
+                    new ArrayList<>());
         }
     }
 
@@ -41,11 +48,8 @@ public class UserConfigLoader {
      * @return The application locale specified in the configuration.
      */
     public Locale getLocale() {
-        String savedLocale = data.get("locale");
-        if (savedLocale == null) return Main.DEFAULT_LOCALE;
-        if (savedLocale.equals("en")) return Locale.ENGLISH;
-        else if (savedLocale.equals("nl_NL")) return Locale.forLanguageTag("nl-NL");
-        return Main.DEFAULT_LOCALE;
+        String languageTag = data.getLanguageTag();
+        return Locale.forLanguageTag(languageTag);
     }
 
     /**
@@ -55,7 +59,7 @@ public class UserConfigLoader {
      * @param l The new locale of the application.
      */
     public void setLocale(Locale l) {
-        data.put("locale", l.toString());
+        data.setLanguageTag(l.toLanguageTag());
         save();
     }
 
@@ -64,7 +68,10 @@ public class UserConfigLoader {
      */
     private void save() {
         try {
-            om.writer(new DefaultPrettyPrinter()).writeValue(new File("config.json"), data);
+            INJECTOR
+                    .getInstance(ObjectMapper.class)
+                    .writer(new DefaultPrettyPrinter())
+                    .writeValue(new File("config.json"), data);
         } catch (IOException e) {
             System.err.println("Could not open the user config file.");
         }

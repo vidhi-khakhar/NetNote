@@ -28,10 +28,10 @@ public class Collection {
     private String alias;
 
     /**
-     * Default constructor is requested by JPA.
+     * Default constructor is requested by JPA and Jackson.
      */
     @SuppressWarnings("unused")
-    protected Collection() { }
+    public Collection() { }
 
     /**
      * Recommended constructor for Collection.
