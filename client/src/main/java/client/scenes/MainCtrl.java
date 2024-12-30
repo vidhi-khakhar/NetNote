@@ -143,9 +143,25 @@ public class MainCtrl {
                 });
 
         noteTitleInput.textProperty().addListener(noteTitleInputListener);
+
+        noteEditor.textProperty().addListener((_, _, newValue) -> {
+            content = newValue;
+            if (content.isEmpty()) {
+                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
+                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
+            } else {
+                props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
+                renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
+            }
+        });
+
+        initializeShortcuts();
+        initializeTextProperties();
+
         updateDisplay();
+    }
 
-
+    private void initializeShortcuts() {
         mainView.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             List<String> eventKeys = new ArrayList<>();
             if (event.isControlDown()) eventKeys.add("Ctrl");
@@ -180,7 +196,6 @@ public class MainCtrl {
                 case "Ctrl+U" -> underlineMarkdown();
             }
         });
-        initializeTextProperties();
     }
 
     private void initializeTextProperties() {
@@ -421,7 +436,9 @@ public class MainCtrl {
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
             props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-            renderedNoteView.getEngine().loadContent(selectedNote.getText());
+            renderedNoteView
+                    .getEngine()
+                    .loadContent(markdownCtrl.markdownToHtml(selectedNote.getText()));
         } else {
             selectedNoteIndex = -1;
 
@@ -444,17 +461,6 @@ public class MainCtrl {
      * so that they are automatically propagated in the rendered view.
      */
     public void updateDisplay() {
-        noteEditor.textProperty().addListener((_, _, newValue) -> {
-            content = newValue;
-            if (noteTitleInput.getText().isEmpty() && content.isEmpty()) {
-                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
-                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
-            } else {
-                props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-                renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
-            }
-        });
-
         if (selectedNoteIndex != -1) {
             // If a note is selected, update the content of that note
             Note selectedNote = savedNotes.get(selectedNoteIndex);
