@@ -179,14 +179,14 @@ public class MainCtrl {
                     try {
                         undoHandler.undoAction();
                     } catch (CannotUndoException e) {
-                        Notification.create(stage,  e.getMessage());
+                        Notification.create(stage, e.getMessage());
                     }
                 }
                 case "Ctrl+Y" -> {
                     try {
                         undoHandler.redoAction();
                     } catch (CannotRedoException e) {
-                        Notification.create(stage,  e.getMessage());
+                        Notification.create(stage, e.getMessage());
                     }
                 }
                 case "Ctrl+N" -> handleAddNote();
@@ -284,7 +284,7 @@ public class MainCtrl {
                 showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertText").get(),
                         Alert.AlertType.ERROR);
-            } else if(isTitlePresent(title)) {
+            } else if (isTitlePresent(title)) {
 
                 showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertTitleExists").get(),
@@ -435,10 +435,10 @@ public class MainCtrl {
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(selectedNote.getTitle());
-            props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-            renderedNoteView
-                    .getEngine()
-                    .loadContent(markdownCtrl.markdownToHtml(selectedNote.getText()));
+            if (selectedNote.getText().isEmpty()) {
+                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
+                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
+            }
         } else {
             selectedNoteIndex = -1;
 
@@ -615,6 +615,7 @@ public class MainCtrl {
 
     /**
      * Check for duplicate title
+     *
      * @param title title to check
      * @return whether the title already exists in the database
      */
