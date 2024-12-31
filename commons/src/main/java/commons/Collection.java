@@ -3,6 +3,7 @@ package commons;
 import jakarta.persistence.*;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -28,23 +29,34 @@ public class Collection {
     private String alias;
 
     /**
+     * The address of the server that hosts the collection <br>
+     * E.g. {@code http://192.168.1.123/}
+     */
+    private String server;
+
+    /**
      * Default constructor is requested by JPA and Jackson.
      */
     @SuppressWarnings("unused")
-    public Collection() { }
+    public Collection() {
+    }
 
     /**
      * Recommended constructor for Collection.
-     * @param collectionUniqueName unique name of collection
-     * @param alias user-friendly name
+     *
+     * @param collectionUniqueName Unique name of collection
+     * @param alias                User-friendly name
+     * @param server               The address of the server where the collection is stored
      */
-    public Collection(String collectionUniqueName, String alias) {
+    public Collection(String collectionUniqueName, String alias, String server) {
         this.collectionUniqueName = collectionUniqueName;
         this.alias = alias;
+        this.server = server;
     }
 
     /**
      * Getter for collectionUniqueName.
+     *
      * @return collectionUniqueName
      */
     public String getCollectionUniqueName() {
@@ -53,6 +65,7 @@ public class Collection {
 
     /**
      * Getter for alias.
+     *
      * @return alias
      */
     public String getAlias() {
@@ -61,10 +74,29 @@ public class Collection {
 
     /**
      * Setter for alias.
+     *
      * @param alias new alias
      */
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    /**
+     * Getter for the address of the server where the collection is located
+     *
+     * @return The address of the server where the collection is located
+     */
+    public String getServer() {
+        return server;
+    }
+
+    /**
+     * Setter for the address of the server where the collection is located
+     *
+     * @param server The new address of the server where the collection is located
+     */
+    public void setServer(String server) {
+        this.server = server;
     }
 
     /**
@@ -73,7 +105,7 @@ public class Collection {
      */
     @Override
     public boolean equals(Object anotherCollection) {
-        return EqualsBuilder.reflectionEquals(this,anotherCollection);
+        return EqualsBuilder.reflectionEquals(this, anotherCollection);
     }
 
     /**
