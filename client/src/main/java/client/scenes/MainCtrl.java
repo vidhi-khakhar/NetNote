@@ -1,7 +1,7 @@
 package client.scenes;
 
 import client.Main;
-import client.ConfigLoader;
+import client.config.ConfigLoader;
 import client.components.Notification;
 import client.utils.undo.*;
 import com.google.inject.Inject;

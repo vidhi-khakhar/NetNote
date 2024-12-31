@@ -1,8 +1,11 @@
-package client;
+package client.config;
 
+import client.Main;
+import client.MyModule;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import java.io.*;
@@ -10,11 +13,9 @@ import java.util.*;
 
 import commons.Collection;
 
-import static com.google.inject.Guice.createInjector;
-
 public class ConfigLoader {
 
-    private static final Injector INJECTOR = createInjector(new MyModule());
+    private static final Injector INJECTOR = Guice.createInjector(new MyModule());
 
     private Config data;
 
