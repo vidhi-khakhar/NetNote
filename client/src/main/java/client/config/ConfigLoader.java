@@ -16,24 +16,35 @@ import commons.Collection;
 public class ConfigLoader {
 
     private static final Injector INJECTOR = Guice.createInjector(new MyModule());
-
     private Config data;
+    private String filePath;
+
+    /**
+     * Default constructor used by Guice
+     */
+    @SuppressWarnings("unused")
+    public ConfigLoader() {
+    }
 
     /**
      * Constructor for the UserConfigLoader object.
      * Tries to load the pre-existing configurations and creates a new
-     * config.json file in the root of the project if it doesn't exist yet.
+     * file in the root of the project if it doesn't exist yet.
+     *
+     * @param filePath The path to the file in which to store the
+     *                 configuration data
      */
-    public ConfigLoader() {
+    public ConfigLoader(String filePath) {
+        this.filePath = filePath;
         try {
-            File configFile = new File("config.json");
+            File configFile = new File(filePath);
             if (!configFile.exists()) {
                 System.out.println("Config file not present. Creating a new config file");
                 save();
             }
             data = INJECTOR
                     .getInstance(ObjectMapper.class)
-                    .readValue(new File("config.json"), Config.class);
+                    .readValue(new File(filePath), Config.class);
         } catch (DatabindException e) {
             System.err.println("Could not bind to the given class.");
         } catch (IOException e) {
@@ -84,6 +95,7 @@ public class ConfigLoader {
      */
     public void addCollection(Collection c) {
         data.getCollections().add(c);
+        save();
     }
 
     /**
@@ -100,6 +112,7 @@ public class ConfigLoader {
                         .stream()
                         .filter(c -> !c.getCollectionUniqueName().equals(uniqueName))
                         .toList());
+        save();
     }
 
     /**
@@ -110,7 +123,7 @@ public class ConfigLoader {
             INJECTOR
                     .getInstance(ObjectMapper.class)
                     .writer(new DefaultPrettyPrinter())
-                    .writeValue(new File("config.json"), data);
+                    .writeValue(new File(filePath), data);
         } catch (IOException e) {
             System.err.println("Could not open the user config file.");
         }

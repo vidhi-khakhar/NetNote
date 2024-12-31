@@ -72,7 +72,8 @@ public class Config {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Config config = (Config) o;
-        return Objects.equals(locale, config.locale) && Objects.equals(collections, config.collections);
+        return Objects.equals(locale, config.locale) &&
+                Objects.equals(collections, config.collections);
     }
 
     /**

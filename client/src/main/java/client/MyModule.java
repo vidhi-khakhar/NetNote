@@ -15,20 +15,36 @@
  */
 package client;
 
+import client.config.ConfigLoader;
 import client.scenes.MainCtrl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.google.inject.Provides;
 import com.google.inject.Scopes;
-
 
 public class MyModule implements Module {
 
     /**
      * Adds scopes to the specified classes
+     *
      * @param binder Used for scoping the classes
      */
     @Override
     public void configure(Binder binder) {
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(ObjectMapper.class).in(Scopes.SINGLETON);
+    }
+
+    /**
+     * Specifies how to instantiate the {@link ConfigLoader} when
+     * injecting it.
+     *
+     * @return The default instance of the {@link ConfigLoader} which
+     * stores the configuration data in the {@code config.json} file.
+     */
+    @Provides
+    public ConfigLoader configLoader() {
+        return new ConfigLoader("config.json");
     }
 }
