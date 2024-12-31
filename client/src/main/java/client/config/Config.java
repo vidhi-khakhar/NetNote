@@ -62,4 +62,36 @@ public class Config {
     public void setCollections(List<Collection> collections) {
         this.collections = collections;
     }
+
+    /**
+     * Compares a collection to another object to see if they are equal
+     * @param o The object to compare against
+     * @return True if the collections are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Config config = (Config) o;
+        return Objects.equals(locale, config.locale) && Objects.equals(collections, config.collections);
+    }
+
+    /**
+     * Generates a hashcode for a Config object
+     * @return The hashcode used by hash tables
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(locale, collections);
+    }
+
+    /**
+     * Generates a string representation of the Config object
+     * @return A string representation of the Config object
+     */
+    @Override
+    public String toString() {
+        return "Config { locale = " + locale +
+                ", collections = " + collections +
+                " }";
+    }
 }
