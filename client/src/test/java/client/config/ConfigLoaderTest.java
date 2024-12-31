@@ -1,0 +1,100 @@
+package client.config;
+
+import client.Main;
+import org.junit.jupiter.api.*;
+
+import commons.Collection;
+
+import java.io.*;
+import java.util.List;
+import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ConfigLoaderTest {
+
+    private static final String filePath = "test-config.json";
+    private ConfigLoader loader;
+    Collection col1;
+    Collection col2;
+    Collection col3;
+
+    @BeforeEach
+    void setUp() {
+        col1 = new Collection("notes-1", "CSEP notes", "http://192.168.1.123/");
+        col2 = new Collection("notes-2", "Uni notes", "http://192.168.1.123/");
+        col3 = new Collection("notes-3", "Travelling notes", "http://192.168.1.124");
+        try (PrintWriter w = new PrintWriter(new FileWriter(filePath))) {
+            w.print("""
+                    {
+                      "locale" : "nl_NL",
+                      "collections" : [
+                        {
+                          "collectionUniqueName" : "notes-1",
+                          "alias" : "CSEP notes",
+                          "server" : "http://192.168.1.123/"
+                        },
+                        {
+                          "collectionUniqueName" : "notes-2",
+                          "alias" : "Uni notes",
+                          "server" : "http://192.168.1.123/"
+                        }
+                      ]
+                    }
+                    """);
+            w.flush();
+        } catch (IOException e) {
+            System.err.println("Could not write to the specified file");
+        }
+        loader = new ConfigLoader(filePath);
+    }
+
+    @Test
+    void getLocaleTest() {
+        assertEquals(Locale.forLanguageTag("nl-NL"), loader.getLocale());
+    }
+
+    /**
+     * Tests if the data was saved to the {@code test-config.json} file
+     * by creating a new {@link ConfigLoader} to parse the contents of the
+     * file again.
+     */
+    @Test
+    void setLocaleTest() {
+        loader.setLocale(Locale.ENGLISH);
+        ConfigLoader newLoader = new ConfigLoader(filePath);
+        assertEquals(Locale.ENGLISH, newLoader.getLocale());
+    }
+
+    @Test
+    void getCollectionsTest() {
+        assertEquals(List.of(col1, col2), loader.getCollections());
+    }
+
+    @Test
+    void addCollectionTest() {
+        loader.addCollection(col3);
+        ConfigLoader newLoader = new ConfigLoader(filePath);
+        assertEquals(List.of(col1, col2, col3), newLoader.getCollections());
+    }
+
+    @Test
+    void removeCollectionTest() {
+        loader.removeCollection("notes-1");
+        ConfigLoader newLoader = new ConfigLoader(filePath);
+        assertEquals(List.of(col2), newLoader.getCollections());
+    }
+
+    @Test
+    void defaultValuesTest() {
+        new File(filePath).delete();
+        ConfigLoader newLoader = new ConfigLoader(filePath);
+        assertEquals(Main.DEFAULT_LOCALE, newLoader.getLocale());
+        assertEquals(List.of(), newLoader.getCollections());
+    }
+
+    @AfterAll
+    static void removeTestFile() {
+        new File(filePath).delete();
+    }
+}

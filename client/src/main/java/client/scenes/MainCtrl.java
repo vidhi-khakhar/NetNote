@@ -1,7 +1,7 @@
 package client.scenes;
 
 import client.Main;
-import client.UserConfigLoader;
+import client.config.ConfigLoader;
 import client.components.Notification;
 import client.utils.undo.*;
 import com.google.inject.Inject;
@@ -57,7 +57,7 @@ public class MainCtrl {
     private NoteServerUtils noteServerUtils;
 
     @Inject
-    private UserConfigLoader configLoader;
+    private ConfigLoader configLoader;
 
     @FXML
     private TextField searchBar;

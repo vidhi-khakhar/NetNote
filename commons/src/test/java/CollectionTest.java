@@ -25,63 +25,65 @@ public class CollectionTest {
 
     @Test
     void testConstructor() {
-        Collection collection = new Collection("uniqueName", "alias");
+        Collection collection = new Collection("uniqueName", "alias", "http://192.168.1.123/");
         assertEquals("uniqueName", collection.getCollectionUniqueName());
         assertEquals("alias", collection.getAlias());
+        assertEquals("http://192.168.1.123/", collection.getServer());
     }
 
     @Test
     void testSetAlias() {
-        Collection collection = new Collection("uniqueName", "alias1");
+        Collection collection = new Collection("uniqueName", "alias1", "http://192.168.1.123/");
         collection.setAlias("alias2");
         assertEquals("alias2", collection.getAlias());
     }
 
     @Test
     void testEquals_same() {
-        Collection collection = new Collection("uniqueName", "alias");
+        Collection collection = new Collection("uniqueName", "alias", "http://192.168.1.123/");
         assertTrue(collection.equals(collection));
     }
 
     @Test
     void testEquals_equalSameValues() {
-        Collection collection1 = new Collection("uniqueName", "alias");
-        Collection collection2 = new Collection("uniqueName", "alias");
+        Collection collection1 = new Collection("uniqueName", "alias", "http://192.168.1.123/");
+        Collection collection2 = new Collection("uniqueName", "alias", "http://192.168.1.123/");
         assertEquals(collection1, collection2);
     }
 
     @Test
     void testEquals_notEqualDifferentValues() {
-        Collection collection1 = new Collection("uniqueName", "alias1");
-        Collection collection2 = new Collection("differentName", "alias2");
+        Collection collection1 = new Collection("uniqueName", "alias1", "http://192.168.1.123/");
+        Collection collection2 = new Collection("differentName", "alias2", "http://192.168.1.124/");
         assertNotEquals(collection1, collection2);
     }
 
     @Test
     void testHashCode_same() {
-        Collection collection = new Collection("uniqueName", "alias");
+        Collection collection = new Collection("uniqueName", "alias", "http://192.168.1.123/");
         assertEquals(collection.hashCode(), collection.hashCode());
     }
 
     @Test
     void testHashCode_equalSameValues() {
-        Collection collection1 = new Collection("uniqueName", "alias");
-        Collection collection2 = new Collection("uniqueName", "alias");
+        Collection collection1 = new Collection("uniqueName", "alias", "http://192.168.1.123/");
+        Collection collection2 = new Collection("uniqueName", "alias", "http://192.168.1.123/");
         assertEquals(collection1.hashCode(), collection2.hashCode());
     }
 
     @Test
     void testHashCode_notEqualDifferentValues() {
-        Collection collection1 = new Collection("uniqueName", "alias1");
-        Collection collection2 = new Collection("differentName", "alias2");
+        Collection collection1 = new Collection("uniqueName", "alias1", "http://192.168.1.123/");
+        Collection collection2 = new Collection("differentName", "alias2", "http://192.168.1.124/");
         assertNotEquals(collection1.hashCode(), collection2.hashCode());
     }
 
     @Test
     void testToString() {
-        Collection collection = new Collection("uniqueName", "alias");
+        Collection collection = new Collection("uniqueName", "alias", "http://192.168.1.123/");
         assertTrue(collection.toString().contains("uniqueName"));
         assertTrue(collection.toString().contains("alias"));
+        assertTrue(collection.toString().contains("server"));
     }
 
 }
