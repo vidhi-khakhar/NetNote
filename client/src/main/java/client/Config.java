@@ -6,7 +6,7 @@ import commons.Collection;
 
 public class Config {
 
-    private String languageTag;
+    private Locale locale;
     private List<Collection> collections;
 
     /**
@@ -18,30 +18,30 @@ public class Config {
     /**
      * Constructor for an object that contains application configuration data
      *
-     * @param languageTag The language tag for the application locale
+     * @param locale The application locale
      * @param collections The collections the client has access to
      */
-    public Config(String languageTag, List<Collection> collections) {
-        this.languageTag = languageTag;
+    public Config(Locale locale, List<Collection> collections) {
+        this.locale = locale;
         this.collections = collections;
     }
 
     /**
-     * Getter for the application locale language tag
+     * Getter for the application locale
      *
-     * @return The application locale language tag
+     * @return The application locale
      */
-    public String getLanguageTag() {
-        return languageTag;
+    public Locale getLocale() {
+        return locale;
     }
 
     /**
-     * Setter for the application locale language tag
+     * Setter for the application locale
      *
-     * @param languageTag The new application locale language tag
+     * @param locale The new application locale
      */
-    public void setLanguageTag(String languageTag) {
-        this.languageTag = languageTag;
+    public void setLocale(Locale locale) {
+        this.locale = locale;
     }
 
     /**

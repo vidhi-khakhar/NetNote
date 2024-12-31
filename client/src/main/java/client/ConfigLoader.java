@@ -37,7 +37,7 @@ public class ConfigLoader {
             System.err.println("Could not open the user config file.");
         } finally {
             if (data == null) data = new Config(
-                    Main.DEFAULT_LOCALE.toLanguageTag(),
+                    Main.DEFAULT_LOCALE,
                     new ArrayList<>());
         }
     }
@@ -48,8 +48,7 @@ public class ConfigLoader {
      * @return The application locale specified in the configuration.
      */
     public Locale getLocale() {
-        String languageTag = data.getLanguageTag();
-        return Locale.forLanguageTag(languageTag);
+        return data.getLocale();
     }
 
     /**
@@ -59,7 +58,7 @@ public class ConfigLoader {
      * @param l The new locale of the application.
      */
     public void setLocale(Locale l) {
-        data.setLanguageTag(l.toLanguageTag());
+        data.setLocale(l);
         save();
     }
 
