@@ -8,6 +8,8 @@ import com.google.inject.Injector;
 import java.io.*;
 import java.util.*;
 
+import commons.Collection;
+
 import static com.google.inject.Guice.createInjector;
 
 public class ConfigLoader {
@@ -60,6 +62,43 @@ public class ConfigLoader {
     public void setLocale(Locale l) {
         data.setLocale(l);
         save();
+    }
+
+    /**
+     * Getter for the list of collections available to the current client
+     *
+     * @return The list of collections available to the current client
+     */
+    public List<Collection> getCollections() {
+        return data.getCollections();
+    }
+
+    /**
+     * Add the specified collection to the list of collections
+     * available to the current client <br>
+     * WARNING: Does not check if the collection is already present
+     *
+     * @param c The collection to be added to the list of collections
+     *          available to the current client
+     */
+    public void addCollection(Collection c) {
+        data.getCollections().add(c);
+    }
+
+    /**
+     * Removes a collection from the list of available collections if it matches
+     * the specified unique name. Does nothing if no such collection exists.
+     *
+     * @param uniqueName The unique name (id) of the collection to be removed from
+     *                   the list of collections available to the current client.
+     */
+    public void removeCollection(String uniqueName) {
+        data.setCollections(
+                data
+                        .getCollections()
+                        .stream()
+                        .filter(c -> !c.getCollectionUniqueName().equals(uniqueName))
+                        .toList());
     }
 
     /**
