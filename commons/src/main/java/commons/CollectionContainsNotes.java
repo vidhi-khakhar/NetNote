@@ -3,6 +3,7 @@ package commons;
 import jakarta.persistence.*;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -12,7 +13,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * This table represents a many-to-many relationship where each entry
  * associates one Collection with one Note. The primary key is a composite
  * key represented by the {@link CollectionContainsNotesId} class.
- *
+ * <p>
  * This entity does not contain additional business logic and serves
  * solely to facilitate the many-to-many relationship between the
  * {@link Collection} and {@link Note} entities.
@@ -31,7 +32,8 @@ public class CollectionContainsNotes {
      * Default constructor for JPA. It is required for the entity class to
      * have a no-argument constructor.
      */
-    public CollectionContainsNotes() {}
+    public CollectionContainsNotes() {
+    }
 
     /**
      * Constructor to create a CollectionContainsNotes entity with the specified
@@ -39,7 +41,7 @@ public class CollectionContainsNotes {
      * for this entity.
      *
      * @param collectionId The ID of the Collection.
-     * @param noteId The ID of the Note.
+     * @param noteId       The ID of the Note.
      */
     public CollectionContainsNotes(Long collectionId, Long noteId) {
         this.id = new CollectionContainsNotesId(collectionId, noteId);
@@ -78,7 +80,7 @@ public class CollectionContainsNotes {
      */
     @Override
     public boolean equals(Object anotherCollectionContainsNotes) {
-        return EqualsBuilder.reflectionEquals(this,anotherCollectionContainsNotes);
+        return EqualsBuilder.reflectionEquals(this, anotherCollectionContainsNotes);
     }
 
     /**
