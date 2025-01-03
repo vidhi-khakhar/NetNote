@@ -723,9 +723,11 @@ public class MainCtrl {
     }
 
     public void handleSearch(String query){
-        if (query.trim().isEmpty() || query == null) {
+        if (query.trim().isEmpty()) {
             notesList.setItems(FXCollections.observableArrayList(noteServerUtils.getAllNotes()));
             indexMap.clear();
+            selectedNoteIndex = -1;
+            notesList.getSelectionModel().clearSelection();
             return;
         }
 
