@@ -45,6 +45,7 @@ public class MainCtrl {
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
 
     private final Map<String, StringProperty> props = new HashMap<>();
+    private Map<Note, Integer> indexMap = new HashMap<>();
     private Scene mainView;
     private Stage stage;
 
@@ -135,7 +136,12 @@ public class MainCtrl {
                 .getSelectionModel()
                 .selectedItemProperty()
                 .addListener((_, _, selectedNote) -> {
-                    selectedNoteIndex = notesList.getSelectionModel().getSelectedIndex();
+                    if (indexMap.containsKey(selectedNote)) {
+                        selectedNoteIndex = indexMap.get(selectedNote);
+                    } else {
+                        selectedNoteIndex = savedNotes.indexOf(selectedNote);
+                    }
+
                     if (selectedNote != null) {
                         System.out.println("The selected note is on index:" + selectedNoteIndex);
                         noteTitleInput.setText(selectedNote.getTitle());
@@ -719,12 +725,17 @@ public class MainCtrl {
     public void handleSearch(String query){
         if (query.trim().isEmpty() || query == null) {
             notesList.setItems(FXCollections.observableArrayList(noteServerUtils.getAllNotes()));
+            indexMap.clear();
             return;
         }
 
         List<Note> allNotes = noteServerUtils.getAllNotes();
-
         List<Note> searchedNotes = NoteSearchUtils.search(allNotes, query);
+
+        indexMap.clear();
+        for (Note note : searchedNotes) {
+            indexMap.put(note, savedNotes.indexOf(note));
+        }
 
         ObservableList<Note> filteredObservableNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredObservableNotes);
