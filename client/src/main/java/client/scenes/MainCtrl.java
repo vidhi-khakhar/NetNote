@@ -304,6 +304,8 @@ public class MainCtrl {
                 Note newNote = new Note(title.trim(), "");
                 savedNotes.add(newNote);
                 noteServerUtils.storeNote(newNote);
+                notesList.setItems(FXCollections.observableArrayList(savedNotes));
+                indexMap.clear();
                 notesList.getSelectionModel().select(savedNotes.size() - 1);
                 noteTitleInput.setText(newNote.getTitle());
                 noteEditor.setText(newNote.getText());
@@ -371,6 +373,10 @@ public class MainCtrl {
                         this));
             }
             commitDeleteNote(index);
+
+            String currentlySearched = searchBar.getText().trim();
+            handleSearch(currentlySearched);
+
             return true;
         } else {
             updateDisplay();
