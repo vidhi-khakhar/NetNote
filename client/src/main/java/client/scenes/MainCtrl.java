@@ -3,6 +3,7 @@ package client.scenes;
 import client.Main;
 import client.config.ConfigLoader;
 import client.components.Notification;
+import client.utils.NoteSearchUtils;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;
@@ -716,7 +717,21 @@ public class MainCtrl {
     }
 
     public void handleSearch(String query){
+        if (query.trim().isEmpty() || query == null) {
+            notesList.setItems(FXCollections.observableArrayList(noteServerUtils.getAllNotes()));
+            return;
+        }
 
+        List<Note> allNotes = noteServerUtils.getAllNotes();
+
+        List<Note> searchedNotes = NoteSearchUtils.search(allNotes, query);
+
+        ObservableList<Note> filteredObservableNotes = FXCollections.observableArrayList(searchedNotes);
+        notesList.setItems(filteredObservableNotes);
+
+        if (filteredObservableNotes.isEmpty()) {
+            notesList.getSelectionModel().clearSelection();
+        }
     }
 
     /**
