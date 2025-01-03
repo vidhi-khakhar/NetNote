@@ -16,13 +16,13 @@ public class NoteSearchUtils {
      *
      * @param notes The list of notes to search through.
      * @param query The search query (supports multiple words).
-     * @return A list of notes matching the query, sorted by most recently edited.
+     * @return A list of notes matching the query, sorted by title.
      */
     public static List<Note> search(List<Note> notes, String query) {
         if (query == null || query.trim().isEmpty()) {
             // Return all notes sorted by title if no query is provided
             return notes.stream()
-                    .sorted(Comparator.comparing(Note::getTitle).reversed())
+                    .sorted(Comparator.comparing(Note::getTitle))
                     .collect(Collectors.toList());
         }
 
@@ -39,7 +39,7 @@ public class NoteSearchUtils {
                     }
                     return true;
                 })
-                .sorted(Comparator.comparing(Note::getTitle).reversed())
+                .sorted(Comparator.comparing(Note::getTitle))
                 .collect(Collectors.toList());
     }
 }
