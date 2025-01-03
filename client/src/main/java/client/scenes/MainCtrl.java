@@ -155,6 +155,10 @@ public class MainCtrl {
             }
         });
 
+        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+            handleSearch(newValue);
+        });
+
         initializeShortcuts();
         initializeTextProperties();
 
@@ -709,6 +713,10 @@ public class MainCtrl {
             noteEditor.positionCaret(cursorPos + 3);
             noteEditor.requestFocus();
         }
+    }
+
+    public void handleSearch(String query){
+
     }
 
     /**
