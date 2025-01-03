@@ -304,9 +304,6 @@ public class MainCtrl {
                 Note newNote = new Note(title.trim(), "");
                 savedNotes.add(newNote);
                 noteServerUtils.storeNote(newNote);
-                notesList.setItems(FXCollections.observableArrayList(savedNotes));
-                indexMap.clear();
-                refreshSearchResults();
                 notesList.getSelectionModel().select(savedNotes.size() - 1);
                 noteTitleInput.setText(newNote.getTitle());
                 noteEditor.setText(newNote.getText());
@@ -374,7 +371,6 @@ public class MainCtrl {
                         this));
             }
             commitDeleteNote(index);
-            refreshSearchResults();
             return true;
         } else {
             updateDisplay();
@@ -751,9 +747,8 @@ public class MainCtrl {
         }
     }
 
-    private void refreshSearchResults() {
-        String currentQuery = searchBar.getText().trim();
-        handleSearch(currentQuery);
+    public String getCurrentQuery() {
+        return searchBar.getText().trim();
     }
 
 
