@@ -1,4 +1,7 @@
 package server.database;
 
-public interface EmbeddedFileRepository {
+import commons.EmbeddedFile;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EmbeddedFileRepository extends JpaRepository<EmbeddedFile, Long> {
 }
