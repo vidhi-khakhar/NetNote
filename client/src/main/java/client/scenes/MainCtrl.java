@@ -45,7 +45,7 @@ public class MainCtrl {
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
 
     private final Map<String, StringProperty> props = new HashMap<>();
-    private Map<Note, Integer> indexMap = new HashMap<>();
+    private final Map<Note, Integer> indexMap = new HashMap<>();
     private Scene mainView;
     private Stage stage;
 
@@ -738,6 +738,12 @@ public class MainCtrl {
             noteEditor.requestFocus();
         }
     }
+
+    /**
+     *  This method filters the notesList based on a given search query,
+     *  and it refreshes the notesList to display only the matching notes.
+     * @param query the text entered by the user in the search bar
+     */
     public void handleSearch(String query) {
         if (query.trim().isEmpty()) {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
@@ -758,20 +764,22 @@ public class MainCtrl {
             indexMap.put(note, savedNotes.indexOf(note));
         }
 
-        ObservableList<Note> filteredObservableNotes = FXCollections.observableArrayList(searchedNotes);
-        notesList.setItems(filteredObservableNotes);
+        ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
+        notesList.setItems(filteredNotes);
 
-        if (filteredObservableNotes.isEmpty()) {
+        if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(new Label("No notes match your search query."));
             notesList.getSelectionModel().clearSelection();
         }
     }
 
-
+    /**
+     * Returns the currently searched query
+     * @return current text in search bar
+     */
     public String getCurrentQuery() {
         return searchBar.getText().trim();
     }
-
 
     /**
      * Updates the application locale.
