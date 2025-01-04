@@ -284,6 +284,11 @@ public class MainCtrl {
      */
     public void handleAddNote() {
 
+        if(!getCurrentQuery().isEmpty()){
+            searchBar.clear();
+            handleSearch("");
+        }
+
         TextInputDialog dialog = new TextInputDialog();
         dialog.titleProperty().bind(props.get("addDialogTitle"));
         dialog.contentTextProperty().bind(props.get("addDialogText"));
@@ -304,6 +309,8 @@ public class MainCtrl {
                 Note newNote = new Note(title.trim(), "");
                 savedNotes.add(newNote);
                 noteServerUtils.storeNote(newNote);
+                indexMap.put(newNote, savedNotes.size() - 1);
+                notesList.setItems(savedNotes);
                 notesList.getSelectionModel().select(savedNotes.size() - 1);
                 noteTitleInput.setText(newNote.getTitle());
                 noteEditor.setText(newNote.getText());
@@ -321,6 +328,10 @@ public class MainCtrl {
                         this));
 
                 noteEditor.requestFocus();
+
+                if (!getCurrentQuery().isEmpty()) {
+                    handleSearch(getCurrentQuery());
+                }
             }
         });
     }
@@ -347,6 +358,11 @@ public class MainCtrl {
      * or the user cancelled the operation.
      */
     public boolean handleDeleteNote(int index, boolean isAddedToUndoStack) {
+
+        String previousQuery = getCurrentQuery();
+        if(!getCurrentQuery().isEmpty()){
+            handleSearch("");
+        }
         if (index == -1) {
             showPopUp(props.get("deleteNoteWarningTitle").get(),
                     props.get("deleteNoteWarningText").get(),
@@ -371,6 +387,7 @@ public class MainCtrl {
                         this));
             }
             commitDeleteNote(index);
+            handleSearch(previousQuery);
             return true;
         } else {
             updateDisplay();
@@ -721,18 +738,20 @@ public class MainCtrl {
             noteEditor.requestFocus();
         }
     }
-
-    public void handleSearch(String query){
+    public void handleSearch(String query) {
         if (query.trim().isEmpty()) {
-            notesList.setItems(FXCollections.observableArrayList(noteServerUtils.getAllNotes()));
+            notesList.setItems(FXCollections.observableArrayList(savedNotes));
             indexMap.clear();
+            for (int i = 0; i < savedNotes.size(); i++) {
+                indexMap.put(savedNotes.get(i), i);
+            }
+
             selectedNoteIndex = -1;
             notesList.getSelectionModel().clearSelection();
             return;
         }
 
-        List<Note> allNotes = noteServerUtils.getAllNotes();
-        List<Note> searchedNotes = NoteSearchUtils.search(allNotes, query);
+        List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
 
         indexMap.clear();
         for (Note note : searchedNotes) {
@@ -743,9 +762,11 @@ public class MainCtrl {
         notesList.setItems(filteredObservableNotes);
 
         if (filteredObservableNotes.isEmpty()) {
+            notesList.setPlaceholder(new Label("No notes match your search query."));
             notesList.getSelectionModel().clearSelection();
         }
     }
+
 
     public String getCurrentQuery() {
         return searchBar.getText().trim();
