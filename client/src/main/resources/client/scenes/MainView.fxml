@@ -23,9 +23,9 @@
    <children>
       <HBox fx:id="rootContainer" prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: #f4f4f4;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <VBox prefHeight="450.0" prefWidth="800.0" HBox.hgrow="ALWAYS">
+            <VBox prefHeight="450.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
                <children>
-                  <HBox fx:id="upperHBox" prefHeight="40.0" prefWidth="800.0" VBox.vgrow="NEVER">
+                  <HBox fx:id="upperHBox" prefHeight="40.0" prefWidth="800.0">
                      <children>
                         <HBox maxWidth="975.0" prefHeight="40.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
                            <children>
@@ -44,84 +44,9 @@
                               </Button>
                            </children>
                         </HBox>
-                        <HBox maxHeight="40.0" maxWidth="20.0" prefHeight="40.0" prefWidth="15.0" HBox.hgrow="ALWAYS" />
-                        <HBox prefHeight="40.0" prefWidth="250.0">
-                           <children>
-                              <Label fx:id="collectionLabel" style="-fx-font-weight: bold;" text="%label.collectionLabel">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                                 <HBox.margin>
-                                    <Insets bottom="5.0" top="7.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <ComboBox fx:id="collectionDropdown" prefWidth="150.0">
-                                 <HBox.margin>
-                                    <Insets left="5.0" top="5.0" />
-                                 </HBox.margin>
-                              </ComboBox>
-                           </children>
-                        </HBox>
-                        <HBox layoutX="492.0" layoutY="10.0" maxHeight="40.0" maxWidth="200.0" prefHeight="40.0" prefWidth="15.0" HBox.hgrow="ALWAYS" />
-                        <HBox prefHeight="40.0" prefWidth="50.0">
-                           <children>
-                              <MenuButton fx:id="languageDropdown" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0">
-                                 <items>
-                                    <MenuItem fx:id="englishMenuItem" mnemonicParsing="false" onAction="#setEN">
-                                       <graphic>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@/images/en.png" />
-                                             </image>
-                                          </ImageView>
-                                       </graphic>
-                                    </MenuItem>
-                                    <MenuItem fx:id="dutchMenuItem" mnemonicParsing="false" onAction="#setNL">
-                                       <graphic>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@/images/nl_NL.png" />
-                                             </image>
-                                          </ImageView>
-                                       </graphic>
-                                    </MenuItem>
-                                    <MenuItem fx:id="romanianMenuItem" mnemonicParsing="false" onAction="#setRO">
-                                       <graphic>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@/images/ro_RO.png" />
-                                             </image>
-                                          </ImageView>
-                                       </graphic>
-                                    </MenuItem>
-                                 </items>
-                                 <font>
-                                    <Font size="10.0" />
-                                 </font>
-                                 <graphic>
-                                    <ImageView fx:id="selectedLanguageImage" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
-                                 </graphic>
-                                 <HBox.margin>
-                                    <Insets left="5.0" right="5.0" top="5.0" />
-                                 </HBox.margin>
-                              </MenuButton>
-                           </children>
-                        </HBox>
-                        <MenuButton fx:id="menuButton" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0" text="☰">
-                           <items>
-                              <MenuItem fx:id="hideEditorButton" mnemonicParsing="false" onAction="#toggleEditor" text="👁️‍🗨️" />
-                              <MenuItem fx:id="themeToggleButton" mnemonicParsing="false" onAction="#toggleTheme" text="☾" />
-                           </items>
-                           <font>
-                              <Font size="10.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets bottom="5.0" right="5.0" top="5.0" />
-                           </HBox.margin>
-                        </MenuButton>
                      </children>
                   </HBox>
-                  <HBox fx:id="middleHBox" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" VBox.vgrow="NEVER">
+                  <HBox fx:id="middleHBox" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0">
                      <children>
                         <HBox prefHeight="40.0" prefWidth="100.0" HBox.hgrow="NEVER">
                            <children>
@@ -135,7 +60,7 @@
                               </Label>
                            </children>
                         </HBox>
-                        <HBox prefHeight="100.0" prefWidth="700.0" HBox.hgrow="ALWAYS">
+                        <HBox prefHeight="100.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
                            <children>
                               <Label text="Add tag dropdowns and clear tags button here." HBox.hgrow="NEVER">
                                  <HBox.margin>
@@ -153,7 +78,7 @@
                      <children>
                         <VBox fx:id="leftPanel" prefHeight="370.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <ListView fx:id="notesList" onMouseClicked="#displaySavedNote" prefHeight="330.0" prefWidth="134.0" VBox.vgrow="ALWAYS">
+                              <ListView fx:id="notesList" maxWidth="400.0" onMouseClicked="#displaySavedNote" prefHeight="330.0" prefWidth="134.0" VBox.vgrow="ALWAYS">
                                  <VBox.margin>
                                     <Insets left="5.0" />
                                  </VBox.margin>
@@ -196,7 +121,7 @@
                               </HBox>
                            </children>
                         </VBox>
-                        <VBox fx:id="middlePanel" layoutX="10.0" layoutY="10.0" prefHeight="370.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
+                        <VBox fx:id="middlePanel" layoutX="10.0" layoutY="10.0" maxWidth="550.0" prefHeight="370.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="noteEditorLabel" style="-fx-font-weight: bold;" text="%label.noteEditorName">
                                  <font>
@@ -226,53 +151,144 @@
                                  </VBox.margin>
                               </HBox>
                            </children>
-                        </VBox>
-                        <VBox fx:id="rightPanel" layoutX="210.0" layoutY="10.0" prefHeight="370.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
-                           <children>
-                              <Label fx:id="renderedNoteLabel" maxWidth="1.7976931348623157E308" prefHeight="27.0" style="-fx-font-weight: bold;" text="%label.renderedViewName">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                                 <VBox.margin>
-                                    <Insets left="5.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
-                                 <children>
-                                    <Label fx:id="renderedNoteTitleLabel" prefHeight="22.0" prefWidth="178.0" style="-fx-font-weight: bold;" text="%label.renderedNoteTitleDefaultLabel">
-                                       <HBox.margin>
-                                          <Insets bottom="5.0" left="5.0" />
-                                       </HBox.margin>
-                                       <font>
-                                          <Font size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Region prefHeight="24.0" prefWidth="34.0" HBox.hgrow="ALWAYS" />
-                                    <CheckBox fx:id="problemsCheckbox" mnemonicParsing="false" onAction="#showProblems" text="%label.markdownCheckboxLabel" HBox.hgrow="ALWAYS">
-                                       <HBox.margin>
-                                          <Insets bottom="5.0" left="10.0" right="10.0" />
-                                       </HBox.margin>
-                                    </CheckBox>
-                                 </children>
-                              </HBox>
-                              <WebView fx:id="renderedNoteView" prefHeight="278.0" prefWidth="224.0" VBox.vgrow="ALWAYS">
-                                 <VBox.margin>
-                                    <Insets right="5.0" />
-                                 </VBox.margin>
-                              </WebView>
-                              <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
-                                 <VBox.margin>
-                                    <Insets bottom="5.0" top="5.0" />
-                                 </VBox.margin>
-                              </HBox>
-                           </children>
                            <HBox.margin>
-                              <Insets bottom="5.0" />
+                              <Insets right="5.0" />
                            </HBox.margin>
                         </VBox>
                      </children>
                   </HBox>
                </children>
+            </VBox>
+            <VBox maxWidth="10.0" prefHeight="450.0" prefWidth="5.0" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="4.0" right="2.0" />
+               </HBox.margin>
+            </VBox>
+            <VBox maxWidth="550.0" prefHeight="450.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <HBox fx:id="upperHBox1" prefHeight="40.0" prefWidth="800.0">
+                     <children>
+                        <HBox prefHeight="40.0" prefWidth="250.0">
+                           <children>
+                              <Label fx:id="collectionLabel" style="-fx-font-weight: bold;" text="%label.collectionLabel">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" top="7.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ComboBox fx:id="collectionDropdown" prefWidth="150.0">
+                                 <HBox.margin>
+                                    <Insets left="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </ComboBox>
+                           </children>
+                        </HBox>
+                        <HBox layoutX="492.0" layoutY="10.0" maxHeight="40.0" maxWidth="200.0" prefHeight="40.0" prefWidth="15.0" HBox.hgrow="ALWAYS" />
+                        <HBox prefHeight="40.0" prefWidth="50.0">
+                           <children>
+                              <MenuButton fx:id="languageDropdown" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0">
+                                 <items>
+                                    <MenuItem fx:id="englishMenuItem1" mnemonicParsing="false" onAction="#setEN">
+                                       <graphic>
+                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@/images/en.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </MenuItem>
+                                    <MenuItem fx:id="dutchMenuItem1" mnemonicParsing="false" onAction="#setNL">
+                                       <graphic>
+                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@/images/nl_NL.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </MenuItem>
+                                    <MenuItem fx:id="romanianMenuItem1" mnemonicParsing="false" onAction="#setRO">
+                                       <graphic>
+                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@/images/ro_RO.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </MenuItem>
+                                 </items>
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                                 <graphic>
+                                    <ImageView fx:id="selectedLanguageImage" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
+                                 </graphic>
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </MenuButton>
+                           </children>
+                        </HBox>
+                        <MenuButton fx:id="menuButton" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0" text="☰">
+                           <items>
+                              <MenuItem fx:id="hideEditorButton1" mnemonicParsing="false" onAction="#toggleEditor" text="👁️‍🗨️" />
+                              <MenuItem fx:id="themeToggleButton1" mnemonicParsing="false" onAction="#toggleTheme" text="☾" />
+                           </items>
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets bottom="5.0" right="5.0" top="5.0" />
+                           </HBox.margin>
+                        </MenuButton>
+                     </children>
+                  </HBox>
+                  <HBox fx:id="middleHBox1" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" />
+                  <VBox fx:id="rightPanel" prefHeight="370.0" prefWidth="300.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="renderedNoteLabel" maxWidth="1.7976931348623157E308" prefHeight="27.0" style="-fx-font-weight: bold;" text="%label.renderedViewName">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets left="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
+                           <children>
+                              <Label fx:id="renderedNoteTitleLabel" prefHeight="22.0" prefWidth="178.0" style="-fx-font-weight: bold;" text="%label.renderedNoteTitleDefaultLabel">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" />
+                                 </HBox.margin>
+                                 <font>
+                                    <Font name="Times New Roman Bold" size="16.0" />
+                                 </font>
+                              </Label>
+                              <Region prefHeight="24.0" prefWidth="34.0" HBox.hgrow="ALWAYS" />
+                              <CheckBox fx:id="problemsCheckbox" mnemonicParsing="false" onAction="#showProblems" text="%label.markdownCheckboxLabel" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="10.0" right="10.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                           </children>
+                        </HBox>
+                        <WebView fx:id="renderedNoteView" prefHeight="278.0" prefWidth="224.0" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets right="5.0" />
+                           </VBox.margin>
+                        </WebView>
+                        <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
             </VBox>
          </children>
       </HBox>
