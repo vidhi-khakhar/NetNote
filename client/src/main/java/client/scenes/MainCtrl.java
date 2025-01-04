@@ -18,6 +18,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -63,10 +64,80 @@ public class MainCtrl {
     private TextField searchBar;
 
     @FXML
+    private Button searchButton;
+
+    @FXML
+    private ImageView selectedLanguageImage;
+
+    @FXML
+    private Label collectionLabel;
+
+    @FXML
+    private ComboBox<?> collectionDropdown;
+
+    @FXML
+    private MenuButton languageDropdown;
+
+    @FXML
+    private MenuItem dutchMenuItem;
+
+    @FXML
+    private MenuItem englishMenuItem;
+
+    @FXML
+    private MenuItem romanianMenuItem;
+
+
+    @FXML
+    private HBox middleHBox;
+
+    @FXML
+    private HBox lowerHBox;
+
+    @FXML
+    private VBox leftPanel;
+
+    @FXML
     private ListView<Note> notesList;
 
     @FXML
+    private Button addButton;
+
+    @FXML
+    private Button deleteButton;
+
+    @FXML
+    private Button refreshButton;
+
+    @FXML
     private VBox middlePanel;
+
+    @FXML
+    private Label noteEditorLabel;
+
+    @FXML
+    private TextArea noteEditor;
+
+    @FXML
+    private VBox rightPanel;
+
+
+    @FXML
+    private Label renderedNoteTitleLabel;
+
+    @FXML
+    private CheckBox problemsCheckbox;
+
+
+    @FXML
+    private Button serverConfigButton;
+
+    @FXML
+    private MenuButton menuButton;
+
+    @FXML
+    private MenuItem themeToggleButton;
+
 
     @FXML
     private TextField noteTitleInput;
@@ -75,25 +146,7 @@ public class MainCtrl {
             (_, _, _) -> updateTitle();
 
     @FXML
-    private TextArea noteEditor;
-
-    @FXML
-    private Label renderedNoteTitleLabel;
-
-    @FXML
-    private ImageView selectedLanguageImage;
-
-    @FXML
-    private MenuItem themeToggleButton;
-
-    @FXML
     private WebView renderedNoteView;
-
-    @FXML
-    private CheckBox problemsCheckbox;
-
-    @FXML
-    private Label noteEditorLabel;
 
     @FXML
     private Label renderedNoteLabel;
