@@ -27,7 +27,7 @@
                <children>
                   <HBox fx:id="upperHBox" prefHeight="40.0" prefWidth="800.0" VBox.vgrow="NEVER">
                      <children>
-                        <HBox prefHeight="40.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
+                        <HBox maxWidth="975.0" prefHeight="40.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
                            <children>
                               <TextField fx:id="searchBar" prefHeight="26.0" prefWidth="416.0" promptText="%label.searchPlaceholder" style="-fx-background-color: #ffffff; -fx-border-color: grey;" HBox.hgrow="ALWAYS">
                                  <HBox.margin>
@@ -44,9 +44,10 @@
                               </Button>
                            </children>
                         </HBox>
+                        <HBox maxHeight="40.0" maxWidth="20.0" prefHeight="40.0" prefWidth="15.0" HBox.hgrow="ALWAYS" />
                         <HBox prefHeight="40.0" prefWidth="250.0">
                            <children>
-                              <Label fx:id="collectionLabel" style="-fx-font-weight: bold;" text="Collections:">
+                              <Label fx:id="collectionLabel" style="-fx-font-weight: bold;" text="%label.collectionLabel">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -61,6 +62,7 @@
                               </ComboBox>
                            </children>
                         </HBox>
+                        <HBox layoutX="492.0" layoutY="10.0" maxHeight="40.0" maxWidth="200.0" prefHeight="40.0" prefWidth="15.0" HBox.hgrow="ALWAYS" />
                         <HBox prefHeight="40.0" prefWidth="50.0">
                            <children>
                               <MenuButton fx:id="languageDropdown" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0">
@@ -100,7 +102,7 @@
                                     <ImageView fx:id="selectedLanguageImage" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
                                  </graphic>
                                  <HBox.margin>
-                                    <Insets right="5.0" top="5.0" />
+                                    <Insets left="5.0" right="5.0" top="5.0" />
                                  </HBox.margin>
                               </MenuButton>
                            </children>
@@ -114,7 +116,7 @@
                               <Font size="10.0" />
                            </font>
                            <HBox.margin>
-                              <Insets bottom="5.0" top="5.0" />
+                              <Insets bottom="5.0" right="5.0" top="5.0" />
                            </HBox.margin>
                         </MenuButton>
                      </children>

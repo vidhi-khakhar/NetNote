@@ -268,6 +268,7 @@ public class MainCtrl {
         problemsCheckbox.textProperty().bind(props.get("markdownCheckboxLabel"));
         searchBar.promptTextProperty().bind(props.get("searchPlaceholder"));
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
+        collectionLabel.textProperty().bind(props.get("collectionLabel"));
 
         setLocale(configLoader.getLocale());
     }
