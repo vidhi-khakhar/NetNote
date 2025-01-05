@@ -620,7 +620,7 @@ public class MainCtrl {
      */
     public void updateTitle() {
         String updatedTitle = noteTitleInput.getText();
-        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
+        String previousTitle;
 
         renderedNoteTitleLabel.textProperty().unbind();
         if (updatedTitle.isEmpty()) {
@@ -628,23 +628,31 @@ public class MainCtrl {
                     props.get("invalidTitleAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
-        } else {
-            renderedNoteTitleLabel.setText(updatedTitle);
+        }
+        Note selectedNote = null;
+        if (selectedNoteIndex >= 0) {
+           selectedNote = savedNotes.get(selectedNoteIndex);
         }
 
         if (selectedNote != null) {
-            notesList.refresh();
-            if (isTitlePresent(selectedNote.getTitle())) {
-                if (!isTitlePresent(updatedTitle)) {
-                    HashMap<String, String> patch = new HashMap<>();
-                    patch.put("title", updatedTitle);
-                    noteServerUtils.updateNote(selectedNote.getTitle(), patch);
-                    selectedNote.setTitle(updatedTitle);
-                } else if (!updatedTitle.equals(selectedNote.getTitle())) {
-                    showPopUp(props.get("invalidTitleAlertTitle").get(),
-                            props.get("invalidTitleAlertTitleExists").get(),
-                            Alert.AlertType.ERROR);
-                }
+            previousTitle = selectedNote.getTitle();
+            if (!updatedTitle.equals(previousTitle) && isTitlePresent(updatedTitle)) {
+                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                        props.get("invalidTitleAlertTitleExists").get(),
+                        Alert.AlertType.ERROR);
+            }
+
+            selectedNote.setTitle(updatedTitle);
+
+            try {
+                noteServerUtils.updateNote(previousTitle, Map.of("title", updatedTitle));
+            } catch (Exception e) {
+                selectedNote.setTitle(previousTitle);
+                return;
+            }
+
+            if (notesList.getItems().contains(selectedNote)) {
+                notesList.refresh();
             }
         } else if (selectedNoteIndex == -1 &&
                 (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
@@ -652,9 +660,16 @@ public class MainCtrl {
             String noteContent = noteEditor.getText();
             Note firstNote = new Note(updatedTitle, noteContent);
             savedNotes.add(firstNote);
-            selectedNoteIndex = 0;
-            notesList.getSelectionModel().select(0);
+            selectedNoteIndex = savedNotes.size()-1;
+            indexMap.put(firstNote, savedNotes.size() -1);
+            notesList.setItems(FXCollections.observableArrayList(savedNotes));
+            notesList.getSelectionModel().select(selectedNoteIndex);
             notesList.refresh();
+            noteServerUtils.storeNote(firstNote);
+
+            renderedNoteTitleLabel.textProperty().unbind();
+            renderedNoteTitleLabel.setText(updatedTitle);
+
         }
     }
 
@@ -762,6 +777,11 @@ public class MainCtrl {
      * @param query the text entered by the user in the search bar
      */
     public void handleSearch(String query) {
+        Note currentNote = null;
+        if (selectedNoteIndex >= 0 && selectedNoteIndex < savedNotes.size()) {
+            currentNote = savedNotes.get(selectedNoteIndex);
+        }
+
         if (query.trim().isEmpty()) {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
             indexMap.clear();
@@ -769,8 +789,10 @@ public class MainCtrl {
                 indexMap.put(savedNotes.get(i), i);
             }
 
-            selectedNoteIndex = -1;
-            notesList.getSelectionModel().clearSelection();
+            if (currentNote != null) {
+                selectedNoteIndex = savedNotes.indexOf(currentNote);
+                notesList.getSelectionModel().select(selectedNoteIndex);
+            }
             return;
         }
 
@@ -784,9 +806,13 @@ public class MainCtrl {
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
 
+        if (currentNote != null && !filteredNotes.contains(currentNote)) {
+            selectedNoteIndex = savedNotes.indexOf(currentNote);
+        } else if (!filteredNotes.isEmpty()) {
+            notesList.getSelectionModel().clearSelection();
+        }
         if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(new Label("No notes match your search query."));
-            notesList.getSelectionModel().clearSelection();
         }
     }
 
