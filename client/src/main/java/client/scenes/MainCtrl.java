@@ -628,6 +628,8 @@ public class MainCtrl {
                     props.get("invalidTitleAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
+        } else {
+            renderedNoteTitleLabel.setText(updatedTitle);
         }
         Note selectedNote = null;
         if (selectedNoteIndex >= 0) {
@@ -669,7 +671,7 @@ public class MainCtrl {
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(updatedTitle);
-
+            renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(noteContent));
         }
     }
 
