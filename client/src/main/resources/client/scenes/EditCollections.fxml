@@ -11,37 +11,37 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="250.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EditCollectionsCtrl">
-   <HBox alignment="CENTER" fillHeight="false" prefWidth="500.0" style="-fx-background-color: #dadada;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<AnchorPane prefHeight="250.0" prefWidth="500.0" style="-fx-border-color: BLACK; -fx-border-width: 2;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EditCollectionsCtrl">
+   <HBox alignment="CENTER" fillHeight="false" minWidth="-Infinity" prefWidth="500.0" style="-fx-background-color: #dadada; -fx-border-color: BLACK; -fx-border-width: 0 0 1 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <padding>
          <Insets bottom="8.0" top="8.0" />
       </padding>
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%label.editCollectionsMenuTitle" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+      <Text strokeType="OUTSIDE" text="%label.editCollectionsMenuTitle" textAlignment="CENTER" HBox.hgrow="ALWAYS">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Text>
    </HBox>
    <HBox layoutY="40.0" prefHeight="189.0" prefWidth="502.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
-      <VBox prefHeight="210.0" prefWidth="200.0" spacing="4.0">
+      <VBox prefHeight="210.0" prefWidth="200.0" spacing="4.0" HBox.hgrow="ALWAYS">
          <padding>
             <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
          </padding>
-         <ListView prefHeight="314.0" prefWidth="134.0" />
-         <HBox alignment="CENTER" fillHeight="false" prefHeight="100.0" prefWidth="200.0" spacing="8.0">
-            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold;" text="+">
+         <ListView prefHeight="314.0" prefWidth="134.0" style="-fx-border-color: BLACK;" VBox.vgrow="ALWAYS" />
+         <HBox alignment="CENTER" fillHeight="false" prefHeight="30.0" prefWidth="200.0" spacing="8.0" VBox.vgrow="NEVER">
+            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="+">
                <font>
                   <Font size="14.0" />
                </font>
             </Button>
-            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #d43b3b; -fx-font-weight: bold;" text="-">
+            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="-">
                <font>
                   <Font size="14.0" />
                </font>
             </Button>
          </HBox>
       </VBox>
-      <VBox prefHeight="210.0" prefWidth="400.0" spacing="4.0" HBox.hgrow="ALWAYS">
+      <VBox prefHeight="210.0" prefWidth="400.0" spacing="4.0" style="-fx-border-color: BLACK; -fx-border-width: 0 0 0 1;">
          <padding>
             <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
          </padding>
@@ -49,27 +49,27 @@
             <Label text="%label.editCollectionsMenuLabelTitle" HBox.hgrow="ALWAYS" />
             <TextField minWidth="-Infinity" prefHeight="26.0" prefWidth="250.0" HBox.hgrow="NEVER" />
          </HBox>
-         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="4.0">
+         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="4.0" VBox.vgrow="ALWAYS">
             <Label text="%label.editCollectionsMenuLabelServer" HBox.hgrow="ALWAYS" />
             <TextField minWidth="-Infinity" prefHeight="26.0" prefWidth="250.0" promptText="http://192.168.1.123:8080/" HBox.hgrow="NEVER" />
          </HBox>
-         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="4.0">
+         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="4.0" VBox.vgrow="ALWAYS">
             <Label text="%label.editCollectionsMenuLabelCollection" HBox.hgrow="ALWAYS" />
             <TextField minWidth="-Infinity" prefHeight="26.0" prefWidth="250.0" HBox.hgrow="NEVER" />
          </HBox>
-         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="4.0">
+         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="4.0" VBox.vgrow="ALWAYS">
             <Label text="%label.editCollectionsMenuLabelStatus" HBox.hgrow="ALWAYS" />
             <VBox alignment="CENTER_LEFT" minWidth="-Infinity" prefHeight="200.0" prefWidth="250.0">
                <Text strokeType="OUTSIDE" strokeWidth="0.0" />
             </VBox>
          </HBox>
-         <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="4.0">
-            <Button maxHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="121.0" style="-fx-background-color: #fbee04; -fx-font-weight: bold;" text="%label.buttonMakeDefault">
+         <HBox alignment="BOTTOM_RIGHT" prefHeight="30.0" prefWidth="342.0" spacing="4.0" VBox.vgrow="NEVER">
+            <Button maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" style="-fx-background-color: #fbee04; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonMakeDefault" HBox.hgrow="NEVER">
                <font>
                   <Font size="14.0" />
                </font>
             </Button>
-            <Button maxHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="59.0" style="-fx-background-color: #13d5ec; -fx-font-weight: bold;" text="%label.buttonSave" textAlignment="CENTER">
+            <Button maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" style="-fx-background-color: #13d5ec; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonSave" textAlignment="CENTER" HBox.hgrow="NEVER">
                <font>
                   <Font size="14.0" />
                </font>
