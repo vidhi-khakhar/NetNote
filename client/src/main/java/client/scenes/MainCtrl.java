@@ -66,9 +66,6 @@ public class MainCtrl {
     private TextField searchBar;
 
     @FXML
-    private Button searchButton;
-
-    @FXML
     private ImageView selectedLanguageImage;
 
     @FXML
