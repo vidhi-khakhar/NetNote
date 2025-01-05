@@ -61,9 +61,18 @@ public class Main extends Application {
 
         var mainView = FXML.load(MainCtrl.class, "client", "scenes", "MainView.fxml");
         var mainViewScene = new Scene(mainView.getValue());
+
+        // Apply the CSS file
+        String cssPath = getClass()
+                .getResource("/client/scenes/gui.css")
+                .toExternalForm(); // Ensure correct URL path
+        mainViewScene.getStylesheets().add(cssPath);
+
+
         primaryStage.setTitle("NetNote");
         primaryStage.setScene(mainViewScene);
         primaryStage.show();
+
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, mainViewScene);
