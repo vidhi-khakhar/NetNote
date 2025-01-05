@@ -633,7 +633,7 @@ public class MainCtrl {
         }
         Note selectedNote = null;
         if (selectedNoteIndex >= 0) {
-           selectedNote = savedNotes.get(selectedNoteIndex);
+            selectedNote = savedNotes.get(selectedNoteIndex);
         }
 
         if (selectedNote != null) {
@@ -801,9 +801,7 @@ public class MainCtrl {
         List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
 
         indexMap.clear();
-        for (Note note : searchedNotes) {
-            indexMap.put(note, savedNotes.indexOf(note));
-        }
+        searchedNotes.forEach(note -> indexMap.put(note, savedNotes.indexOf(note)));
 
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
@@ -812,8 +810,7 @@ public class MainCtrl {
             selectedNoteIndex = savedNotes.indexOf(currentNote);
         } else if (!filteredNotes.isEmpty()) {
             notesList.getSelectionModel().clearSelection();
-        }
-        if (filteredNotes.isEmpty()) {
+        } if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(new Label("No notes match your search query."));
         }
     }
