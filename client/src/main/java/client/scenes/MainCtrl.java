@@ -135,12 +135,6 @@ public class MainCtrl {
     @FXML
     private Button serverConfigButton;
 
-    @FXML
-    private MenuButton menuButton;
-
-    @FXML
-    private MenuItem themeToggleButton;
-
 
     @FXML
     private TextField noteTitleInput;
@@ -293,34 +287,6 @@ public class MainCtrl {
      */
     public void setSavedNotes(ObservableList<Note> newNotes) {
         this.savedNotes = newNotes;
-    }
-
-    /**
-     * Toggles the dark mode theme on/off depending on the current theme.
-     */
-    public void toggleTheme() {
-        URL darkThemeCss = getClass().getResource("/client/scenes/dark-theme.css");
-        URL lightThemeCss = getClass().getResource("/client/scenes/gui.css");
-        if (darkThemeCss == null || lightThemeCss == null) return; //TODO handle null
-
-        String oldForm = isDarkTheme ?
-                darkThemeCss.toExternalForm() :
-                lightThemeCss.toExternalForm();
-        String newForm = isDarkTheme ?
-                lightThemeCss.toExternalForm() :
-                darkThemeCss.toExternalForm();
-
-        mainView.getStylesheets().remove(oldForm);
-        mainView.getStylesheets().add(newForm);
-
-        if (isDarkTheme) {
-            themeToggleButton.setText("🌙");
-        } else {
-            themeToggleButton.setText("☀");
-            themeToggleButton.setStyle("-fx-font-size: 10px;");
-        }
-
-        isDarkTheme = !isDarkTheme;
     }
 
     /**
@@ -612,13 +578,6 @@ public class MainCtrl {
             props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(renderedContent);
         }
-    }
-
-    /**
-     * Toggles the middle panel of the interface.
-     */
-    public void toggleEditor() {
-        middlePanel.setVisible(!middlePanel.isVisible());
     }
 
     /**

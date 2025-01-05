@@ -14,7 +14,6 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
@@ -86,7 +85,7 @@
                                  <children>
                                     <Button fx:id="addButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold;" text="+">
                                        <HBox.margin>
-                                          <Insets left="10.0" />
+                                          <Insets left="5.0" />
                                        </HBox.margin>
                                        <font>
                                           <Font size="14.0" />
@@ -112,6 +111,9 @@
                                        <font>
                                           <Font name="System Bold" size="11.0" />
                                        </font>
+                                       <HBox.margin>
+                                          <Insets right="5.0" />
+                                       </HBox.margin>
                                     </Button>
                                  </children>
                                  <VBox.margin>
@@ -144,7 +146,7 @@
                                     <Insets left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
                               </TextArea>
-                              <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
+                              <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="30.0" prefWidth="100.0">
                                  <VBox.margin>
                                     <Insets bottom="5.0" top="5.0" />
                                  </VBox.margin>
@@ -169,7 +171,7 @@
                      <children>
                         <HBox prefHeight="40.0" prefWidth="250.0">
                            <children>
-                              <Label fx:id="collectionLabel" style="-fx-font-weight: bold;" text="%label.collectionLabel">
+                              <Label fx:id="collectionLabel" maxWidth="90.0" prefWidth="85.0" style="-fx-font-weight: bold;" text="%label.collectionLabel">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -184,7 +186,7 @@
                               </ComboBox>
                            </children>
                         </HBox>
-                        <HBox layoutX="492.0" layoutY="10.0" maxHeight="40.0" maxWidth="200.0" prefHeight="40.0" prefWidth="15.0" HBox.hgrow="ALWAYS" />
+                        <HBox layoutX="492.0" layoutY="10.0" maxHeight="40.0" prefHeight="40.0" prefWidth="15.0" HBox.hgrow="ALWAYS" />
                         <HBox prefHeight="40.0" prefWidth="50.0">
                            <children>
                               <MenuButton fx:id="languageDropdown" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0">
@@ -228,19 +230,10 @@
                                  </HBox.margin>
                               </MenuButton>
                            </children>
-                        </HBox>
-                        <MenuButton fx:id="menuButton" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0" text="☰">
-                           <items>
-                              <MenuItem fx:id="hideEditorButton1" mnemonicParsing="false" onAction="#toggleEditor" text="👁️‍🗨️" />
-                              <MenuItem fx:id="themeToggleButton1" mnemonicParsing="false" onAction="#toggleTheme" text="☾" />
-                           </items>
-                           <font>
-                              <Font size="10.0" />
-                           </font>
                            <HBox.margin>
-                              <Insets bottom="5.0" right="5.0" top="5.0" />
+                              <Insets left="5.0" right="5.0" />
                            </HBox.margin>
-                        </MenuButton>
+                        </HBox>
                      </children>
                   </HBox>
                   <HBox fx:id="middleHBox1" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" />
@@ -251,23 +244,27 @@
                               <Font size="14.0" />
                            </font>
                            <VBox.margin>
-                              <Insets left="5.0" />
+                              <Insets />
                            </VBox.margin>
                         </Label>
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
                            <children>
-                              <Label fx:id="renderedNoteTitleLabel" prefHeight="22.0" prefWidth="178.0" style="-fx-font-weight: bold;" text="%label.renderedNoteTitleDefaultLabel">
+                              <Label fx:id="renderedNoteTitleLabel" maxWidth="300.0" prefHeight="22.0" prefWidth="178.0" style="-fx-font-weight: bold; -fx-background-color: white;" text="%label.renderedNoteTitleDefaultLabel" HBox.hgrow="ALWAYS">
                                  <HBox.margin>
-                                    <Insets bottom="5.0" left="5.0" />
+                                    <Insets bottom="5.0" />
                                  </HBox.margin>
                                  <font>
                                     <Font name="Times New Roman Bold" size="16.0" />
                                  </font>
                               </Label>
-                              <Region prefHeight="24.0" prefWidth="34.0" HBox.hgrow="ALWAYS" />
-                              <CheckBox fx:id="problemsCheckbox" mnemonicParsing="false" onAction="#showProblems" text="%label.markdownCheckboxLabel" HBox.hgrow="ALWAYS">
+                              <HBox prefHeight="100.0" prefWidth="15.0" HBox.hgrow="ALWAYS">
                                  <HBox.margin>
-                                    <Insets bottom="5.0" left="10.0" right="10.0" />
+                                    <Insets right="5.0" />
+                                 </HBox.margin>
+                              </HBox>
+                              <CheckBox fx:id="problemsCheckbox" maxWidth="170.0" mnemonicParsing="false" onAction="#showProblems" text="%label.markdownCheckboxLabel">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="10.0" right="5.0" />
                                  </HBox.margin>
                               </CheckBox>
                            </children>
@@ -277,7 +274,7 @@
                               <Insets right="5.0" />
                            </VBox.margin>
                         </WebView>
-                        <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
+                        <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="30.0" prefWidth="100.0">
                            <VBox.margin>
                               <Insets bottom="5.0" top="5.0" />
                            </VBox.margin>
