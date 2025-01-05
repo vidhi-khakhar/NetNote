@@ -114,11 +114,7 @@ public class CollectionController {
                                                    @RequestBody Collection updatedCollection) {
         // find the collection by unique name
         List<Collection> allCollections = collectionRepository.findAll();
-        Optional<Collection> collectionOptional = allCollections
-                .stream()
-                .filter(x -> x.getCollectionUniqueName().equals(uniqueName))
-                .findFirst();
-
+        Optional<Collection> collectionOptional = findCollectionByUniqueName(uniqueName);
         if (collectionOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Collection not found.");
@@ -158,10 +154,8 @@ public class CollectionController {
     public ResponseEntity<String> deleteCollection(@PathVariable("uniqueName") String uniqueName) {
         // find the collection by unique name
         List<Collection> allCollections = collectionRepository.findAll();
-        Optional<Collection> collectionOptional = allCollections
-                .stream()
-                .filter(c -> c.getCollectionUniqueName().equals(uniqueName))
-                .findFirst();
+
+        Optional<Collection> collectionOptional = findCollectionByUniqueName(uniqueName);
 
         if (collectionOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -319,6 +313,14 @@ public class CollectionController {
         return ResponseEntity.ok("Note moved successfully.");
     }
 
+    // method to find collection by unique name
+    public Optional<Collection> findCollectionByUniqueName(String uniqueName) {
+        List<Collection> allCollections = collectionRepository.findAll();
+        return allCollections
+                .stream()
+                .filter(x -> x.getCollectionUniqueName().equals(uniqueName))
+                .findFirst();
+    }
 }
 
 
