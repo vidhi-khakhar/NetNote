@@ -33,7 +33,7 @@
                                     <Insets left="5.0" top="5.0" />
                                  </HBox.margin>
                               </TextField>
-                              <Button fx:id="searchButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="27.0" style="-fx-background-color: #6fbed5; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="🔎">
+                              <Button fx:id="searchButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="27.0" style="-fx-background-color: #6fbed5; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="🔎">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" top="5.0" />
                                  </HBox.margin>
@@ -45,7 +45,7 @@
                         </HBox>
                      </children>
                   </HBox>
-                  <HBox fx:id="middleHBox" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 0.5 0 0 0;">
+                  <HBox fx:id="middleHBox" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
                      <children>
                         <HBox prefHeight="40.0" prefWidth="484.0">
                            <children>
@@ -64,18 +64,18 @@
                         </HBox>
                      </children>
                   </HBox>
-                  <HBox fx:id="lowerHBox" prefHeight="370.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 0.5 0 0 0;" VBox.vgrow="ALWAYS">
+                  <HBox fx:id="lowerHBox" prefHeight="370.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;" VBox.vgrow="ALWAYS">
                      <children>
                         <VBox fx:id="leftPanel" prefHeight="370.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <ListView fx:id="notesList" maxWidth="400.0" onMouseClicked="#displaySavedNote" prefHeight="330.0" prefWidth="134.0" style="-fx-border-width: 0.5; -fx-border-color: black;" VBox.vgrow="ALWAYS">
+                              <ListView fx:id="notesList" maxWidth="400.0" onMouseClicked="#displaySavedNote" prefHeight="330.0" prefWidth="134.0" style="-fx-border-width: 1; -fx-border-color: black;" VBox.vgrow="ALWAYS">
                                  <VBox.margin>
                                     <Insets left="5.0" top="5.0" />
                                  </VBox.margin>
                               </ListView>
                               <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
                                  <children>
-                                    <Button fx:id="addButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="+">
+                                    <Button fx:id="addButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="+">
                                        <HBox.margin>
                                           <Insets left="5.0" />
                                        </HBox.margin>
@@ -83,7 +83,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="deleteButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #d43b3b; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="-">
+                                    <Button fx:id="deleteButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #d43b3b; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="-">
                                        <HBox.margin>
                                           <Insets left="5.0" />
                                        </HBox.margin>
@@ -91,7 +91,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="refreshButton" layoutX="35.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="⟳">
+                                    <Button fx:id="refreshButton" layoutX="35.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="⟳">
                                        <HBox.margin>
                                           <Insets left="5.0" right="10.0" />
                                        </HBox.margin>
@@ -99,7 +99,7 @@
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="serverConfigButton" mnemonicParsing="false" onAction="#handleConfigureIP" prefHeight="34.0" prefWidth="47.0" style="-fx-background-color: #e8b419; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="IP">
+                                    <Button fx:id="serverConfigButton" mnemonicParsing="false" onAction="#handleConfigureIP" prefHeight="34.0" prefWidth="47.0" style="-fx-background-color: #e8b419; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="IP">
                                        <font>
                                           <Font name="System Bold" size="11.0" />
                                        </font>
@@ -126,14 +126,14 @@
                               </Label>
                               <HBox prefHeight="21.0" prefWidth="234.0">
                                  <children>
-                                    <TextField fx:id="noteTitleInput" onKeyReleased="#updateTitle" prefHeight="26.0" prefWidth="230.0" promptText="%label.titlePlaceholder" style="-fx-border-color: black; -fx-border-width: 0.5;">
+                                    <TextField fx:id="noteTitleInput" onKeyReleased="#updateTitle" prefHeight="26.0" prefWidth="230.0" promptText="%label.titlePlaceholder" style="-fx-border-color: black; -fx-border-width: 1;">
                                        <HBox.margin>
                                           <Insets left="5.0" right="5.0" />
                                        </HBox.margin>
                                     </TextField>
                                  </children>
                               </HBox>
-                              <TextArea fx:id="noteEditor" onKeyReleased="#updateDisplay" prefHeight="278.0" prefWidth="224.0" promptText="%label.editorPlaceholder" style="-fx-border-color: black; -fx-border-width: 0.5;" VBox.vgrow="ALWAYS">
+                              <TextArea fx:id="noteEditor" onKeyReleased="#updateDisplay" prefHeight="278.0" prefWidth="224.0" promptText="%label.editorPlaceholder" style="-fx-border-color: black; -fx-border-width: 1;" VBox.vgrow="ALWAYS">
                                  <VBox.margin>
                                     <Insets left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
@@ -223,8 +223,8 @@
                         </HBox>
                      </children>
                   </HBox>
-                  <HBox fx:id="middleHBox1" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 0.5 0 0 0;" />
-                  <VBox fx:id="rightPanel" prefHeight="370.0" prefWidth="300.0" style="-fx-border-color: black; -fx-border-width: 0.5 0 0 0;" VBox.vgrow="ALWAYS">
+                  <HBox fx:id="middleHBox1" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;" />
+                  <VBox fx:id="rightPanel" prefHeight="370.0" prefWidth="300.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;" VBox.vgrow="ALWAYS">
                      <children>
                         <Label fx:id="renderedNoteLabel" maxWidth="1.7976931348623157E308" prefHeight="27.0" style="-fx-font-weight: bold;" text="%label.renderedViewName">
                            <font>
@@ -256,7 +256,7 @@
                               </CheckBox>
                            </children>
                         </HBox>
-                        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="278.0" prefWidth="224.0" style="-fx-border-color: black; -fx-border-width: 0.5;" VBox.vgrow="ALWAYS">
+                        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="278.0" prefWidth="224.0" style="-fx-border-color: black; -fx-border-width: 1;" VBox.vgrow="ALWAYS">
                            <children>
                               <WebView fx:id="renderedNoteView" maxWidth="550.0" prefHeight="277.0" prefWidth="287.0" HBox.hgrow="ALWAYS" />
                            </children>
