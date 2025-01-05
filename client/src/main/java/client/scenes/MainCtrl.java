@@ -17,8 +17,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
@@ -39,7 +37,6 @@ public class MainCtrl {
      * {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
      **/
     private int selectedNoteIndex = -1;
-    private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private Map<String, StringProperty> props;
@@ -67,9 +64,6 @@ public class MainCtrl {
     private TextField searchBar;
 
     @FXML
-    private Button searchButton;
-
-    @FXML
     private ImageView selectedLanguageImage;
 
     @FXML
@@ -79,43 +73,7 @@ public class MainCtrl {
     private Label filterByTagLabel;
 
     @FXML
-    private ComboBox<?> collectionDropdown;
-
-    @FXML
-    private MenuButton languageDropdown;
-
-    @FXML
-    private MenuItem dutchMenuItem;
-
-    @FXML
-    private MenuItem englishMenuItem;
-
-    @FXML
-    private MenuItem romanianMenuItem;
-
-    @FXML
-    private HBox middleHBox;
-
-    @FXML
-    private HBox lowerHBox;
-
-    @FXML
-    private VBox leftPanel;
-
-    @FXML
     private ListView<Note> notesList;
-
-    @FXML
-    private Button addButton;
-
-    @FXML
-    private Button deleteButton;
-
-    @FXML
-    private Button refreshButton;
-
-    @FXML
-    private VBox middlePanel;
 
     @FXML
     private Label noteEditorLabel;
@@ -124,16 +82,10 @@ public class MainCtrl {
     private TextArea noteEditor;
 
     @FXML
-    private VBox rightPanel;
-
-    @FXML
     private Label renderedNoteTitleLabel;
 
     @FXML
     private CheckBox problemsCheckbox;
-
-    @FXML
-    private Button serverConfigButton;
 
     @FXML
     private TextField noteTitleInput;
