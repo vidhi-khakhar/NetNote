@@ -45,6 +45,8 @@ public class MainCtrl {
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
 
     private final Map<String, StringProperty> props = new HashMap<>();
+
+    private Scene editCollectionsMenu;
     private Scene mainView;
     private Stage stage;
 
@@ -155,13 +157,15 @@ public class MainCtrl {
     /**
      * Initializes the controller.
      *
-     * @param stage    Reference to the primary stage.
-     * @param mainView Holds a reference to the mainView scene.
+     * @param stage               Reference to the primary stage.
+     * @param mainView            Holds a reference to the MainView scene.
+     * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
      */
-    public void initialize(Stage stage, Scene mainView) {
+    public void initialize(Stage stage, Scene mainView, Scene editCollectionsMenu) {
 
         this.stage = stage;
         this.mainView = mainView;
+        this.editCollectionsMenu = editCollectionsMenu;
 
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
         notesList.setItems(savedNotes);
@@ -770,6 +774,16 @@ public class MainCtrl {
      */
     public void setRO() {
         setLocale(Locale.forLanguageTag("ro-RO"));
+    }
+
+    /**
+     * Opens the "Edit Collections" scene to manage the current collections
+     */
+    public void showEditCollectionsMenu() {
+        Stage secondaryStage = new Stage();
+        secondaryStage.titleProperty().bind(props.get("collectionsDropdownEditCollections"));
+        secondaryStage.setScene(editCollectionsMenu);
+        secondaryStage.show();
     }
 }
 

@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
@@ -49,7 +48,7 @@
                      <children>
                         <HBox prefHeight="40.0" prefWidth="484.0">
                            <children>
-                              <Label fx:id="filterByTagLabel" maxWidth="220.0" prefHeight="20.0" prefWidth="175.0" style="-fx-font-weight: bold;" text="%label.filterByTagName"> HBox.hgrow="NEVER">
+                              <Label fx:id="filterByTagLabel" maxWidth="220.0" prefHeight="20.0" prefWidth="175.0" style="-fx-font-weight: bold;" text="%label.filterByTagName" HBox.hgrow="NEVER">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -83,7 +82,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="deleteButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #d43b3b; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="-">
+                                    <Button fx:id="deleteButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="-">
                                        <HBox.margin>
                                           <Insets left="5.0" />
                                        </HBox.margin>
@@ -156,7 +155,7 @@
                <children>
                   <HBox fx:id="upperHBox1" prefHeight="40.0" prefWidth="800.0">
                      <children>
-                        <HBox prefHeight="40.0" prefWidth="250.0">
+                        <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="250.0" spacing="4.0" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="collectionLabel" maxWidth="90.0" prefWidth="85.0" style="-fx-font-weight: bold;" text="%label.collectionLabel">
                                  <font>
@@ -166,16 +165,11 @@
                                     <Insets bottom="5.0" left="7.0" top="7.0" />
                                  </HBox.margin>
                               </Label>
-                              <ComboBox fx:id="collectionDropdown" prefWidth="150.0">
-                                 <HBox.margin>
-                                    <Insets left="5.0" top="5.0" />
-                                 </HBox.margin>
-                              </ComboBox>
-                           </children>
-                        </HBox>
-                        <HBox layoutX="492.0" layoutY="10.0" maxHeight="40.0" prefHeight="40.0" prefWidth="15.0" HBox.hgrow="ALWAYS" />
-                        <HBox prefHeight="40.0" prefWidth="50.0">
-                           <children>
+                              <MenuButton mnemonicParsing="false" prefWidth="150.0">
+                                <items>
+                                  <MenuItem mnemonicParsing="false" onAction="#showEditCollectionsMenu" text="%label.collectionsDropdownEditCollections" />
+                                </items>
+                              </MenuButton>
                               <MenuButton fx:id="languageDropdown" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0">
                                  <items>
                                     <MenuItem fx:id="englishMenuItem1" mnemonicParsing="false" onAction="#setEN">
@@ -212,14 +206,8 @@
                                  <graphic>
                                     <ImageView fx:id="selectedLanguageImage" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
                                  </graphic>
-                                 <HBox.margin>
-                                    <Insets left="5.0" right="5.0" top="5.0" />
-                                 </HBox.margin>
                               </MenuButton>
                            </children>
-                           <HBox.margin>
-                              <Insets left="5.0" right="5.0" />
-                           </HBox.margin>
                         </HBox>
                      </children>
                   </HBox>

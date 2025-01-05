@@ -16,6 +16,7 @@
 package client;
 
 import client.config.ConfigLoader;
+import client.scenes.EditCollectionsCtrl;
 import client.scenes.MainCtrl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Binder;
@@ -33,6 +34,7 @@ public class MyModule implements Module {
     @Override
     public void configure(Binder binder) {
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(EditCollectionsCtrl.class).in(Scopes.SINGLETON);
         binder.bind(ObjectMapper.class).in(Scopes.SINGLETON);
     }
 

@@ -60,7 +60,10 @@ public class Main extends Application {
         }
 
         var mainView = FXML.load(MainCtrl.class, "client", "scenes", "MainView.fxml");
+        var editCollectionsMenu =
+                FXML.load(MainCtrl.class, "client", "scenes", "EditCollections.fxml");
         var mainViewScene = new Scene(mainView.getValue());
+        var editCollectionsMenuScene = new Scene(editCollectionsMenu.getValue());
 
         // Apply the CSS file
         String cssPath = getClass()
@@ -68,14 +71,12 @@ public class Main extends Application {
                 .toExternalForm(); // Ensure correct URL path
         mainViewScene.getStylesheets().add(cssPath);
 
-
         primaryStage.setTitle("NetNote");
         primaryStage.setScene(mainViewScene);
         primaryStage.show();
 
-
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, mainViewScene);
+        mainCtrl.initialize(primaryStage, mainViewScene, editCollectionsMenuScene);
         mainCtrl.updateDisplay();
     }
 }
