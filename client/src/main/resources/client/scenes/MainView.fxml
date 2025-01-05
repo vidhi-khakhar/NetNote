@@ -45,25 +45,17 @@
                         </HBox>
                      </children>
                   </HBox>
-                  <HBox fx:id="middleHBox" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0">
+                  <HBox fx:id="middleHBox" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 0.5 0 0 0;">
                      <children>
                         <HBox prefHeight="40.0" prefWidth="484.0">
                            <children>
-                              <Label fx:id="filterByTagLabel" maxWidth="200.0" prefHeight="20.0" prefWidth="125.0" style="-fx-font-weight: bold;" text="%label.filterByTagName"> HBox.hgrow="NEVER">
+                              <Label fx:id="filterByTagLabel" maxWidth="220.0" prefHeight="20.0" prefWidth="175.0" style="-fx-font-weight: bold;" text="%label.filterByTagName"> HBox.hgrow="NEVER">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets bottom="5.0" left="5.0" top="5.0" />
+                                    <Insets bottom="5.0" left="5.0" top="9.0" />
                                  </HBox.margin>
-                              </Label>
-                              <Label prefHeight="19.0" prefWidth="275.0" text="Add tag dropdowns and clear tags button here.">
-                                 <HBox.margin>
-                                    <Insets bottom="5.0" top="6.0" />
-                                 </HBox.margin>
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
                               </Label>
                            </children>
                            <HBox.margin>
@@ -72,13 +64,13 @@
                         </HBox>
                      </children>
                   </HBox>
-                  <HBox fx:id="lowerHBox" prefHeight="370.0" prefWidth="800.0" VBox.vgrow="ALWAYS">
+                  <HBox fx:id="lowerHBox" prefHeight="370.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 0.5 0 0 0;" VBox.vgrow="ALWAYS">
                      <children>
                         <VBox fx:id="leftPanel" prefHeight="370.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <ListView fx:id="notesList" maxWidth="400.0" onMouseClicked="#displaySavedNote" prefHeight="330.0" prefWidth="134.0" VBox.vgrow="ALWAYS">
+                              <ListView fx:id="notesList" maxWidth="400.0" onMouseClicked="#displaySavedNote" prefHeight="330.0" prefWidth="134.0" style="-fx-border-width: 0.5; -fx-border-color: black;" VBox.vgrow="ALWAYS">
                                  <VBox.margin>
-                                    <Insets left="5.0" />
+                                    <Insets left="5.0" top="5.0" />
                                  </VBox.margin>
                               </ListView>
                               <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
@@ -134,14 +126,14 @@
                               </Label>
                               <HBox prefHeight="21.0" prefWidth="234.0">
                                  <children>
-                                    <TextField fx:id="noteTitleInput" onKeyReleased="#updateTitle" prefHeight="26.0" prefWidth="230.0" promptText="%label.titlePlaceholder">
+                                    <TextField fx:id="noteTitleInput" onKeyReleased="#updateTitle" prefHeight="26.0" prefWidth="230.0" promptText="%label.titlePlaceholder" style="-fx-border-color: black; -fx-border-width: 0.5;">
                                        <HBox.margin>
                                           <Insets left="5.0" right="5.0" />
                                        </HBox.margin>
                                     </TextField>
                                  </children>
                               </HBox>
-                              <TextArea fx:id="noteEditor" onKeyReleased="#updateDisplay" prefHeight="278.0" prefWidth="224.0" promptText="%label.editorPlaceholder" VBox.vgrow="ALWAYS">
+                              <TextArea fx:id="noteEditor" onKeyReleased="#updateDisplay" prefHeight="278.0" prefWidth="224.0" promptText="%label.editorPlaceholder" style="-fx-border-color: black; -fx-border-width: 0.5;" VBox.vgrow="ALWAYS">
                                  <VBox.margin>
                                     <Insets left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
@@ -153,17 +145,12 @@
                               </HBox>
                            </children>
                            <HBox.margin>
-                              <Insets />
+                              <Insets left="5.0" right="5.0" />
                            </HBox.margin>
                         </VBox>
                      </children>
                   </HBox>
                </children>
-            </VBox>
-            <VBox maxWidth="10.0" prefHeight="450.0" prefWidth="5.0" HBox.hgrow="ALWAYS">
-               <HBox.margin>
-                  <Insets left="4.0" right="2.0" />
-               </HBox.margin>
             </VBox>
             <VBox maxWidth="550.0" prefHeight="450.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
                <children>
@@ -176,7 +163,7 @@
                                     <Font size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets bottom="5.0" left="5.0" top="7.0" />
+                                    <Insets bottom="5.0" left="7.0" top="7.0" />
                                  </HBox.margin>
                               </Label>
                               <ComboBox fx:id="collectionDropdown" prefWidth="150.0">
@@ -236,22 +223,22 @@
                         </HBox>
                      </children>
                   </HBox>
-                  <HBox fx:id="middleHBox1" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" />
-                  <VBox fx:id="rightPanel" prefHeight="370.0" prefWidth="300.0" VBox.vgrow="ALWAYS">
+                  <HBox fx:id="middleHBox1" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 0.5 0 0 0;" />
+                  <VBox fx:id="rightPanel" prefHeight="370.0" prefWidth="300.0" style="-fx-border-color: black; -fx-border-width: 0.5 0 0 0;" VBox.vgrow="ALWAYS">
                      <children>
                         <Label fx:id="renderedNoteLabel" maxWidth="1.7976931348623157E308" prefHeight="27.0" style="-fx-font-weight: bold;" text="%label.renderedViewName">
                            <font>
                               <Font size="14.0" />
                            </font>
                            <VBox.margin>
-                              <Insets />
+                              <Insets left="5.0" />
                            </VBox.margin>
                         </Label>
                         <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" prefHeight="29.0" prefWidth="200.0">
                            <children>
                               <Label fx:id="renderedNoteTitleLabel" maxWidth="300.0" prefHeight="22.0" prefWidth="178.0" style="-fx-font-weight: bold; -fx-background-color: white;" text="%label.renderedNoteTitleDefaultLabel" HBox.hgrow="ALWAYS">
                                  <HBox.margin>
-                                    <Insets bottom="5.0" />
+                                    <Insets bottom="5.0" left="5.0" />
                                  </HBox.margin>
                                  <font>
                                     <Font name="Times New Roman Bold" size="16.0" />
@@ -269,11 +256,14 @@
                               </CheckBox>
                            </children>
                         </HBox>
-                        <WebView fx:id="renderedNoteView" prefHeight="278.0" prefWidth="224.0" VBox.vgrow="ALWAYS">
+                        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="278.0" prefWidth="224.0" style="-fx-border-color: black; -fx-border-width: 0.5;" VBox.vgrow="ALWAYS">
+                           <children>
+                              <WebView fx:id="renderedNoteView" maxWidth="550.0" prefHeight="277.0" prefWidth="287.0" HBox.hgrow="ALWAYS" />
+                           </children>
                            <VBox.margin>
-                              <Insets right="5.0" />
+                              <Insets left="5.0" right="5.0" />
                            </VBox.margin>
-                        </WebView>
+                        </HBox>
                         <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="30.0" prefWidth="100.0">
                            <VBox.margin>
                               <Insets bottom="5.0" top="5.0" />
