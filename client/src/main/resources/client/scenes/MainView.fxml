@@ -33,7 +33,7 @@
                                     <Insets left="5.0" top="5.0" />
                                  </HBox.margin>
                               </TextField>
-                              <Button fx:id="searchButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="27.0" style="-fx-background-color: #6fbed5;" text="🔎">
+                              <Button fx:id="searchButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="27.0" style="-fx-background-color: #6fbed5; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="🔎">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" top="5.0" />
                                  </HBox.margin>
@@ -75,7 +75,7 @@
                               </ListView>
                               <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
                                  <children>
-                                    <Button fx:id="addButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold;" text="+">
+                                    <Button fx:id="addButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="+">
                                        <HBox.margin>
                                           <Insets left="5.0" />
                                        </HBox.margin>
@@ -83,7 +83,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="deleteButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #d43b3b; -fx-font-weight: bold;" text="-">
+                                    <Button fx:id="deleteButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #d43b3b; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="-">
                                        <HBox.margin>
                                           <Insets left="5.0" />
                                        </HBox.margin>
@@ -91,7 +91,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="refreshButton" layoutX="35.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold;" text="⟳">
+                                    <Button fx:id="refreshButton" layoutX="35.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="⟳">
                                        <HBox.margin>
                                           <Insets left="5.0" right="10.0" />
                                        </HBox.margin>
@@ -99,7 +99,7 @@
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="serverConfigButton" mnemonicParsing="false" onAction="#handleConfigureIP" prefHeight="34.0" prefWidth="47.0" style="-fx-background-color: #e8b419; -fx-font-weight: bold;" text="IP">
+                                    <Button fx:id="serverConfigButton" mnemonicParsing="false" onAction="#handleConfigureIP" prefHeight="34.0" prefWidth="47.0" style="-fx-background-color: #e8b419; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 3;" text="IP">
                                        <font>
                                           <Font name="System Bold" size="11.0" />
                                        </font>
