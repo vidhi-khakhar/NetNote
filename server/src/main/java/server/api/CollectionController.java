@@ -27,11 +27,13 @@ public class CollectionController {
      *
      * @param collectionRepository              The collection repository.
      * @param noteRepository                    The note repository.
-     * @param collectionContainsNotesRepository The repository managing relationships between collections and notes.
+     * @param collectionContainsNotesRepository
+     * The repository managing relationships between collections and notes.
      */
     public CollectionController(CollectionRepository collectionRepository,
                                 NoteRepository noteRepository,
-                                CollectionContainsNotesRepository collectionContainsNotesRepository) {
+                                CollectionContainsNotesRepository
+                                        collectionContainsNotesRepository) {
         this.collectionRepository = collectionRepository;
         this.noteRepository = noteRepository;
         this.collectionContainsNotesRepository = collectionContainsNotesRepository;
@@ -42,6 +44,7 @@ public class CollectionController {
      * Enforces alias length restrictions and ensures unique names.
      *
      * @param collection The collection to be stored in the database.
+     * @return status
      */
     @PostMapping("/")
     public ResponseEntity<String> createCollection(@RequestBody Collection collection) {
@@ -51,14 +54,17 @@ public class CollectionController {
         }
         // validate the server field (ensure it's not empty)
         if (collection.getServer() == null || collection.getServer().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
                     .body("Server field cannot be empty.");
         }
-        // check if the collection exists by searching through the existing collections using unique name
+        // check if the collection exists by searching
+        // through the existing collections using unique name
         List<Collection> allCollections = collectionRepository.findAll();
         boolean collectionExists = false;
         for (Collection existingCollection : allCollections) {
-            if (existingCollection.getCollectionUniqueName().equals(collection.getCollectionUniqueName())) {
+            if (existingCollection.getCollectionUniqueName()
+                    .equals(collection.getCollectionUniqueName())) {
                 collectionExists = true;
                 break;
             }
@@ -88,10 +94,12 @@ public class CollectionController {
      * Returns a specific collection by its unique name.
      *
      * @param uniqueName The unique name of the collection to retrieve.
-     * @return The collection with the specified unique name, or a 404 response if not found.
+     * @return The collection with the specified unique name,
+     * or a 404 response if not found.
      */
     @GetMapping("/{uniqueName}")
-    public ResponseEntity<Collection> getCollectionByUniqueName(@PathVariable("uniqueName") String uniqueName) {
+    public ResponseEntity<Collection> getCollectionByUniqueName
+    (@PathVariable("uniqueName") String uniqueName) {
         List<Collection> allCollections = collectionRepository.findAll();
         // find the collection by unique name
         Optional<Collection> collectionOptional = allCollections
@@ -108,6 +116,7 @@ public class CollectionController {
      *
      * @param uniqueName        The unique name of the collection to update.
      * @param updatedCollection The updated collection data.
+     * @return status
      */
     @PutMapping("/{uniqueName}")
     public ResponseEntity<String> updateCollection(@PathVariable("uniqueName") String uniqueName,
@@ -195,6 +204,7 @@ public class CollectionController {
      *
      * @param uniqueName The unique name of the collection.
      * @param noteTitle  The title of the note to add.
+     * @return status
      */
     @PostMapping("/{uniqueName}/notes/{noteTitle}")
     public ResponseEntity<String> addNoteToCollection(@PathVariable("uniqueName") String uniqueName,
@@ -224,12 +234,16 @@ public class CollectionController {
                     .body("Note with the specified title does not exist.");
         }
 
-        // retrieve the collection unique name and note id
-        String collectionUniqueName = collectionOptional.get().getCollectionUniqueName();
+        // retrieve the collection unique name and
+        // note id
+        String collectionUniqueName = collectionOptional
+                .get().getCollectionUniqueName();
         Long noteId = noteOptional.get().getNoteId();
 
-        // create a new relationship between collection and note using CollectionContainsNotesId
-        CollectionContainsNotes relation = new CollectionContainsNotes(collectionUniqueName, noteId);
+        // create a new relationship between collection
+        // and note using CollectionContainsNotesId
+        CollectionContainsNotes relation =
+                new CollectionContainsNotes(collectionUniqueName, noteId);
 
         // save the relationship to the database
         collectionContainsNotesRepository.save(relation);
@@ -239,18 +253,21 @@ public class CollectionController {
     }
 
     /**
-     * Moves a note from one collection to another.
+     * Moves a note from one collection
+     * to another.
      *
      * @param uniqueName           The unique name of the current collection.
      * @param noteTitle            The title of the note to move.
      * @param targetCollectionName The unique name of the target collection.
+     * @return status
      */
     @PostMapping("/{uniqueName}/move-note/{noteTitle}")
-    public ResponseEntity<String> moveNoteToAnotherCollection(@PathVariable("uniqueName") String uniqueName,
-                                                              @PathVariable("noteTitle") String noteTitle,
-                                                              @RequestBody String targetCollectionName) {
+    public ResponseEntity<String> moveNoteToAnotherCollection
+    (   @PathVariable("uniqueName") String uniqueName,
+        @PathVariable("noteTitle") String noteTitle,
+        @RequestBody String targetCollectionName) {
 
-// find the current collection and target collection by unique name
+        // find the current collection and target collection by unique name
         List<Collection> allCollections = collectionRepository.findAll();
         Optional<Collection> currentCollection = allCollections
                 .stream()
@@ -276,6 +293,7 @@ public class CollectionController {
 
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+
                     .body("Note with the specified title does not exist.");
         }
 
@@ -286,7 +304,9 @@ public class CollectionController {
         CollectionContainsNotes currentRelation = allRelations
                 .stream()
                 .filter(relation ->
-                        relation.getCollectionId().equals(currentCollection.get().getCollectionUniqueName()) &&
+                        relation.getCollectionId()
+                                .equals(currentCollection
+                                        .get().getCollectionUniqueName()) &&
                         relation.getNoteId().equals(noteOptional.get().getNoteId()))
                 .findFirst()
                 .orElse(null);
@@ -309,11 +329,17 @@ public class CollectionController {
         collectionContainsNotesRepository.save(newRelation);
 
 
-
         return ResponseEntity.ok("Note moved successfully.");
     }
 
-    // method to find collection by unique name
+    //
+
+    /**
+     * Method to find collection by unique name
+     *
+     * @param uniqueName
+     * @return status
+     */
     public Optional<Collection> findCollectionByUniqueName(String uniqueName) {
         List<Collection> allCollections = collectionRepository.findAll();
         return allCollections

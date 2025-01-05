@@ -63,6 +63,10 @@ public class Collection {
         return collectionUniqueName;
     }
 
+    /**
+     * Setter for collectionUniqueName.
+     * @param collectionUniqueName
+     */
     public void setCollectionUniqueName(String collectionUniqueName) {
         this.collectionUniqueName = collectionUniqueName;
     }
