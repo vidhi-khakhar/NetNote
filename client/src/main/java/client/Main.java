@@ -17,6 +17,7 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
+import client.scenes.EditCollectionsCtrl;
 import client.scenes.MainCtrl;
 import client.utils.NoteServerUtils;
 import com.google.inject.Injector;
@@ -61,7 +62,7 @@ public class Main extends Application {
 
         var mainView = FXML.load(MainCtrl.class, "client", "scenes", "MainView.fxml");
         var editCollectionsMenu =
-                FXML.load(MainCtrl.class, "client", "scenes", "EditCollections.fxml");
+                FXML.load(EditCollectionsCtrl.class, "client", "scenes", "EditCollections.fxml");
         var mainViewScene = new Scene(mainView.getValue());
         var editCollectionsMenuScene = new Scene(editCollectionsMenu.getValue());
 

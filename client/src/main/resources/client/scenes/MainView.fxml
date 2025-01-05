@@ -167,7 +167,7 @@
                               </Label>
                               <MenuButton mnemonicParsing="false" prefWidth="150.0">
                                 <items>
-                                  <MenuItem mnemonicParsing="false" onAction="#showEditCollectionsMenu" text="%label.collectionsDropdownEditCollections" />
+                                  <MenuItem fx:id="editCollectionsDropdownOption" mnemonicParsing="false" onAction="#showEditCollectionsMenu" text="%label.collectionsDropdownEditCollections" />
                                 </items>
                               </MenuButton>
                               <MenuButton fx:id="languageDropdown" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="40.0">

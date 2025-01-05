@@ -1,12 +1,11 @@
 package client.scenes;
 
-import client.Main;
 import client.config.ConfigLoader;
 import client.components.Notification;
+import client.utils.LangUtils;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -43,8 +42,7 @@ public class MainCtrl {
     private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
-
-    private final Map<String, StringProperty> props = new HashMap<>();
+    private Map<String, StringProperty> props;
 
     private Scene editCollectionsMenu;
     private Scene mainView;
@@ -61,6 +59,9 @@ public class MainCtrl {
 
     @Inject
     private ConfigLoader configLoader;
+
+    @Inject
+    private LangUtils langUtils;
 
     @FXML
     private TextField searchBar;
@@ -91,7 +92,6 @@ public class MainCtrl {
 
     @FXML
     private MenuItem romanianMenuItem;
-
 
     @FXML
     private HBox middleHBox;
@@ -126,17 +126,14 @@ public class MainCtrl {
     @FXML
     private VBox rightPanel;
 
-
     @FXML
     private Label renderedNoteTitleLabel;
 
     @FXML
     private CheckBox problemsCheckbox;
 
-
     @FXML
     private Button serverConfigButton;
-
 
     @FXML
     private TextField noteTitleInput;
@@ -146,6 +143,9 @@ public class MainCtrl {
 
     @FXML
     private WebView renderedNoteView;
+
+    @FXML
+    private MenuItem editCollectionsDropdownOption;
 
     @FXML
     private Label renderedNoteLabel;
@@ -167,6 +167,7 @@ public class MainCtrl {
         this.mainView = mainView;
         this.editCollectionsMenu = editCollectionsMenu;
 
+        props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
         notesList.setItems(savedNotes);
 
@@ -253,15 +254,6 @@ public class MainCtrl {
     }
 
     private void initializeTextProperties() {
-        var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, configLoader.getLocale());
-
-        rb.keySet()
-                .forEach(key -> {
-                    String shortKey = key.split("\\.")[1];
-                    StringProperty newProp = new SimpleStringProperty();
-                    props.put(shortKey, newProp);
-                });
-
         noteEditor.promptTextProperty().bind(props.get("editorPlaceholder"));
         noteTitleInput.promptTextProperty().bind(props.get("titlePlaceholder"));
         noteEditorLabel.textProperty().bind(props.get("noteEditorName"));
@@ -271,6 +263,8 @@ public class MainCtrl {
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
         filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
+        editCollectionsDropdownOption.textProperty().bind(
+                props.get("collectionsDropdownEditCollections"));
 
         setLocale(configLoader.getLocale());
     }
@@ -745,14 +739,7 @@ public class MainCtrl {
             selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
         }
         configLoader.setLocale(l);
-
-        var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, l);
-
-        rb.keySet()
-                .forEach(key -> {
-                    String shortKey = key.split("\\.")[1];
-                    props.get(shortKey).set(rb.getString(key));
-                });
+        langUtils.setLocale(l);
     }
 
     /**
