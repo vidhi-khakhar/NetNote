@@ -18,6 +18,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -63,10 +64,77 @@ public class MainCtrl {
     private TextField searchBar;
 
     @FXML
+    private Button searchButton;
+
+    @FXML
+    private ImageView selectedLanguageImage;
+
+    @FXML
+    private Label collectionLabel;
+
+    @FXML
+    private Label filterByTagLabel;
+
+    @FXML
+    private ComboBox<?> collectionDropdown;
+
+    @FXML
+    private MenuButton languageDropdown;
+
+    @FXML
+    private MenuItem dutchMenuItem;
+
+    @FXML
+    private MenuItem englishMenuItem;
+
+    @FXML
+    private MenuItem romanianMenuItem;
+
+
+    @FXML
+    private HBox middleHBox;
+
+    @FXML
+    private HBox lowerHBox;
+
+    @FXML
+    private VBox leftPanel;
+
+    @FXML
     private ListView<Note> notesList;
 
     @FXML
+    private Button addButton;
+
+    @FXML
+    private Button deleteButton;
+
+    @FXML
+    private Button refreshButton;
+
+    @FXML
     private VBox middlePanel;
+
+    @FXML
+    private Label noteEditorLabel;
+
+    @FXML
+    private TextArea noteEditor;
+
+    @FXML
+    private VBox rightPanel;
+
+
+    @FXML
+    private Label renderedNoteTitleLabel;
+
+    @FXML
+    private CheckBox problemsCheckbox;
+
+
+    @FXML
+    private Button serverConfigButton;
+
 
     @FXML
     private TextField noteTitleInput;
@@ -75,25 +143,7 @@ public class MainCtrl {
             (_, _, _) -> updateTitle();
 
     @FXML
-    private TextArea noteEditor;
-
-    @FXML
-    private Label renderedNoteTitleLabel;
-
-    @FXML
-    private ImageView selectedLanguageImage;
-
-    @FXML
-    private MenuItem themeToggleButton;
-
-    @FXML
     private WebView renderedNoteView;
-
-    @FXML
-    private CheckBox problemsCheckbox;
-
-    @FXML
-    private Label noteEditorLabel;
 
     @FXML
     private Label renderedNoteLabel;
@@ -215,6 +265,8 @@ public class MainCtrl {
         problemsCheckbox.textProperty().bind(props.get("markdownCheckboxLabel"));
         searchBar.promptTextProperty().bind(props.get("searchPlaceholder"));
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
+        collectionLabel.textProperty().bind(props.get("collectionLabel"));
+        filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
 
         setLocale(configLoader.getLocale());
     }
@@ -235,34 +287,6 @@ public class MainCtrl {
      */
     public void setSavedNotes(ObservableList<Note> newNotes) {
         this.savedNotes = newNotes;
-    }
-
-    /**
-     * Toggles the dark mode theme on/off depending on the current theme.
-     */
-    public void toggleTheme() {
-        URL darkThemeCss = getClass().getResource("/client/scenes/dark-theme.css");
-        URL lightThemeCss = getClass().getResource("/client/scenes/gui.css");
-        if (darkThemeCss == null || lightThemeCss == null) return; //TODO handle null
-
-        String oldForm = isDarkTheme ?
-                darkThemeCss.toExternalForm() :
-                lightThemeCss.toExternalForm();
-        String newForm = isDarkTheme ?
-                lightThemeCss.toExternalForm() :
-                darkThemeCss.toExternalForm();
-
-        mainView.getStylesheets().remove(oldForm);
-        mainView.getStylesheets().add(newForm);
-
-        if (isDarkTheme) {
-            themeToggleButton.setText("🌙");
-        } else {
-            themeToggleButton.setText("☀");
-            themeToggleButton.setStyle("-fx-font-size: 10px;");
-        }
-
-        isDarkTheme = !isDarkTheme;
     }
 
     /**
@@ -554,13 +578,6 @@ public class MainCtrl {
             props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(renderedContent);
         }
-    }
-
-    /**
-     * Toggles the middle panel of the interface.
-     */
-    public void toggleEditor() {
-        middlePanel.setVisible(!middlePanel.isVisible());
     }
 
     /**
