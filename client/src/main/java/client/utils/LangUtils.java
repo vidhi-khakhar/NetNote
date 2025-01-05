@@ -12,6 +12,11 @@ public class LangUtils {
 
     private final Map<String, StringProperty> props = new HashMap<>();
 
+    /**
+     * Constructor for the {@link LangUtils} singleton
+     *
+     * @param configLoader Injected reference to the {@link ConfigLoader}
+     */
     @Inject
     public LangUtils(ConfigLoader configLoader) {
         var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, configLoader.getLocale());
@@ -25,10 +30,20 @@ public class LangUtils {
                 });
     }
 
+    /**
+     * Getter for the internationalized string properties
+     *
+     * @return The internationalized string properties
+     */
     public Map<String, StringProperty> getProps() {
         return props;
     }
 
+    /**
+     * Changes the application locale by updating the string properties
+     *
+     * @param l The new locale of the application
+     */
     public void setLocale(Locale l) {
         var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, l);
 

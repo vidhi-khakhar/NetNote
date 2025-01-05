@@ -38,6 +38,10 @@ public class EditCollectionsCtrl {
     @FXML
     private Button buttonSave;
 
+    /**
+     * Initializes the {@link EditCollectionsCtrl} controller by
+     * setting the binding the appropriate text properties.
+     */
     public void initialize() {
         props = langUtils.getProps();
 
