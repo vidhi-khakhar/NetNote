@@ -73,6 +73,9 @@ public class MainCtrl {
     private Label collectionLabel;
 
     @FXML
+    private Label filterByTagLabel;
+
+    @FXML
     private ComboBox<?> collectionDropdown;
 
     @FXML
@@ -269,6 +272,7 @@ public class MainCtrl {
         searchBar.promptTextProperty().bind(props.get("searchPlaceholder"));
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
+        filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
 
         setLocale(configLoader.getLocale());
     }

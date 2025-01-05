@@ -48,9 +48,9 @@
                   </HBox>
                   <HBox fx:id="middleHBox" maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0">
                      <children>
-                        <HBox prefHeight="40.0" prefWidth="100.0" HBox.hgrow="NEVER">
+                        <HBox prefHeight="40.0" prefWidth="484.0">
                            <children>
-                              <Label style="-fx-font-weight: bold;" text="Filter by Tag:" HBox.hgrow="NEVER">
+                              <Label fx:id="filterByTagLabel" maxWidth="200.0" prefHeight="20.0" prefWidth="125.0" style="-fx-font-weight: bold;" text="%label.filterByTagName"> HBox.hgrow="NEVER">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -58,11 +58,7 @@
                                     <Insets bottom="5.0" left="5.0" top="5.0" />
                                  </HBox.margin>
                               </Label>
-                           </children>
-                        </HBox>
-                        <HBox prefHeight="100.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
-                           <children>
-                              <Label text="Add tag dropdowns and clear tags button here." HBox.hgrow="NEVER">
+                              <Label prefHeight="19.0" prefWidth="275.0" text="Add tag dropdowns and clear tags button here.">
                                  <HBox.margin>
                                     <Insets bottom="5.0" top="6.0" />
                                  </HBox.margin>
@@ -71,6 +67,9 @@
                                  </font>
                               </Label>
                            </children>
+                           <HBox.margin>
+                              <Insets bottom="5.0" left="5.0" />
+                           </HBox.margin>
                         </HBox>
                      </children>
                   </HBox>
@@ -152,7 +151,7 @@
                               </HBox>
                            </children>
                            <HBox.margin>
-                              <Insets right="5.0" />
+                              <Insets />
                            </HBox.margin>
                         </VBox>
                      </children>
