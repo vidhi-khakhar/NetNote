@@ -46,6 +46,7 @@ public class MainCtrl {
     private Scene editCollectionsMenu;
     private Scene mainView;
     private Stage stage;
+    private final Label noNotesMatchYourQueryLabel = new Label();
 
     @Inject
     private MarkdownCtrl markdownCtrl;
@@ -169,9 +170,9 @@ public class MainCtrl {
             }
         });
 
-        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-            handleSearch(newValue);
-        });
+        searchBar.textProperty().addListener((_, _, newValue) ->
+                handleSearch(newValue)
+        );
 
         initializeShortcuts();
         initializeTextProperties();
@@ -228,6 +229,7 @@ public class MainCtrl {
         filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
         editCollectionsDropdownOption.textProperty().bind(
                 props.get("collectionsDropdownEditCollections"));
+        noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
 
         setLocale(configLoader.getLocale());
     }
@@ -258,7 +260,7 @@ public class MainCtrl {
      */
     public void handleAddNote() {
 
-        if(!getCurrentQuery().isEmpty()){
+        if (!getCurrentQuery().isEmpty()) {
             searchBar.clear();
             handleSearch("");
         }
@@ -334,7 +336,7 @@ public class MainCtrl {
     public boolean handleDeleteNote(int index, boolean isAddedToUndoStack) {
 
         String previousQuery = getCurrentQuery();
-        if(!getCurrentQuery().isEmpty()){
+        if (!getCurrentQuery().isEmpty()) {
             handleSearch("");
         }
         if (index == -1) {
@@ -603,14 +605,13 @@ public class MainCtrl {
             if (notesList.getItems().contains(selectedNote)) {
                 notesList.refresh();
             }
-        } else if (selectedNote == null &&
-                (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
+        } else if (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty()) {
             // Ensure the first note is created when only content exists
             String noteContent = noteEditor.getText();
             Note firstNote = new Note(updatedTitle, noteContent);
             savedNotes.add(firstNote);
-            selectedNoteIndex = savedNotes.size()-1;
-            indexMap.put(firstNote, savedNotes.size() -1);
+            selectedNoteIndex = savedNotes.size() - 1;
+            indexMap.put(firstNote, savedNotes.size() - 1);
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
             notesList.getSelectionModel().select(selectedNoteIndex);
             notesList.refresh();
@@ -722,18 +723,21 @@ public class MainCtrl {
 
     /**
      * Returns the currently opened note.
+     *
      * @return currently displayed note.
      */
-    public Note getCurrentNote(){
+    public Note getCurrentNote() {
         Note currentNote = null;
         if (selectedNoteIndex >= 0 && selectedNoteIndex < savedNotes.size()) {
             currentNote = savedNotes.get(selectedNoteIndex);
         }
         return currentNote;
     }
+
     /**
-     *  This method filters the notesList based on a given search query,
-     *  and it refreshes the notesList to display only the matching notes.
+     * This method filters the notesList based on a given search query,
+     * and it refreshes the notesList to display only the matching notes.
+     *
      * @param query the text entered by the user in the search bar
      */
     public void handleSearch(String query) {
@@ -770,12 +774,13 @@ public class MainCtrl {
             notesList.getSelectionModel().clearSelection();
         }
         if (filteredNotes.isEmpty()) {
-            notesList.setPlaceholder(new Label("No notes match your search query."));
+            notesList.setPlaceholder(noNotesMatchYourQueryLabel);
         }
     }
 
     /**
      * Returns the currently searched query
+     *
      * @return current text in search bar
      */
     public String getCurrentQuery() {
