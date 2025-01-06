@@ -20,7 +20,7 @@ public class CollectionContainsNotesId implements Serializable {
     /**
      * collectionId is part of the composite key.
      */
-    private Long collectionId;
+    private String collectionId;
     /**
      * noteId is part of the composite key.
      */
@@ -39,7 +39,7 @@ public class CollectionContainsNotesId implements Serializable {
      * @param collectionId The ID of the Collection.
      * @param noteId The ID of the Note.
      */
-    public CollectionContainsNotesId(Long collectionId, Long noteId) {
+    public CollectionContainsNotesId(String collectionId, Long noteId) {
         this.collectionId = collectionId;
         this.noteId = noteId;
     }
@@ -49,7 +49,7 @@ public class CollectionContainsNotesId implements Serializable {
      *
      * @return The ID of the Collection.
      */
-    public Long getCollectionId() {
+    public String getCollectionId() {
         return collectionId;
     }
 

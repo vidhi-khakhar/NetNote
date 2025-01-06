@@ -43,7 +43,7 @@ public class CollectionContainsNotes {
      * @param collectionId The ID of the Collection.
      * @param noteId       The ID of the Note.
      */
-    public CollectionContainsNotes(Long collectionId, Long noteId) {
+    public CollectionContainsNotes(String collectionId, Long noteId) {
         this.id = new CollectionContainsNotesId(collectionId, noteId);
     }
 
@@ -61,7 +61,7 @@ public class CollectionContainsNotes {
      *
      * @return The ID of the Collection.
      */
-    public Long getCollectionId() {
+    public String getCollectionId() {
         return id.getCollectionId();
     }
 
