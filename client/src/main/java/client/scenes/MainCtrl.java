@@ -1,13 +1,12 @@
 package client.scenes;
 
-import client.Main;
 import client.config.ConfigLoader;
 import client.components.Notification;
 import client.utils.NoteSearchUtils;
+import client.utils.LangUtils;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -19,8 +18,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
@@ -41,14 +38,15 @@ public class MainCtrl {
      * {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
      **/
     private int selectedNoteIndex = -1;
-    private boolean isDarkTheme = false;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
+    private Map<String, StringProperty> props;
 
-    private final Map<String, StringProperty> props = new HashMap<>();
     private final Map<Note, Integer> indexMap = new HashMap<>();
+    private Scene editCollectionsMenu;
     private Scene mainView;
     private Stage stage;
+    private Label noNotesMatchYourQueryLabel;
 
     @Inject
     private MarkdownCtrl markdownCtrl;
@@ -61,6 +59,9 @@ public class MainCtrl {
 
     @Inject
     private ConfigLoader configLoader;
+
+    @Inject
+    private LangUtils langUtils;
 
     @FXML
     private TextField searchBar;
@@ -75,44 +76,7 @@ public class MainCtrl {
     private Label filterByTagLabel;
 
     @FXML
-    private ComboBox<?> collectionDropdown;
-
-    @FXML
-    private MenuButton languageDropdown;
-
-    @FXML
-    private MenuItem dutchMenuItem;
-
-    @FXML
-    private MenuItem englishMenuItem;
-
-    @FXML
-    private MenuItem romanianMenuItem;
-
-
-    @FXML
-    private HBox middleHBox;
-
-    @FXML
-    private HBox lowerHBox;
-
-    @FXML
-    private VBox leftPanel;
-
-    @FXML
     private ListView<Note> notesList;
-
-    @FXML
-    private Button addButton;
-
-    @FXML
-    private Button deleteButton;
-
-    @FXML
-    private Button refreshButton;
-
-    @FXML
-    private VBox middlePanel;
 
     @FXML
     private Label noteEditorLabel;
@@ -121,19 +85,10 @@ public class MainCtrl {
     private TextArea noteEditor;
 
     @FXML
-    private VBox rightPanel;
-
-
-    @FXML
     private Label renderedNoteTitleLabel;
 
     @FXML
     private CheckBox problemsCheckbox;
-
-
-    @FXML
-    private Button serverConfigButton;
-
 
     @FXML
     private TextField noteTitleInput;
@@ -145,6 +100,9 @@ public class MainCtrl {
     private WebView renderedNoteView;
 
     @FXML
+    private MenuItem editCollectionsDropdownOption;
+
+    @FXML
     private Label renderedNoteLabel;
 
     private final ChangeListener<String> webViewContentPropertyListener =
@@ -154,16 +112,21 @@ public class MainCtrl {
     /**
      * Initializes the controller.
      *
-     * @param stage    Reference to the primary stage.
-     * @param mainView Holds a reference to the mainView scene.
+     * @param stage               Reference to the primary stage.
+     * @param mainView            Holds a reference to the MainView scene.
+     * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
      */
-    public void initialize(Stage stage, Scene mainView) {
+    public void initialize(Stage stage, Scene mainView, Scene editCollectionsMenu) {
 
         this.stage = stage;
         this.mainView = mainView;
+        this.editCollectionsMenu = editCollectionsMenu;
 
+        props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
         notesList.setItems(savedNotes);
+
+        noNotesMatchYourQueryLabel = new Label();
 
         // This part was created with the help of generative AI,
         // it makes only the Title of the note appear in ListView
@@ -209,9 +172,9 @@ public class MainCtrl {
             }
         });
 
-        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-            handleSearch(newValue);
-        });
+        searchBar.textProperty().addListener((_, _, newValue) ->
+                handleSearch(newValue)
+        );
 
         initializeShortcuts();
         initializeTextProperties();
@@ -257,15 +220,6 @@ public class MainCtrl {
     }
 
     private void initializeTextProperties() {
-        var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, configLoader.getLocale());
-
-        rb.keySet()
-                .forEach(key -> {
-                    String shortKey = key.split("\\.")[1];
-                    StringProperty newProp = new SimpleStringProperty();
-                    props.put(shortKey, newProp);
-                });
-
         noteEditor.promptTextProperty().bind(props.get("editorPlaceholder"));
         noteTitleInput.promptTextProperty().bind(props.get("titlePlaceholder"));
         noteEditorLabel.textProperty().bind(props.get("noteEditorName"));
@@ -275,6 +229,9 @@ public class MainCtrl {
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
         filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
+        editCollectionsDropdownOption.textProperty().bind(
+                props.get("collectionsDropdownEditCollections"));
+        noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
 
         setLocale(configLoader.getLocale());
     }
@@ -305,7 +262,7 @@ public class MainCtrl {
      */
     public void handleAddNote() {
 
-        if(!getCurrentQuery().isEmpty()){
+        if (!getCurrentQuery().isEmpty()) {
             searchBar.clear();
             handleSearch("");
         }
@@ -381,7 +338,7 @@ public class MainCtrl {
     public boolean handleDeleteNote(int index, boolean isAddedToUndoStack) {
 
         String previousQuery = getCurrentQuery();
-        if(!getCurrentQuery().isEmpty()){
+        if (!getCurrentQuery().isEmpty()) {
             handleSearch("");
         }
         if (index == -1) {
@@ -650,14 +607,13 @@ public class MainCtrl {
             if (notesList.getItems().contains(selectedNote)) {
                 notesList.refresh();
             }
-        } else if (selectedNote == null &&
-                (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
+        } else if (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty()) {
             // Ensure the first note is created when only content exists
             String noteContent = noteEditor.getText();
             Note firstNote = new Note(updatedTitle, noteContent);
             savedNotes.add(firstNote);
-            selectedNoteIndex = savedNotes.size()-1;
-            indexMap.put(firstNote, savedNotes.size() -1);
+            selectedNoteIndex = savedNotes.size() - 1;
+            indexMap.put(firstNote, savedNotes.size() - 1);
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
             notesList.getSelectionModel().select(selectedNoteIndex);
             notesList.refresh();
@@ -769,18 +725,21 @@ public class MainCtrl {
 
     /**
      * Returns the currently opened note.
+     *
      * @return currently displayed note.
      */
-    public Note getCurrentNote(){
+    public Note getCurrentNote() {
         Note currentNote = null;
         if (selectedNoteIndex >= 0 && selectedNoteIndex < savedNotes.size()) {
             currentNote = savedNotes.get(selectedNoteIndex);
         }
         return currentNote;
     }
+
     /**
-     *  This method filters the notesList based on a given search query,
-     *  and it refreshes the notesList to display only the matching notes.
+     * This method filters the notesList based on a given search query,
+     * and it refreshes the notesList to display only the matching notes.
+     *
      * @param query the text entered by the user in the search bar
      */
     public void handleSearch(String query) {
@@ -817,12 +776,13 @@ public class MainCtrl {
             notesList.getSelectionModel().clearSelection();
         }
         if (filteredNotes.isEmpty()) {
-            notesList.setPlaceholder(new Label("No notes match your search query."));
+            notesList.setPlaceholder(noNotesMatchYourQueryLabel);
         }
     }
 
     /**
      * Returns the currently searched query
+     *
      * @return current text in search bar
      */
     public String getCurrentQuery() {
@@ -842,14 +802,7 @@ public class MainCtrl {
             selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
         }
         configLoader.setLocale(l);
-
-        var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, l);
-
-        rb.keySet()
-                .forEach(key -> {
-                    String shortKey = key.split("\\.")[1];
-                    props.get(shortKey).set(rb.getString(key));
-                });
+        langUtils.setLocale(l);
     }
 
     /**
@@ -871,6 +824,16 @@ public class MainCtrl {
      */
     public void setRO() {
         setLocale(Locale.forLanguageTag("ro-RO"));
+    }
+
+    /**
+     * Opens the "Edit Collections" scene to manage the current collections
+     */
+    public void showEditCollectionsMenu() {
+        Stage secondaryStage = new Stage();
+        secondaryStage.titleProperty().bind(props.get("collectionsDropdownEditCollections"));
+        secondaryStage.setScene(editCollectionsMenu);
+        secondaryStage.show();
     }
 }
 
