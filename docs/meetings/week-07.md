@@ -1,11 +1,11 @@
-| Key          | Value                                                                   |
-|--------------|-------------------------------------------------------------------------|
-| Date         | 08.01.2024                                                              |
-| Time         | 13:45                                                                   |
-| Location     | DW PC1 Cubicle 6                                                        |
-| Chair        | Lukasz Kasprzak                                                         |
-| Minute Taker | Michał Barciński                                                        |
-| Attendees    | Serban Untu <br/> Radu Malmare <br/> Vidhi Khakhar <br/> Yoanna Dyakova |
+| Key          | Value                                  |
+|--------------|----------------------------------------|
+| Date         | 08.01.2024                             |
+| Time         | 13:45                                  |
+| Location     | DW PC1 Cubicle 6                       |
+| Chair        | Lukasz Kasprzak                        |
+| Minute Taker | Michał Barciński                       |
+| Attendees    | Serban Untu <br/> Radu Malmare         |
 
 
 # Agenda Items 
