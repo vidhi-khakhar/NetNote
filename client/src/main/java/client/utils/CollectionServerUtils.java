@@ -141,9 +141,26 @@ public class CollectionServerUtils {
         }
     }
 
-
+    /**
+     * Deletes a collection by its unique name.
+     * Sends a DELETE request to the "api/collections/{uniqueName} endpoint.
+     * @param uniqueName The uniqueName of the collection to delete.
+     */
     public void deleteCollection(String uniqueName) {
-
+        try {
+            var response = ClientBuilder.newClient()
+                    .target(serverAddress + "api/collections/" + uniqueName)
+                    .request(MediaType.APPLICATION_JSON)
+                    .delete();
+            if (response.getStatus() == 200) {
+                System.out.println("Collection deleted successfully.");
+            } else {
+                System.out.println("Failed to delete collection. Status: " + response.getStatus());
+                System.out.println("Response message: " + response.readEntity(String.class));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void addNoteToCollection(String uniqueName, String noteTitle) {
