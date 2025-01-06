@@ -46,7 +46,7 @@ public class MainCtrl {
     private Scene editCollectionsMenu;
     private Scene mainView;
     private Stage stage;
-    private final Label noNotesMatchYourQueryLabel = new Label();
+    private Label noNotesMatchYourQueryLabel;
 
     @Inject
     private MarkdownCtrl markdownCtrl;
@@ -125,6 +125,8 @@ public class MainCtrl {
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
         notesList.setItems(savedNotes);
+
+        noNotesMatchYourQueryLabel = new Label();
 
         // This part was created with the help of generative AI,
         // it makes only the Title of the note appear in ListView
