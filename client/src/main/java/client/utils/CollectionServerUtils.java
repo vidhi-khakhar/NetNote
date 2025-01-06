@@ -5,6 +5,7 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
+import org.glassfish.jersey.client.ClientConfig;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -57,14 +58,15 @@ public class CollectionServerUtils {
      */
     public boolean isServerAvailable(String address) {
         try {
-            var response = ClientBuilder.newClient()
+            if (ClientBuilder.newClient(new ClientConfig())
                     .target(address + "api/collections/")
-                    .request()
-                    .get();
-            return response.getStatus() == 200;
+                    .request(MediaType.APPLICATION_JSON)
+                    .get()
+                    .getStatus() != 200) return false;
         } catch (Exception e) {
             return false;
         }
+        return true;
     }
 
     /**
