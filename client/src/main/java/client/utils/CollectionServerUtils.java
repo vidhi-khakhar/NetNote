@@ -1,5 +1,7 @@
 package client.utils;
 
+import jakarta.ws.rs.client.ClientBuilder;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -26,9 +28,25 @@ public class CollectionServerUtils {
             return "";
         }
     }
-
+    /**
+     * Method to check if an address corresponds to an available server.
+     * The server must send a 200 OK response containing JSON when a
+     * GET request is made to /api/notes for it to be considered available.
+     *
+     * @param address The address of the server to try to connect to.
+     * @return {@code true} if the server is reachable and valid and
+     * {@code false} otherwise
+     */
     public boolean isServerAvailable(String address) {
-        return false;
+        try {
+            var response = ClientBuilder.newClient()
+                    .target(address)
+                    .request()
+                    .get();
+            return response.getStatus() == 200;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public List<commons.Collection> getAllCollections() {
