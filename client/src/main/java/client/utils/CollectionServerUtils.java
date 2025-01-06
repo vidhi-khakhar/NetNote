@@ -2,6 +2,7 @@ package client.utils;
 
 import commons.Collection;
 import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 
@@ -90,23 +91,42 @@ public class CollectionServerUtils {
         return collections;
     }
 
-    public boolean createCollection(commons.Collection collection) {
-        return false;
+    /**
+     * Sends a request to create a new collection on the server.
+     * Sends a PUT request with the Collection object as the request body.
+     *
+     * @param collection The collection to created and stored on the server.
+     */
+    public void createCollection(commons.Collection collection) {
+        try {
+            var response = ClientBuilder.newClient()
+                    .target(serverAddress + "api/collections/")
+                    .request(MediaType.APPLICATION_JSON)
+                    .put(Entity.entity(collection, MediaType.APPLICATION_JSON));
+            if (response.getStatus() == 201) {
+                System.out.println("collection created");
+            } else {
+                System.out.println("Failed to create collection. Status:" + response.getStatus());
+                System.out.println("Response message:" + response.readEntity(String.class));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public boolean updateCollectionAlias(String uniqueName, String newAlias) {
-        return false;
+    public void updateCollectionAlias(String uniqueName, String newAlias) {
+
     }
 
-    public boolean deleteCollection(String uniqueName) {
-        return false;
+    public void deleteCollection(String uniqueName) {
+
     }
 
-    public boolean addNoteToCollection(String uniqueName, String noteTitle) {
-        return false;
+    public void addNoteToCollection(String uniqueName, String noteTitle) {
+
     }
 
-    public boolean moveNoteToAnotherCollection(String uniqueName, String noteTitle, String targetUniqueName) {
-        return false;
+    public void moveNoteToAnotherCollection(String uniqueName, String noteTitle, String targetUniqueName) {
+
     }
 }
