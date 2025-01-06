@@ -87,7 +87,10 @@ public class CollectionServerUtils {
                 collections = response.readEntity(new GenericType<List<Collection>>() {
                 });
             }
-            else System.out.println(response.getStatus());
+            else {
+                System.out.println("Failed to retrieve collections." +
+                        " Status: " + response.getStatus());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -136,7 +139,8 @@ public class CollectionServerUtils {
             if (response.getStatus() == 200) {
                 System.out.println("Collection alias updated successfully.");
             } else {
-                System.out.println("Failed to update collection alias. Status: " + response.getStatus());
+                System.out.println("Failed to update collection alias." +
+                        " Status: " + response.getStatus());
                 System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
@@ -182,7 +186,8 @@ public class CollectionServerUtils {
             if (response.getStatus() == 200) {
                 System.out.println("Note added to collection successfully.");
             } else {
-                System.out.println("Failed to add note to collection. Status: " + response.getStatus());
+                System.out.println("Failed to add note to collection." +
+                        " Status: " + response.getStatus());
                 System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
@@ -192,22 +197,28 @@ public class CollectionServerUtils {
 
     /**
      * Moves a note from one collection to another.
-     * Sends a POST request to the "api/collections/{uniqueName}/notes/{noteTitle}/move/{targetUniqueName}" endpoint.
+     * Sends a POST request to the
+     * "api/collections/{uniqueName}/notes/{noteTitle}/move/{targetUniqueName}" endpoint.
      *
      * @param uniqueName The unique name of the source collection.
      * @param noteTitle The title of the note to move.
      * @param targetUniqueName The unique name of the target collection.
      */
-    public void moveNoteToAnotherCollection(String uniqueName, String noteTitle, String targetUniqueName) {
+    public void moveNoteToAnotherCollection
+    (String uniqueName, String noteTitle, String targetUniqueName) {
         try {
             var response = ClientBuilder.newClient()
-                    .target(serverAddress + "api/collections/" + uniqueName + "/notes/" + noteTitle + "/move/" + targetUniqueName)
+                    .target(serverAddress + "api/collections/"
+                            + uniqueName + "/notes/"
+                            + noteTitle + "/move/"
+                            + targetUniqueName)
                     .request(MediaType.APPLICATION_JSON)
                     .post(null);
             if (response.getStatus() == 200) {
                 System.out.println("Note moved to another collection successfully.");
             } else {
-                System.out.println("Failed to move note. Status: " + response.getStatus());
+                System.out.println("Failed to move note." +
+                        " Status: " + response.getStatus());
                 System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
