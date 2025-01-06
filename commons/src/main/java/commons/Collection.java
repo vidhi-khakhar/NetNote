@@ -10,7 +10,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Entity Collection.
- * Has 2 fields: collectionUniqueName(modifiable), alias
+ * Has 3 fields: collectionUniqueName(modifiable), alias, server
  */
 @Entity // Marks this class as a JPA entity.
 public class Collection {
@@ -123,4 +123,6 @@ public class Collection {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
     }
+
+
 }
