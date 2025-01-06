@@ -6,6 +6,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Entity Note.
  * Has 3 fields: noteId(unmodifiable), title, text
@@ -32,6 +35,10 @@ public class Note {
      */
     private String text;
 
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EmbeddedFile> embeddedFiles;
+
+
     /**
      * Default constructor is requested by JPA.
      */
@@ -46,6 +53,7 @@ public class Note {
     public Note(String title, String text) {
         this.title = title;
         this.text = text;
+        embeddedFiles = new ArrayList<>();
     }
 
     /**
@@ -86,6 +94,16 @@ public class Note {
      */
     public void setText(String text) {
         this.text = text;
+    }
+
+    public void addEmbeddedFile(EmbeddedFile embeddedFile) {
+        embeddedFile.setNote(this);
+        embeddedFiles.add(embeddedFile);
+    }
+
+    public void removeEmbeddedFile(EmbeddedFile embeddedFile) {
+        embeddedFiles.remove(embeddedFile);
+        embeddedFile.setNote(null);
     }
 
     /**
