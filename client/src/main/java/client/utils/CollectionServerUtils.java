@@ -45,6 +45,7 @@ public class CollectionServerUtils {
             return "";
         }
     }
+
     /**
      * Method to check if an address corresponds to an available server.
      * The server must send a 200 OK response containing JSON when a
@@ -57,7 +58,7 @@ public class CollectionServerUtils {
     public boolean isServerAvailable(String address) {
         try {
             var response = ClientBuilder.newClient()
-                    .target(address)
+                    .target(address + "api/collections/")
                     .request()
                     .get();
             return response.getStatus() == 200;
@@ -73,7 +74,7 @@ public class CollectionServerUtils {
      * and an empty list if the request fails
      */
     public List<commons.Collection> getAllCollections() {
-        List<commons.Collection> collections = new ArrayList<Collection>();
+        List<commons.Collection> collections = new ArrayList<>();
         try {
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/")
@@ -113,6 +114,7 @@ public class CollectionServerUtils {
             e.printStackTrace();
         }
     }
+
     /**
      * Updates the alias of an existing collection.
      * Sends a POST request to the "api/collections/{uniqueName}" endpoint
@@ -121,7 +123,6 @@ public class CollectionServerUtils {
      * @param uniqueName The unique name of the collection.
      * @param newAlias The new alias.
      */
-
     public void updateCollectionAlias(String uniqueName, String newAlias) {
         try {
             var updatedCollection = new commons.Collection();
@@ -163,11 +164,52 @@ public class CollectionServerUtils {
         }
     }
 
+    /**
+     * Adds a note to a specified collection.
+     * Sends a POST request to the "api/collections/{uniqueName}/notes/{noteTitle}" endpoint.
+     *
+     * @param uniqueName The unique name of the collection.
+     * @param noteTitle The title of the note to added.
+     */
     public void addNoteToCollection(String uniqueName, String noteTitle) {
-
+        try {
+            var response = ClientBuilder.newClient()
+                    .target(serverAddress + "api/collections/" + uniqueName + "/notes/" + noteTitle)
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(null);
+            if (response.getStatus() == 200) {
+                System.out.println("Note added to collection successfully.");
+            } else {
+                System.out.println("Failed to add note to collection. Status: " + response.getStatus());
+                System.out.println("Response message: " + response.readEntity(String.class));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Moves a note from one collection to another.
+     * Sends a POST request to the "api/collections/{uniqueName}/notes/{noteTitle}/move/{targetUniqueName}" endpoint.
+     *
+     * @param uniqueName The unique name of the source collection.
+     * @param noteTitle The title of the note to move.
+     * @param targetUniqueName The unique name of the target collection.
+     */
     public void moveNoteToAnotherCollection(String uniqueName, String noteTitle, String targetUniqueName) {
-
+        try {
+            var response = ClientBuilder.newClient()
+                    .target(serverAddress + "api/collections/" + uniqueName + "/notes/" + noteTitle + "/move/" + targetUniqueName)
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(null);
+            if (response.getStatus() == 200) {
+                System.out.println("Note moved to another collection successfully.");
+            } else {
+                System.out.println("Failed to move note. Status: " + response.getStatus());
+                System.out.println("Response message: " + response.readEntity(String.class));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
