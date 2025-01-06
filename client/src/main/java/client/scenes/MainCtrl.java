@@ -628,10 +628,7 @@ public class MainCtrl {
         } else {
             renderedNoteTitleLabel.setText(updatedTitle);
         }
-        Note selectedNote = null;
-        if (selectedNoteIndex >= 0) {
-            selectedNote = savedNotes.get(selectedNoteIndex);
-        }
+        Note selectedNote = getCurrentNote();
 
         if (selectedNote != null) {
             previousTitle = selectedNote.getTitle();
@@ -771,15 +768,23 @@ public class MainCtrl {
     }
 
     /**
+     * Returns the currently opened note.
+     * @return currently displayed note.
+     */
+    public Note getCurrentNote(){
+        Note currentNote = null;
+        if (selectedNoteIndex >= 0 && selectedNoteIndex < savedNotes.size()) {
+            currentNote = savedNotes.get(selectedNoteIndex);
+        }
+        return currentNote;
+    }
+    /**
      *  This method filters the notesList based on a given search query,
      *  and it refreshes the notesList to display only the matching notes.
      * @param query the text entered by the user in the search bar
      */
     public void handleSearch(String query) {
-        Note currentNote = null;
-        if (selectedNoteIndex >= 0 && selectedNoteIndex < savedNotes.size()) {
-            currentNote = savedNotes.get(selectedNoteIndex);
-        }
+        Note currentNote = getCurrentNote();
 
         if (query.trim().isEmpty()) {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
