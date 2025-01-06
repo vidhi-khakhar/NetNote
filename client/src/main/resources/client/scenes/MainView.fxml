@@ -27,14 +27,6 @@
                      <Insets left="5.0" top="5.0" />
                   </HBox.margin>
                </TextField>
-               <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" prefWidth="27.0" style="-fx-background-color: #6fbed5; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="🔎">
-                  <HBox.margin>
-                     <Insets left="5.0" right="5.0" top="5.0" />
-                  </HBox.margin>
-                  <font>
-                     <Font size="10.0" />
-                  </font>
-               </Button>
             </HBox>
          </HBox>
          <HBox maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
