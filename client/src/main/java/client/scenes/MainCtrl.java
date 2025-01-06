@@ -3,6 +3,7 @@ package client.scenes;
 import client.Main;
 import client.config.ConfigLoader;
 import client.components.Notification;
+import client.utils.NoteSearchUtils;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;
@@ -45,6 +46,7 @@ public class MainCtrl {
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
 
     private final Map<String, StringProperty> props = new HashMap<>();
+    private final Map<Note, Integer> indexMap = new HashMap<>();
     private Scene mainView;
     private Stage stage;
 
@@ -62,9 +64,6 @@ public class MainCtrl {
 
     @FXML
     private TextField searchBar;
-
-    @FXML
-    private Button searchButton;
 
     @FXML
     private ImageView selectedLanguageImage;
@@ -184,7 +183,12 @@ public class MainCtrl {
                 .getSelectionModel()
                 .selectedItemProperty()
                 .addListener((_, _, selectedNote) -> {
-                    selectedNoteIndex = notesList.getSelectionModel().getSelectedIndex();
+                    if (indexMap.containsKey(selectedNote)) {
+                        selectedNoteIndex = indexMap.get(selectedNote);
+                    } else {
+                        selectedNoteIndex = savedNotes.indexOf(selectedNote);
+                    }
+
                     if (selectedNote != null) {
                         System.out.println("The selected note is on index:" + selectedNoteIndex);
                         noteTitleInput.setText(selectedNote.getTitle());
@@ -203,6 +207,10 @@ public class MainCtrl {
                 props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
             }
+        });
+
+        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+            handleSearch(newValue);
         });
 
         initializeShortcuts();
@@ -297,6 +305,11 @@ public class MainCtrl {
      */
     public void handleAddNote() {
 
+        if(!getCurrentQuery().isEmpty()){
+            searchBar.clear();
+            handleSearch("");
+        }
+
         TextInputDialog dialog = new TextInputDialog();
         dialog.titleProperty().bind(props.get("addDialogTitle"));
         dialog.contentTextProperty().bind(props.get("addDialogText"));
@@ -317,6 +330,8 @@ public class MainCtrl {
                 Note newNote = new Note(title.trim(), "");
                 savedNotes.add(newNote);
                 noteServerUtils.storeNote(newNote);
+                indexMap.put(newNote, savedNotes.size() - 1);
+                notesList.setItems(savedNotes);
                 notesList.getSelectionModel().select(savedNotes.size() - 1);
                 noteTitleInput.setText(newNote.getTitle());
                 noteEditor.setText(newNote.getText());
@@ -334,6 +349,10 @@ public class MainCtrl {
                         this));
 
                 noteEditor.requestFocus();
+
+                if (!getCurrentQuery().isEmpty()) {
+                    handleSearch(getCurrentQuery());
+                }
             }
         });
     }
@@ -360,6 +379,11 @@ public class MainCtrl {
      * or the user cancelled the operation.
      */
     public boolean handleDeleteNote(int index, boolean isAddedToUndoStack) {
+
+        String previousQuery = getCurrentQuery();
+        if(!getCurrentQuery().isEmpty()){
+            handleSearch("");
+        }
         if (index == -1) {
             showPopUp(props.get("deleteNoteWarningTitle").get(),
                     props.get("deleteNoteWarningText").get(),
@@ -384,6 +408,7 @@ public class MainCtrl {
                         this));
             }
             commitDeleteNote(index);
+            handleSearch(previousQuery);
             return true;
         } else {
             updateDisplay();
@@ -592,7 +617,7 @@ public class MainCtrl {
      */
     public void updateTitle() {
         String updatedTitle = noteTitleInput.getText();
-        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
+        String previousTitle;
 
         renderedNoteTitleLabel.textProperty().unbind();
         if (updatedTitle.isEmpty()) {
@@ -603,30 +628,44 @@ public class MainCtrl {
         } else {
             renderedNoteTitleLabel.setText(updatedTitle);
         }
+        Note selectedNote = getCurrentNote();
 
         if (selectedNote != null) {
-            notesList.refresh();
-            if (isTitlePresent(selectedNote.getTitle())) {
-                if (!isTitlePresent(updatedTitle)) {
-                    HashMap<String, String> patch = new HashMap<>();
-                    patch.put("title", updatedTitle);
-                    noteServerUtils.updateNote(selectedNote.getTitle(), patch);
-                    selectedNote.setTitle(updatedTitle);
-                } else if (!updatedTitle.equals(selectedNote.getTitle())) {
-                    showPopUp(props.get("invalidTitleAlertTitle").get(),
-                            props.get("invalidTitleAlertTitleExists").get(),
-                            Alert.AlertType.ERROR);
-                }
+            previousTitle = selectedNote.getTitle();
+            if (!updatedTitle.equals(previousTitle) && isTitlePresent(updatedTitle)) {
+                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                        props.get("invalidTitleAlertTitleExists").get(),
+                        Alert.AlertType.ERROR);
             }
-        } else if (selectedNoteIndex == -1 &&
+
+            selectedNote.setTitle(updatedTitle);
+
+            try {
+                noteServerUtils.updateNote(previousTitle, Map.of("title", updatedTitle));
+            } catch (Exception e) {
+                selectedNote.setTitle(previousTitle);
+                return;
+            }
+
+            if (notesList.getItems().contains(selectedNote)) {
+                notesList.refresh();
+            }
+        } else if (selectedNote == null &&
                 (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
             // Ensure the first note is created when only content exists
             String noteContent = noteEditor.getText();
             Note firstNote = new Note(updatedTitle, noteContent);
             savedNotes.add(firstNote);
-            selectedNoteIndex = 0;
-            notesList.getSelectionModel().select(0);
+            selectedNoteIndex = savedNotes.size()-1;
+            indexMap.put(firstNote, savedNotes.size() -1);
+            notesList.setItems(FXCollections.observableArrayList(savedNotes));
+            notesList.getSelectionModel().select(selectedNoteIndex);
             notesList.refresh();
+            noteServerUtils.storeNote(firstNote);
+
+            renderedNoteTitleLabel.textProperty().unbind();
+            renderedNoteTitleLabel.setText(updatedTitle);
+            renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(noteContent));
         }
     }
 
@@ -726,6 +765,68 @@ public class MainCtrl {
             noteEditor.positionCaret(cursorPos + 3);
             noteEditor.requestFocus();
         }
+    }
+
+    /**
+     * Returns the currently opened note.
+     * @return currently displayed note.
+     */
+    public Note getCurrentNote(){
+        Note currentNote = null;
+        if (selectedNoteIndex >= 0 && selectedNoteIndex < savedNotes.size()) {
+            currentNote = savedNotes.get(selectedNoteIndex);
+        }
+        return currentNote;
+    }
+    /**
+     *  This method filters the notesList based on a given search query,
+     *  and it refreshes the notesList to display only the matching notes.
+     * @param query the text entered by the user in the search bar
+     */
+    public void handleSearch(String query) {
+        Note currentNote = getCurrentNote();
+
+        if (query.trim().isEmpty()) {
+            notesList.setItems(FXCollections.observableArrayList(savedNotes));
+            indexMap.clear();
+            for (int i = 0; i < savedNotes.size(); i++) {
+                indexMap.put(savedNotes.get(i), i);
+            }
+
+            if (currentNote != null) {
+                selectedNoteIndex = savedNotes.indexOf(currentNote);
+                notesList.getSelectionModel().select(selectedNoteIndex);
+            }
+            return;
+        }
+
+        List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
+
+        indexMap.clear();
+        for (Note note : searchedNotes) {
+            indexMap.put(note, savedNotes.indexOf(note));
+        }
+
+        ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
+        notesList.setItems(filteredNotes);
+
+        if (currentNote != null && !filteredNotes.contains(currentNote)) {
+            selectedNoteIndex = savedNotes.indexOf(currentNote);
+        }
+        if (!filteredNotes.isEmpty() && currentNote == null) {
+            notesList.getSelectionModel().clearSelection();
+        }
+        if (filteredNotes.isEmpty()) {
+            notesList.setPlaceholder(new Label("No notes match your search query."));
+        }
+    }
+
+    /**
+     * Returns the currently searched query
+     * @return current text in search bar
+     */
+    public String getCurrentQuery() {
+        return searchBar.getText().trim();
     }
 
     /**
