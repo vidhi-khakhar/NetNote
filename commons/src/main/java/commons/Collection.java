@@ -64,14 +64,6 @@ public class Collection {
     }
 
     /**
-     * Setter for collectionUniqueName.
-     * @param collectionUniqueName
-     */
-    public void setCollectionUniqueName(String collectionUniqueName) {
-        this.collectionUniqueName = collectionUniqueName;
-    }
-
-    /**
      * Getter for alias.
      *
      * @return alias

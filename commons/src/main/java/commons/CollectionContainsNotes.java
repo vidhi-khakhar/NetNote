@@ -75,25 +75,6 @@ public class CollectionContainsNotes {
     }
 
     /**
-     * Sets the ID of the associated Collection from the composite primary key.
-     *
-     * @return The ID of the Collection.
-     */
-    public String setCollectionId() {
-        return id.getCollectionId();
-    }
-
-    /**
-     * Sets the ID of the associated Note from the composite primary key.
-     *
-     * @return The ID of the Note.
-     */
-    public Long setNoteId() {
-        return id.getNoteId();
-    }
-
-
-    /**
      * @param anotherCollectionContainsNotes another anotherCollectionContainsNotes
      * @return whether two anotherCollectionContainsNotes are equal
      */
