@@ -113,10 +113,34 @@ public class CollectionServerUtils {
             e.printStackTrace();
         }
     }
+    /**
+     * Updates the alias of an existing collection.
+     * Sends a POST request to the "api/collections/{uniqueName}" endpoint
+     * with the new alias.
+     *
+     * @param uniqueName The unique name of the collection.
+     * @param newAlias The new alias.
+     */
 
     public void updateCollectionAlias(String uniqueName, String newAlias) {
-
+        try {
+            var updatedCollection = new commons.Collection();
+            updatedCollection.setAlias(newAlias);
+            var response = ClientBuilder.newClient()
+                    .target(serverAddress + "api/collections/" + uniqueName)
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.entity(updatedCollection, MediaType.APPLICATION_JSON));
+            if (response.getStatus() == 200) {
+                System.out.println("Collection alias updated successfully.");
+            } else {
+                System.out.println("Failed to update collection alias. Status: " + response.getStatus());
+                System.out.println("Response message: " + response.readEntity(String.class));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 
     public void deleteCollection(String uniqueName) {
 
