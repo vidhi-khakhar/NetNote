@@ -653,7 +653,7 @@ public class MainCtrl {
             if (notesList.getItems().contains(selectedNote)) {
                 notesList.refresh();
             }
-        } else if (selectedNoteIndex == -1 &&
+        } else if (selectedNote == null &&
                 (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty())) {
             // Ensure the first note is created when only content exists
             String noteContent = noteEditor.getText();
