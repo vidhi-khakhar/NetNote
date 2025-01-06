@@ -28,7 +28,8 @@ public class CollectionController {
      *
      * @param collectionRepository              The collection repository.
      * @param noteRepository                    The note repository.
-     * @param collectionContainsNotesRepository The repository managing relationships between collections and notes.
+     * @param collectionContainsNotesRepository
+     * The repository managing relationships between collections and notes.
      */
     @Autowired
     public CollectionController(CollectionRepository collectionRepository,
@@ -120,8 +121,9 @@ public class CollectionController {
      * @return status
      */
     @PostMapping("/{uniqueName}")
-    public ResponseEntity<String> updateCollectionAlias(@PathVariable("uniqueName") String uniqueName,
-                                                   @RequestBody Collection updatedCollection) {
+    public ResponseEntity<String> updateCollectionAlias
+    (@PathVariable("uniqueName") String uniqueName,
+                          @RequestBody Collection updatedCollection) {
         // find the collection by unique name
         Optional<Collection> collectionOptional = findCollectionByUniqueName(uniqueName);
         if (collectionOptional.isEmpty()) {
@@ -243,13 +245,13 @@ public class CollectionController {
      * @return A response entity containing a status message.
      */
     @PostMapping("/{uniqueName}/notes/{noteTitle}/move/{targetUniqueName}")
-    public ResponseEntity<String> moveNoteToAnotherCollection
-    (@PathVariable("uniqueName") String uniqueName,
-     @PathVariable("noteTitle") String noteTitle,
-     @PathVariable("targetUniqueName") String targetUniqueName) {
+    public ResponseEntity<String>
+           moveNoteToAnotherCollection( @PathVariable("uniqueName") String uniqueName,
+                                 @PathVariable("noteTitle") String noteTitle,
+                                 @PathVariable("targetUniqueName") String targetUniqueName) {
 
         // find the current collection and target collection by unique name
-        Optional<Collection>currentCollection = collectionRepository.findById(uniqueName);
+        Optional<Collection> currentCollection = collectionRepository.findById(uniqueName);
         Optional<Collection> targetCollection = collectionRepository.findById(targetUniqueName);
 
         if (currentCollection.isEmpty() || targetCollection.isEmpty()) {
@@ -309,7 +311,8 @@ public class CollectionController {
     /**
      * Method to find a collection by its unique name.
      * This method retrieves all collections and searches for the first collection
-     * which has a unique name that matches the provided one. It returns an {@link Optional} that contains the
+     * which has a unique name that matches the provided one.
+     * It returns an {@link Optional} that contains the
      * collection if found, or an empty {@link Optional} if no collection matches the unique name.
      *
      * @param uniqueName The unique name of the collection to search for.
