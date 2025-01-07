@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import server.database.CollectionContainsNotesRepository;
 import server.database.CollectionRepository;
+import server.database.NoteRepository;
 import server.utils.ServerUtils;
 
 import java.util.*;
@@ -20,6 +21,7 @@ public class CollectionController {
     private final CollectionRepository collectionRepository;
     private final CollectionContainsNotesRepository collectionContainsNotesRepository;
     private final ServerUtils serverUtils;
+    private final NoteRepository noteRepository;
 
     /**
      * Constructor for the collection controller.
@@ -28,16 +30,18 @@ public class CollectionController {
      * @param collectionRepository              The collection repository.
      * @param collectionContainsNotesRepository The repository managing relationships between
      *                                          collections and notes.
+     * @param noteRepository                    The note repository.
      * @param serverUtils                       An instance of the server utilities.
      */
     @Autowired
     public CollectionController(CollectionRepository collectionRepository,
                                 CollectionContainsNotesRepository
                                         collectionContainsNotesRepository,
-                                ServerUtils serverUtils) {
+                                ServerUtils serverUtils, NoteRepository noteRepository) {
         this.collectionRepository = collectionRepository;
         this.collectionContainsNotesRepository = collectionContainsNotesRepository;
         this.serverUtils = serverUtils;
+        this.noteRepository = noteRepository;
     }
 
     /**
@@ -155,6 +159,35 @@ public class CollectionController {
     }
 
     /**
+     * Gets all the notes from the collection with the given name
+     *
+     * @param uniqueName The name of the collection from which to fetch all the notes
+     * @return A list of all the notes in that collection, if the collection exists.
+     */
+    @GetMapping("/{uniqueName}/notes")
+    public ResponseEntity<List<Note>> getAllNotesInCollection(
+            @PathVariable("uniqueName") String uniqueName) {
+
+        Optional<Collection> collectionOptional = collectionRepository.findById(uniqueName);
+
+        if (collectionOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+
+        List<Note> notes = collectionContainsNotesRepository
+                .findAll()
+                .stream()
+                .filter(entry -> entry.getCollectionId().equals(uniqueName))
+                .map(CollectionContainsNotes::getNoteId)
+                .map(noteId -> noteRepository.findById(noteId).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+
+        return ResponseEntity.ok(notes);
+    }
+
+    /**
      * Adds a note to a collection.
      *
      * @param uniqueName The unique name of the collection.
@@ -254,8 +287,8 @@ public class CollectionController {
      */
     @DeleteMapping("/{uniqueName}/notes/{noteTitle}")
     public ResponseEntity<String> removeNoteFromCollection(
-            @PathVariable String uniqueName,
-            @PathVariable String noteTitle) {
+            @PathVariable("uniqueName") String uniqueName,
+            @PathVariable("noteTitle") String noteTitle) {
 
         Optional<Collection> collectionOptional = collectionRepository.findById(uniqueName);
         Optional<Note> noteOptional = serverUtils.getNoteByTitle(noteTitle);

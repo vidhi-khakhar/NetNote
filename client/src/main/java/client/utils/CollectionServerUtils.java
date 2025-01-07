@@ -2,6 +2,7 @@ package client.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Collection;
+import commons.Note;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -32,9 +33,10 @@ public class CollectionServerUtils {
 
     /**
      * Getter for the local address of the current device in the network.
+     *
      * @return The local address of the current device.
      */
-    public static String getLocalAddress(){
+    public static String getLocalAddress() {
         try {
             return "http://" + InetAddress.getLocalHost().getHostAddress() + ":8080/";
         } catch (UnknownHostException e) {
@@ -60,8 +62,7 @@ public class CollectionServerUtils {
             if (response.getStatus() == 200) {
                 collections = response.readEntity(new GenericType<List<Collection>>() {
                 });
-            }
-            else {
+            } else {
                 System.out.println("Failed to retrieve collections." +
                         " Status: " + response.getStatus());
             }
@@ -104,7 +105,7 @@ public class CollectionServerUtils {
      * with the new alias.
      *
      * @param uniqueName The unique name of the collection.
-     * @param newAlias The new alias.
+     * @param newAlias   The new alias.
      */
     public void updateCollectionAlias(String uniqueName, String newAlias) {
         try {
@@ -133,6 +134,7 @@ public class CollectionServerUtils {
     /**
      * Deletes a collection by its unique name.
      * Sends a DELETE request to the "api/collections/{uniqueName} endpoint.
+     *
      * @param uniqueName The uniqueName of the collection to delete.
      */
     public void deleteCollection(String uniqueName) {
@@ -154,11 +156,41 @@ public class CollectionServerUtils {
     }
 
     /**
+     * Retrieves all the notes from the collection with the given name.
+     * Makes a GET request to "api/collections/unique-name/notes"
+     *
+     * @param uniqueName The name of the collection to retrieve the notes from.
+     * @return The list of notes in that collection,
+     * if the collection exists.
+     */
+    public List<Note> getAllNotesInCollection(String uniqueName) {
+        try {
+            var response = ClientBuilder.newClient()
+                    .target(serverAddress + "api/collections/" + uniqueName + "/notes/")
+                    .request(MediaType.APPLICATION_JSON)
+                    .get();
+            if (response.getStatus() == 200) {
+                System.out.println("Notes retrieved successfully");
+                return response.readEntity(new GenericType<List<Note>>() {
+                });
+            } else {
+                System.out.println("Failed to retrieve notes from collection" +
+                        " Status: " + response.getStatus());
+                System.out.println("Response message: " + response.readEntity(String.class));
+            }
+        } catch (Exception e) {
+            System.err.println("An error occurred while retrieving the notes: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * Adds a note to a specified collection.
      * Sends a POST request to the "api/collections/{uniqueName}/notes/{noteTitle}" endpoint.
      *
      * @param uniqueName The unique name of the collection.
-     * @param noteTitle The title of the note to added.
+     * @param noteTitle  The title of the note to added.
      */
     public void addNoteToCollection(String uniqueName, String noteTitle) {
         try {
@@ -184,8 +216,8 @@ public class CollectionServerUtils {
      * Sends a POST request to the
      * "api/collections/{uniqueName}/notes/{noteTitle}/move/{targetUniqueName}" endpoint.
      *
-     * @param uniqueName The unique name of the source collection.
-     * @param noteTitle The title of the note to move.
+     * @param uniqueName       The unique name of the source collection.
+     * @param noteTitle        The title of the note to move.
      * @param targetUniqueName The unique name of the target collection.
      */
     public void moveNoteToAnotherCollection
@@ -217,7 +249,7 @@ public class CollectionServerUtils {
      * Makes a DELETE request to /api/collections/collection-name/notes/note-title
      *
      * @param collectionName The name of the collection from which to remove the note
-     * @param noteTitle The title used to identify the note to be removed
+     * @param noteTitle      The title used to identify the note to be removed
      */
     public void removeNoteFromCollection(String collectionName, String noteTitle) {
         try {
@@ -235,7 +267,7 @@ public class CollectionServerUtils {
                 System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
-            System.err.println("Error occurred while moving note to another collection: "
+            System.err.println("Error occurred while removing the note from the collection: "
                     + e.getMessage());
             e.printStackTrace();
         }
