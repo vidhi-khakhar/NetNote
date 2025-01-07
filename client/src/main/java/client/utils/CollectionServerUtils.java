@@ -6,7 +6,6 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
-import org.glassfish.jersey.client.ClientConfig;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -71,6 +70,7 @@ public class CollectionServerUtils {
                         " Status: " + response.getStatus());
             }
         } catch (Exception e) {
+            System.out.println("Error occurred while fetching collections: " + e.getMessage());
             e.printStackTrace();
         }
         return collections;
@@ -98,6 +98,7 @@ public class CollectionServerUtils {
                 System.out.println("Response message:" + response.readEntity(String.class));
             }
         } catch (Exception e) {
+            System.out.println("Error occurred while creating collection: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -129,6 +130,7 @@ public class CollectionServerUtils {
                 System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
+            System.out.println("Error occurred while updating collection alias: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -151,6 +153,7 @@ public class CollectionServerUtils {
                 System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
+            System.out.println("Error occurred while deleting collection: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -176,6 +179,7 @@ public class CollectionServerUtils {
                 System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
+            System.out.println("Error occurred while adding note to collection: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -207,6 +211,7 @@ public class CollectionServerUtils {
                 System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
+            System.out.println("Error occurred while moving note to another collection: " + e.getMessage());
             e.printStackTrace();
         }
     }
