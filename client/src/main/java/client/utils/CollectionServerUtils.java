@@ -11,16 +11,21 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CollectionServerUtils {
 
     private String serverAddress;
+    private final ObjectMapper mapper;
 
     /**
      * Default constructor for CollectionServerUtils.
      * Sets the default server address to the address of the current device.
      */
-    public CollectionServerUtils() {this.serverAddress = getLocalAddress();}
+    public CollectionServerUtils(ObjectMapper mapper) {
+        this.serverAddress = getLocalAddress();
+        this.mapper = mapper;
+    }
 
     /**
      * Getter for the server address
@@ -84,8 +89,7 @@ public class CollectionServerUtils {
      */
     public void createCollection(Collection collection) {
         try {
-            String jsonData = new ObjectMapper()
-                    .writeValueAsString(collection);
+            String jsonData = mapper.writeValueAsString(collection);
 
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/")
@@ -116,7 +120,7 @@ public class CollectionServerUtils {
             var updatedCollection = new Collection();
             updatedCollection.setAlias(newAlias);
 
-            String jsonData = new ObjectMapper().writeValueAsString(updatedCollection);
+            String jsonData = mapper.writeValueAsString(updatedCollection);
 
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/" + uniqueName)
