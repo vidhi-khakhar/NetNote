@@ -9,13 +9,7 @@ import java.util.*;
 @Service
 public class ServerUtils {
 
-    private NoteRepository noteRepo;
-
-    /**
-     * Default constructor used for dependency injection
-     */
-    public ServerUtils() {
-    }
+    private final NoteRepository noteRepo;
 
     /**
      * Constructor containing the dependencies of {@link ServerUtils}

@@ -18,19 +18,10 @@ package server;
 import org.springframework.context.annotation.Bean;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Configuration;
-import server.utils.ServerUtils;
 
 @Configuration
 public class Config {
 
-    /**
-     * Provider for the server utils
-     * @return An instance of the server utils
-     */
-    @Bean
-    public ServerUtils serverUtils() {
-        return new ServerUtils();
-    }
     /**
      * Creates and returns an ObjectMapper bean.
      * @return a new instance of ObjectMapper
