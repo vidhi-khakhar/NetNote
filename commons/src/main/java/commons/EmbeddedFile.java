@@ -16,13 +16,14 @@ public class EmbeddedFile {
      */
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
      * Name of the Embedded File
      */
 
+    @Column(nullable = false)
     private String name;
 
     /**

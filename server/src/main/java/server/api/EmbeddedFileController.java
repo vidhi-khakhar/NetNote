@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.EmbeddedFile;
+import commons.Note;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,46 +31,74 @@ public class EmbeddedFileController {
         return embeddedFileRepository.findAll();
     }
 
-    @PostMapping("/{noteId}")
-    public void storeFile(@PathVariable Long noteId, @RequestBody MultipartFile file) throws IOException {
+    @PostMapping("/{noteName}")
+    public ResponseEntity<String> storeFile(@PathVariable String noteName, @RequestBody MultipartFile file) throws IOException {
         EmbeddedFile embeddedFile = new EmbeddedFile();
         embeddedFile.setName(file.getOriginalFilename());
         embeddedFile.setType(file.getContentType());
         embeddedFile.setData(file.getBytes());
-        noteRepository.findById(noteId).get().addEmbeddedFile(embeddedFile);
-        embeddedFileRepository.save(embeddedFile);
+
+        Optional<EmbeddedFile> fileAlreadyExists = embeddedFileRepository.findAll()
+                .stream()
+                .filter(f -> f.getName().equals(embeddedFile.getName()))
+                .findFirst();
+        if(fileAlreadyExists.isPresent())
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("A file with the same name already exists");
+
+        Optional<Note> note = noteRepository.findAll()
+                .stream()
+                .filter(x -> x.getTitle().equals(noteName))
+                .findFirst();
+        if(note.isPresent()) {
+            embeddedFile.setNote(note.get());
+            note.get().addEmbeddedFile(embeddedFile);
+            embeddedFileRepository.save(embeddedFile);
+            return ResponseEntity.status(HttpStatus.CREATED).body("File successfully stored");
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Note not found");
     }
 
-    @PostMapping("/updateTitle/{fileId}")
-    public ResponseEntity<String> updateFileTitle(@PathVariable Long fileId, @RequestBody String title) {
-        Optional<EmbeddedFile> embeddedFile = embeddedFileRepository.findById(fileId);
-        if (embeddedFile.isPresent()) {
-            String type = embeddedFile.get().getType().substring(embeddedFile.get().getType().indexOf("/") + 1);
-            embeddedFile.get().setName(title + "." + type);
-            embeddedFileRepository.save(embeddedFile.get());
-            return ResponseEntity.status(HttpStatus.OK).body("Successfully changed title to " + title);
+    @PostMapping("/updateTitle/{fileName}")
+    public ResponseEntity<String> updateFileTitle(@PathVariable String fileName, @RequestBody String title) {
+        if(title.isBlank())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Title cannot be empty");
+        Optional<EmbeddedFile> file = embeddedFileRepository.findAll()
+                .stream()
+                .filter(embeddedFile -> embeddedFile.getName().equals(fileName))
+                .findFirst();
+        if (file.isPresent()) {
+            String type = file.get().getType().substring(file.get().getType().indexOf("/") + 1);
+            file.get().setName(title + "." + type);
+            embeddedFileRepository.save(file.get());
+            return ResponseEntity.status(HttpStatus.OK).body("Successfully changed title to " + title + ".");
         }
         else
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
     }
 
-    @GetMapping("/get/{fileId}")
-    public ResponseEntity<byte[]> getImageFile(@PathVariable Long fileId){
-        Optional<EmbeddedFile> embeddedFile = embeddedFileRepository.findById(fileId);
-        if(embeddedFile.isPresent()){
-            if(!embeddedFile.get()
-                    .getType()
-                    .substring(0, embeddedFile.get().getType().indexOf('/'))
-                    .equals("image"))
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.parseMediaType(embeddedFile.get().getType())).body(embeddedFile.get().getData());
+    @GetMapping("/get/{fileName}")
+    public ResponseEntity<byte[]> getFile(@PathVariable String fileName){
+        Optional<EmbeddedFile> file = embeddedFileRepository.findAll()
+                .stream()
+                .filter(embeddedFile -> embeddedFile.getName().equals(fileName))
+                .findFirst();
+        if(file.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.parseMediaType(file.get().getType())).body(file.get().getData());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @DeleteMapping("/delete/{fileId}")
-    public ResponseEntity<String> deleteFile(@PathVariable Long fileId){
-        embeddedFileRepository.deleteById(fileId);
-        return ResponseEntity.ok("Successfully deleted file");
+    @DeleteMapping("/delete/{fileName}")
+    public ResponseEntity<String> deleteFile(@PathVariable String fileName){
+        Optional<EmbeddedFile> file = embeddedFileRepository.findAll()
+                .stream()
+                .filter(embeddedFile -> embeddedFile.getName().equals(fileName))
+                .findFirst();
+        if(file.isPresent()) {
+            noteRepository.getById(file.get().getNote().getNoteId()).removeEmbeddedFile(file.get());
+            embeddedFileRepository.deleteById(file.get().getId());
+            return ResponseEntity.ok("Successfully deleted file");
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
     }
 }
