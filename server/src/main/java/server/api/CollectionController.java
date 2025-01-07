@@ -8,7 +8,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import server.database.CollectionContainsNotesRepository;
 import server.database.CollectionRepository;
-import server.database.NoteRepository;
+import server.utils.ServerUtils;
 
 
 import java.util.*;
@@ -19,26 +19,26 @@ import java.util.*;
 public class CollectionController {
 
     private final CollectionRepository collectionRepository;
-    private final NoteRepository noteRepository;
     private final CollectionContainsNotesRepository collectionContainsNotesRepository;
+    private final ServerUtils serverUtils;
 
     /**
      * Constructor for the collection controller.
      * Used to inject the database repositories as dependencies.
      *
      * @param collectionRepository              The collection repository.
-     * @param noteRepository                    The note repository.
-     * @param collectionContainsNotesRepository
-     * The repository managing relationships between collections and notes.
+     * @param collectionContainsNotesRepository The repository managing relationships between
+     *                                          collections and notes.
+     * @param serverUtils                       An instance of the server utilities.
      */
     @Autowired
     public CollectionController(CollectionRepository collectionRepository,
-                                NoteRepository noteRepository,
                                 CollectionContainsNotesRepository
-                                        collectionContainsNotesRepository) {
+                                        collectionContainsNotesRepository,
+                                ServerUtils serverUtils) {
         this.collectionRepository = collectionRepository;
-        this.noteRepository = noteRepository;
         this.collectionContainsNotesRepository = collectionContainsNotesRepository;
+        this.serverUtils = serverUtils;
     }
 
     /**
@@ -122,8 +122,7 @@ public class CollectionController {
      */
     @PostMapping("/{uniqueName}")
     public ResponseEntity<String> updateCollectionAlias
-    (@PathVariable("uniqueName") String uniqueName,
-                          @RequestBody Collection updatedCollection) {
+    (@PathVariable("uniqueName") String uniqueName, @RequestBody Collection updatedCollection) {
         // find the collection by unique name
         Optional<Collection> collectionOptional = findCollectionByUniqueName(uniqueName);
         if (collectionOptional.isEmpty()) {
@@ -205,12 +204,7 @@ public class CollectionController {
                     .body("Collection with the specified unique name does not exist.");
         }
 
-        // find the note by title
-        List<Note> allNotes = noteRepository.findAll();
-        Optional<Note> noteOptional = allNotes
-                .stream()
-                .filter(note -> note.getTitle().equals(noteTitle))
-                .findFirst();
+        Optional<Note> noteOptional = serverUtils.getNoteByTitle(noteTitle);
 
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -245,10 +239,10 @@ public class CollectionController {
      * @return A response entity containing a status message.
      */
     @PostMapping("/{uniqueName}/notes/{noteTitle}/move/{targetUniqueName}")
-    public ResponseEntity<String>
-           moveNoteToAnotherCollection( @PathVariable("uniqueName") String uniqueName,
-                                 @PathVariable("noteTitle") String noteTitle,
-                                 @PathVariable("targetUniqueName") String targetUniqueName) {
+    public ResponseEntity<String> moveNoteToAnotherCollection(
+            @PathVariable("uniqueName") String uniqueName,
+            @PathVariable("noteTitle") String noteTitle,
+            @PathVariable("targetUniqueName") String targetUniqueName) {
 
         // find the current collection and target collection by unique name
         Optional<Collection> currentCollection = collectionRepository.findById(uniqueName);
@@ -259,12 +253,7 @@ public class CollectionController {
                     .body("One or both collections do not exist.");
         }
 
-        // find the note by title
-        List<Note> allNotes = noteRepository.findAll();
-        Optional<Note> noteOptional = allNotes
-                .stream()
-                .filter(note -> note.getTitle().equals(noteTitle))
-                .findFirst();
+        Optional<Note> noteOptional = serverUtils.getNoteByTitle(noteTitle);
 
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -282,7 +271,7 @@ public class CollectionController {
                         relation.getCollectionId()
                                 .equals(currentCollection
                                         .get().getCollectionUniqueName()) &&
-                        relation.getNoteId().equals(noteOptional.get().getNoteId()))
+                                relation.getNoteId().equals(noteOptional.get().getNoteId()))
                 .findFirst()
                 .orElse(null);
 
