@@ -1,11 +1,11 @@
-| Key          | Value                                                                       |
-|--------------|-----------------------------------------------------------------------------|
-| Date         | 18.12.2024                                                                  |
-| Time         | 13:45                                                                       |
-| Location     | DW PC1 Cubicle 6                                                            |
-| Chair        | Michał Barciński                                                            |
-| Minute Taker | Łukasz Kasprzak                                                            |
-| Attendees    | Vidhi Khakhar <br/> Yoanna Dyakova <br/> Serban Untu <br/> Radu Malmare |
+| Key          | Value                           |
+|--------------|---------------------------------|
+| Date         | 18.12.2024                      |
+| Time         | 13:45                           |
+| Location     | DW PC1 Cubicle 6                |
+| Chair        | Michał Barciński                |
+| Minute Taker | Radu Malmare                    |
+| Attendees    | Vidhi Khakhar <br/> Serban Untu |
 
 # Estimated Time: 31 minutes
 
