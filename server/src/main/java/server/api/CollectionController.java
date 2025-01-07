@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.CollectionContainsNotes;
+import commons.CollectionContainsNotesId;
 import commons.Note;
 import commons.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -224,27 +225,14 @@ public class CollectionController {
                     .body("Note with the specified title does not exist.");
         }
 
-        // Retrieve all CollectionContainsNotes relationships
-        List<CollectionContainsNotes> allRelations = collectionContainsNotesRepository.findAll();
+        CollectionContainsNotesId relId =
+                new CollectionContainsNotesId(uniqueName, noteOptional.get().getNoteId());
 
-        // find the relationship where the note exists in the current collection
-        CollectionContainsNotes currentRelation = allRelations
-                .stream()
-                .filter(relation ->
-                        relation.getCollectionId()
-                                .equals(currentCollection
-                                        .get().getCollectionUniqueName()) &&
-                                relation.getNoteId().equals(noteOptional.get().getNoteId()))
-                .findFirst()
-                .orElse(null);
-
-        if (currentRelation == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Note is not part of the current collection.");
+        if (!collectionContainsNotesRepository.existsById(relId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Note is not part of this collection.");
         }
-
-        // remove the note from the current collection
-        collectionContainsNotesRepository.delete(currentRelation);
+        collectionContainsNotesRepository.deleteById(relId);
 
         // add the note to the target collection
         CollectionContainsNotes newRelation = new CollectionContainsNotes(
@@ -254,5 +242,42 @@ public class CollectionController {
 
         collectionContainsNotesRepository.save(newRelation);
         return ResponseEntity.ok("Note moved successfully.");
+    }
+
+    /**
+     * After successfully calling this method, the note with the given title
+     * will no longer be part of the collection with the given name.
+     *
+     * @param uniqueName The name of the collection to remove the note from.
+     * @param noteTitle  The name of the note to be removed.
+     * @return A message detailing whether the removal was successful or not.
+     */
+    @DeleteMapping("/{uniqueName}/notes/{noteTitle}")
+    public ResponseEntity<String> removeNoteFromCollection(
+            @PathVariable String uniqueName,
+            @PathVariable String noteTitle) {
+
+        Optional<Collection> collectionOptional = collectionRepository.findById(uniqueName);
+        Optional<Note> noteOptional = serverUtils.getNoteByTitle(noteTitle);
+
+        if (collectionOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("The collection with the given title does not exist.");
+        }
+        if (noteOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("The note with the given title does not exist.");
+        }
+
+        CollectionContainsNotesId relId =
+                new CollectionContainsNotesId(uniqueName, noteOptional.get().getNoteId());
+
+        if (!collectionContainsNotesRepository.existsById(relId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Note is not part of this collection.");
+        }
+
+        collectionContainsNotesRepository.deleteById(relId);
+        return ResponseEntity.ok("The note is no longer part of this collection");
     }
 }
