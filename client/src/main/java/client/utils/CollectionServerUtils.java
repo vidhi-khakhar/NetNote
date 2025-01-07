@@ -211,4 +211,33 @@ public class CollectionServerUtils {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Removes a note from a collection if the given note is in that collection.
+     * Makes a DELETE request to /api/collections/collection-name/notes/note-title
+     *
+     * @param collectionName The name of the collection from which to remove the note
+     * @param noteTitle The title used to identify the note to be removed
+     */
+    public void removeNoteFromCollection(String collectionName, String noteTitle) {
+        try {
+            var response = ClientBuilder.newClient()
+                    .target(serverAddress + "api/collections/"
+                            + collectionName + "/notes/"
+                            + noteTitle)
+                    .request(MediaType.APPLICATION_JSON)
+                    .delete();
+            if (response.getStatus() == 200) {
+                System.out.println("Note removed from collection successfully.");
+            } else {
+                System.out.println("Failed to remove note." +
+                        " Status: " + response.getStatus());
+                System.out.println("Response message: " + response.readEntity(String.class));
+            }
+        } catch (Exception e) {
+            System.err.println("Error occurred while moving note to another collection: "
+                    + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
