@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class CollectionServerUtils {
 
@@ -21,6 +20,8 @@ public class CollectionServerUtils {
     /**
      * Default constructor for CollectionServerUtils.
      * Sets the default server address to the address of the current device.
+     *
+     * @param mapper The ObjectMapper instance used for converting objects to JSON.
      */
     public CollectionServerUtils(ObjectMapper mapper) {
         this.serverAddress = getLocalAddress();
