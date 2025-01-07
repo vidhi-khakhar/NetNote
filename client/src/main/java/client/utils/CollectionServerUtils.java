@@ -1,5 +1,6 @@
 package client.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Collection;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
@@ -17,7 +18,7 @@ public class CollectionServerUtils {
     private String serverAddress;
 
     /**
-     * Default constructor for NoteServerUtils used by Guice
+     * Default constructor for CollectionServerUtils.
      * Sets the default server address to the address of the current device.
      */
     public CollectionServerUtils() {this.serverAddress = getLocalAddress();}
@@ -48,35 +49,13 @@ public class CollectionServerUtils {
     }
 
     /**
-     * Method to check if an address corresponds to an available server.
-     * The server must send a 200 OK response containing JSON when a
-     * GET request is made to /api/notes for it to be considered available.
-     *
-     * @param address The address of the server to try to connect to.
-     * @return {@code true} if the server is reachable and valid and
-     * {@code false} otherwise
-     */
-    public boolean isServerAvailable(String address) {
-        try {
-            if (ClientBuilder.newClient(new ClientConfig())
-                    .target(address + "api/collections/")
-                    .request(MediaType.APPLICATION_JSON)
-                    .get()
-                    .getStatus() != 200) return false;
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * This method sends a GET request to the "api/collections/" endpoint to fetch all notes.
      *
      * @return a list of all collections if the server responds with an HTTP status code 200
      * and an empty list if the request fails
      */
-    public List<commons.Collection> getAllCollections() {
-        List<commons.Collection> collections = new ArrayList<>();
+    public List<Collection> getAllCollections() {
+        List<Collection> collections = new ArrayList<>();
         try {
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/")
@@ -103,12 +82,15 @@ public class CollectionServerUtils {
      *
      * @param collection The collection to created and stored on the server.
      */
-    public void createCollection(commons.Collection collection) {
+    public void createCollection(Collection collection) {
         try {
+            String jsonData = new ObjectMapper()
+                    .writeValueAsString(collection);
+
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/")
                     .request(MediaType.APPLICATION_JSON)
-                    .put(Entity.entity(collection, MediaType.APPLICATION_JSON));
+                    .put(Entity.entity(jsonData, MediaType.APPLICATION_JSON));
             if (response.getStatus() == 201) {
                 System.out.println("collection created");
             } else {
@@ -130,12 +112,15 @@ public class CollectionServerUtils {
      */
     public void updateCollectionAlias(String uniqueName, String newAlias) {
         try {
-            var updatedCollection = new commons.Collection();
+            var updatedCollection = new Collection();
             updatedCollection.setAlias(newAlias);
+
+            String jsonData = new ObjectMapper().writeValueAsString(updatedCollection);
+
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/" + uniqueName)
                     .request(MediaType.APPLICATION_JSON)
-                    .post(Entity.entity(updatedCollection, MediaType.APPLICATION_JSON));
+                    .post(Entity.entity(jsonData, MediaType.APPLICATION_JSON));
             if (response.getStatus() == 200) {
                 System.out.println("Collection alias updated successfully.");
             } else {
