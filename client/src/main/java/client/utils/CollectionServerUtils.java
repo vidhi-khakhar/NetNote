@@ -211,7 +211,8 @@ public class CollectionServerUtils {
                 System.out.println("Response message: " + response.readEntity(String.class));
             }
         } catch (Exception e) {
-            System.out.println("Error occurred while moving note to another collection: " + e.getMessage());
+            System.out.println("Error occurred while moving note to another collection: "
+                    + e.getMessage());
             e.printStackTrace();
         }
     }
