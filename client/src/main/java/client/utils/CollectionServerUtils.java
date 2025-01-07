@@ -29,18 +29,6 @@ public class CollectionServerUtils {
     }
 
     /**
-     * Getter for the server address
-     * @return Getter for the server address
-     */
-    public String getServerAddress() {return serverAddress;}
-
-    /**
-     * Setter for the server address
-     * @param serverAddress The new server address
-     */
-    public void setServerAddress(String serverAddress) {this.serverAddress = serverAddress;}
-
-    /**
      * Getter for the local address of the current device in the network.
      * @return The local address of the current device.
      */
