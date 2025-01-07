@@ -14,7 +14,7 @@ import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuer
 
 public class TestCollectionRepository implements CollectionRepository {
 
-    public final Map<Long, Collection> Collections = new HashMap<>();
+    public final Map<String, Collection> Collections = new HashMap<>();
     public final List<String> calledMethods = new ArrayList<>();
 
     private void call(String name) {
@@ -34,7 +34,7 @@ public class TestCollectionRepository implements CollectionRepository {
     }
 
     @Override
-    public List<Collection> findAllById(Iterable<Long> ids) {
+    public List<Collection> findAllById(Iterable<String> ids) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -70,7 +70,7 @@ public class TestCollectionRepository implements CollectionRepository {
     }
 
     @Override
-    public void deleteAllByIdInBatch(Iterable<Long> ids) {
+    public void deleteAllByIdInBatch(Iterable<String> ids) {
         // TODO Auto-generated method stub
 
     }
@@ -82,24 +82,24 @@ public class TestCollectionRepository implements CollectionRepository {
     }
 
     @Override
-    public Collection getOne(Long id) {
+    public Collection getOne(String id) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Collection getById(Long id) {
+    public Collection getById(String id) {
         call("getById");
         return find(id).get();
     }
 
     @Override
-    public Collection getReferenceById(Long id) {
+    public Collection getReferenceById(String id) {
         call("getReferenceById");
         return find(id).get();
     }
 
-    private Optional<Collection> find(Long id) {
+    private Optional<Collection> find(String id) {
         Collection Collection = Collections.get(id);
         if (Collection == null) return Optional.empty();
         return Optional.of(Collection);
@@ -126,18 +126,18 @@ public class TestCollectionRepository implements CollectionRepository {
     @Override
     public <S extends Collection> S save(S entity) {
         call("save");
-        Collections.put((long) Collections.size(), entity);
+        Collections.put(entity.getCollectionUniqueName(), entity);
         return entity;
     }
 
     @Override
-    public Optional<Collection> findById(Long id) {
+    public Optional<Collection> findById(String id) {
         call("find");
         return find(id);
     }
 
     @Override
-    public boolean existsById(Long id) {
+    public boolean existsById(String id) {
         call("existsById");
         return find(id).isPresent();
     }
@@ -148,7 +148,7 @@ public class TestCollectionRepository implements CollectionRepository {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         Collections.remove(id);
     }
 
@@ -158,7 +158,7 @@ public class TestCollectionRepository implements CollectionRepository {
     }
 
     @Override
-    public void deleteAllById(Iterable<? extends Long> ids) {
+    public void deleteAllById(Iterable<? extends String> ids) {
         // TODO Auto-generated method stub
     }
 
