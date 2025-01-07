@@ -96,10 +96,20 @@ public class Note {
         this.text = text;
     }
 
+    /**
+     * Adds an embedded file to the note
+     * @param embeddedFile file that's being added
+     */
+
     public void addEmbeddedFile(EmbeddedFile embeddedFile) {
         embeddedFile.setNote(this);
         embeddedFiles.add(embeddedFile);
     }
+
+    /**
+     * Removes an embedded file from the note
+     * @param embeddedFile file that's being removed
+     */
 
     public void removeEmbeddedFile(EmbeddedFile embeddedFile) {
         embeddedFiles.remove(embeddedFile);
