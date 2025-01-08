@@ -144,8 +144,9 @@ public class EmbeddedFileController {
     public ResponseEntity<String> deleteFile(@PathVariable String fileName){
         Optional<EmbeddedFile> file = checkIfFileExists(fileName);
         if(file.isPresent()) {
-            noteRepository.getById(file.get().getNote().getNoteId()).removeEmbeddedFile(file.get());
-            embeddedFileRepository.deleteById(file.get().getId());
+            EmbeddedFile embeddedFile = file.get();
+            Note note = embeddedFile.getNote();
+            embeddedFileRepository.delete(embeddedFile);
             return ResponseEntity.ok("Successfully deleted file");
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
