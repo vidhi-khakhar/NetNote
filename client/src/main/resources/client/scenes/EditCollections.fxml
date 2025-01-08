@@ -27,7 +27,7 @@
          <padding>
             <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
          </padding>
-         <ListView fx:id="collectionsList" minWidth="150.0" prefHeight="314.0" prefWidth="134.0" style="-fx-border-color: BLACK;" VBox.vgrow="ALWAYS" />
+         <ListView fx:id="collectionsList" minWidth="150.0" onMouseClicked="#handleSelectCollection" prefHeight="314.0" prefWidth="134.0" style="-fx-border-color: BLACK;" VBox.vgrow="ALWAYS" />
          <HBox alignment="CENTER" fillHeight="false" prefHeight="30.0" prefWidth="200.0" spacing="8.0" VBox.vgrow="NEVER">
             <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddCollection" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="+">
                <font>
@@ -51,20 +51,23 @@
          </HBox>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelServer" text="%label.editCollectionsMenuLabelServer" textAlignment="RIGHT" HBox.hgrow="NEVER" />
-            <TextField fx:id="serverInput" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" promptText="http://192.168.1.123:8080/" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="serverInput" maxWidth="-Infinity" minWidth="-Infinity" onKeyTyped="#handleServerChange" prefWidth="200.0" promptText="http://192.168.1.123:8080/" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
          </HBox>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelCollection" text="%label.editCollectionsMenuLabelCollection" textAlignment="RIGHT" HBox.hgrow="NEVER" />
-            <TextField fx:id="uniqueNameInput" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="uniqueNameInput" maxWidth="-Infinity" minWidth="-Infinity" onKeyTyped="#handleUniqueNameChange" prefWidth="200.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
          </HBox>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelStatus" text="%label.editCollectionsMenuLabelStatus" textAlignment="RIGHT" HBox.hgrow="NEVER" />
-            <VBox alignment="CENTER_LEFT" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" HBox.hgrow="ALWAYS">
-               <Text strokeType="OUTSIDE" strokeWidth="0.0" />
+            <HBox alignment="CENTER_LEFT" maxWidth="-Infinity" prefHeight="100.0" prefWidth="200.0" spacing="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#updateServerStatusText" text="↺" />
+                  <Text fx:id="serverStatusText" strokeType="OUTSIDE" strokeWidth="0.0" />
+               </children>
                <padding>
-                  <Insets left="8.0" />
+                  <Insets left="4.0" />
                </padding>
-            </VBox>
+            </HBox>
          </HBox>
          <HBox alignment="BOTTOM_RIGHT" minWidth="-Infinity" prefHeight="30.0" spacing="4.0" VBox.vgrow="ALWAYS">
             <Button fx:id="buttonMakeDefault" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" style="-fx-background-color: #fbee04; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonMakeDefault" HBox.hgrow="NEVER">

@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.utils.NoteServerUtils;
+import client.utils.collection.CollectionServerStatus;
 import client.utils.collection.CollectionServerUtils;
 import client.utils.collection.CollectionUtils;
 import client.utils.collection.CollectionAction;
@@ -78,6 +79,9 @@ public class EditCollectionsCtrl {
     @FXML
     private TextField uniqueNameInput;
 
+    @FXML
+    private Text serverStatusText;
+
     /**
      * Initializes the {@link EditCollectionsCtrl} controller by
      * setting the binding the appropriate text properties.
@@ -138,6 +142,7 @@ public class EditCollectionsCtrl {
         switch (currentAction) {
             case ADD_COLLECTION -> storeCollection();
         }
+        updateServerStatusText();
     }
 
     public void handleDiscard() {
@@ -149,6 +154,31 @@ public class EditCollectionsCtrl {
                 currentAction = CollectionAction.NO_ACTION;
             }
         }
+    }
+
+    public void handleServerChange() {
+        if (currentAction != CollectionAction.ADD_COLLECTION) {
+            serverInput.undo();
+            mainCtrl.showPopUp("Cannot modify server",
+                    "Cannot modify the server of an already created note.",
+                    Alert.AlertType.ERROR);
+        }
+    }
+
+    public void handleUniqueNameChange() {
+        if (currentAction != CollectionAction.ADD_COLLECTION) {
+            uniqueNameInput.undo();
+            mainCtrl.showPopUp("Cannot modify the unique name",
+                    "Cannot modify the unique name of an already created note.",
+                    Alert.AlertType.ERROR);
+        }
+    }
+
+    public void handleSelectCollection() {
+        Collection collection = collectionsList.getSelectionModel().getSelectedItem();
+        aliasInput.setText(collection.getAlias());
+        serverInput.setText(collection.getServer());
+        uniqueNameInput.setText(collection.getCollectionUniqueName());
     }
 
     public void storeCollection() {
@@ -172,12 +202,29 @@ public class EditCollectionsCtrl {
                     Alert.AlertType.ERROR);
             return;
         }
-        List<Collection> serverCollections =
-                collectionServerUtils.getAllCollections(server);
-        if (!collectionUtils.collectionAlreadyExists(serverCollections, uniqueName)) {
+        if (getStatus(server, uniqueName) == CollectionServerStatus.COLLECTION_WILL_BE_CREATED) {
             collectionServerUtils.createCollection(newCollection, server);
         }
         configLoader.addCollection(newCollection);
+        collections.set(collections.size() - 1, newCollection);
         currentAction = CollectionAction.NO_ACTION;
+    }
+
+    public CollectionServerStatus getStatus(String serverAddress, String uniqueName) {
+        if (!noteServerUtils.isServerAvailable(serverAddress))
+            return CollectionServerStatus.SERVER_NOT_REACHABLE;
+        List<Collection> serverCollections =
+                collectionServerUtils.getAllCollections(serverAddress);
+        return collectionUtils.collectionAlreadyExists(serverCollections, uniqueName) ?
+                CollectionServerStatus.COLLECTION_EXISTS :
+                CollectionServerStatus.COLLECTION_WILL_BE_CREATED;
+    }
+
+    public void updateServerStatusText() {
+        String server = serverInput.getText();
+        String uniqueName = uniqueNameInput.getText();
+        CollectionServerStatus status = getStatus(server, uniqueName);
+        serverStatusText.textProperty().unbind();
+        serverStatusText.textProperty().bind(props.get(status.getBundleLabel()));
     }
 }
