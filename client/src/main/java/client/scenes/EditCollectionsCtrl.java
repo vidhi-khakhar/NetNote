@@ -1,8 +1,10 @@
 package client.scenes;
 
 import client.config.ConfigLoader;
-import client.utils.CollectionServerUtils;
-import client.utils.CollectionUtils;
+import client.utils.NoteServerUtils;
+import client.utils.collection.CollectionServerUtils;
+import client.utils.collection.CollectionUtils;
+import client.utils.collection.CollectionAction;
 import client.utils.LangUtils;
 import com.google.inject.Inject;
 import commons.Collection;
@@ -10,11 +12,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
 import java.util.Map;
@@ -28,12 +26,19 @@ public class EditCollectionsCtrl {
     private CollectionServerUtils collectionServerUtils;
 
     @Inject
+    private NoteServerUtils noteServerUtils;
+
+    @Inject
     private ConfigLoader configLoader;
 
     @Inject
     private CollectionUtils collectionUtils;
 
+    @Inject
+    private MainCtrl mainCtrl;
+
     private final ObservableList<Collection> collections = FXCollections.observableArrayList();
+    private CollectionAction currentAction = CollectionAction.NO_ACTION;
     private Map<String, StringProperty> props;
 
     @FXML
@@ -58,7 +63,19 @@ public class EditCollectionsCtrl {
     private Button buttonSave;
 
     @FXML
+    private Button buttonDiscard;
+
+    @FXML
     private ListView<Collection> collectionsList;
+
+    @FXML
+    private TextField aliasInput;
+
+    @FXML
+    private TextField serverInput;
+
+    @FXML
+    private TextField uniqueNameInput;
 
     /**
      * Initializes the {@link EditCollectionsCtrl} controller by
@@ -96,6 +113,7 @@ public class EditCollectionsCtrl {
         labelStatus.textProperty().bind(props.get("editCollectionsMenuLabelStatus"));
         buttonMakeDefault.textProperty().bind(props.get("buttonMakeDefault"));
         buttonSave.textProperty().bind(props.get("buttonSave"));
+        buttonDiscard.textProperty().bind(props.get("buttonDiscard"));
     }
 
     /**
@@ -103,7 +121,45 @@ public class EditCollectionsCtrl {
      * selects it. Does not send the data to the server until the user presses "Save".
      */
     public void handleAddCollection() {
+        if (currentAction != CollectionAction.NO_ACTION) {
+            mainCtrl.showPopUp("Action already in progress",
+                    "Please discard the current action to proceed.",
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        currentAction = CollectionAction.ADD_COLLECTION;
         int newIndex = collectionUtils.createNewCollection(collections);
         collectionsList.getSelectionModel().selectIndices(newIndex);
+
+    }
+
+    public void handleSave() {
+        switch (currentAction) {
+            case ADD_COLLECTION -> {
+                if (!noteServerUtils.isServerAvailable(serverInput.getText())) {
+                    mainCtrl.showPopUp("Server not reachable",
+                            "Server not reachable",
+                            Alert.AlertType.ERROR);
+                    return;
+                }
+                Collection newCollection = new Collection(
+                        uniqueNameInput.getText(),
+                        serverInput.getText(),
+                        aliasInput.getText()
+                );
+                //TODO Handle server
+            }
+        }
+    }
+
+    public void handleDiscard() {
+        switch (currentAction) {
+            case ADD_COLLECTION -> {
+                collectionUtils.removeLastCollection(
+                        collections,
+                        collectionsList.getSelectionModel().getSelectedIndex());
+                currentAction = CollectionAction.NO_ACTION;
+            }
+        }
     }
 }

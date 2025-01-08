@@ -1,4 +1,4 @@
-package client.utils;
+package client.utils.collection;
 
 import client.scenes.EditCollectionsCtrl;
 import commons.Collection;
@@ -38,5 +38,18 @@ public class CollectionUtils {
         }
         currentCollections.add(new Collection("", newCollectionAlias, ""));
         return currentCollections.size() - 1;
+    }
+
+    /**
+     * Removes the last collection in a list of collections
+     * @param currentCollections The current list of collections
+     * @param currentIndex The index of the currently selected collection
+     * @return The index of the selected collection after the deletion
+     */
+    public int removeLastCollection(List<Collection> currentCollections, int currentIndex) {
+        currentCollections.removeLast();
+        if (currentIndex == currentCollections.size())
+            currentIndex--;
+        return currentIndex;
     }
 }

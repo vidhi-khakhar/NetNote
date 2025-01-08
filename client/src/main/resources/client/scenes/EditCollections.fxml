@@ -47,15 +47,15 @@
          </padding>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelTitle" text="%label.editCollectionsMenuLabelTitle" HBox.hgrow="NEVER" />
-            <TextField maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="aliasInput" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
          </HBox>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelServer" text="%label.editCollectionsMenuLabelServer" textAlignment="RIGHT" HBox.hgrow="NEVER" />
-            <TextField maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" promptText="http://192.168.1.123:8080/" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="serverInput" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" promptText="http://192.168.1.123:8080/" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
          </HBox>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelCollection" text="%label.editCollectionsMenuLabelCollection" textAlignment="RIGHT" HBox.hgrow="NEVER" />
-            <TextField maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="uniqueNameInput" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
          </HBox>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelStatus" text="%label.editCollectionsMenuLabelStatus" textAlignment="RIGHT" HBox.hgrow="NEVER" />
@@ -72,7 +72,12 @@
                   <Font size="14.0" />
                </font>
             </Button>
-            <Button fx:id="buttonSave" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" style="-fx-background-color: #13d5ec; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonSave" textAlignment="CENTER" HBox.hgrow="NEVER">
+            <Button fx:id="buttonSave" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#handleSave" prefHeight="30.0" style="-fx-background-color: #13d5ec; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonSave" textAlignment="CENTER" HBox.hgrow="NEVER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="buttonDiscard" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#handleDiscard" prefHeight="30.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonDiscard" textAlignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
