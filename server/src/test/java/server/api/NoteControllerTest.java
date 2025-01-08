@@ -2,6 +2,8 @@ package server.api;
 
 import commons.Note;
 import org.junit.jupiter.api.*;
+import server.utils.ServerUtils;
+
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 
@@ -18,7 +20,7 @@ public class NoteControllerTest {
         n2 = new Note("Note2", "Note 2 content");
         db.save(n1);
         db.save(n2);
-        sut = new NoteController(db);
+        sut = new NoteController(db, new ServerUtils(db));
     }
 
     @Test
@@ -31,6 +33,11 @@ public class NoteControllerTest {
     @Test
     public void getAllNotes() {
         assertEquals(List.of(n1, n2), sut.getAllNotes());
+    }
+
+    @Test
+    public void getNoteByTitle() {
+        assertEquals(n1, sut.getNoteByTitle("Note1").getBody());
     }
 
     @Test
