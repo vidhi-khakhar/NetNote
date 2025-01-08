@@ -97,6 +97,14 @@ public class Note {
     }
 
     /**
+     * @return The files found in the note.
+     */
+
+    public List<EmbeddedFile> getEmbeddedFiles() {
+        return embeddedFiles;
+    }
+
+    /**
      * Adds an embedded file to the note
      * @param embeddedFile file that's being added
      */

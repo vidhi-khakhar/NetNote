@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.CollectionContainsNotes;
+import commons.CollectionContainsNotesId;
 import commons.Note;
 import commons.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,36 +10,38 @@ import org.springframework.web.bind.annotation.*;
 import server.database.CollectionContainsNotesRepository;
 import server.database.CollectionRepository;
 import server.database.NoteRepository;
-
+import server.utils.ServerUtils;
 
 import java.util.*;
-
 
 @RestController
 @RequestMapping("/api/collections/")
 public class CollectionController {
 
     private final CollectionRepository collectionRepository;
-    private final NoteRepository noteRepository;
     private final CollectionContainsNotesRepository collectionContainsNotesRepository;
+    private final ServerUtils serverUtils;
+    private final NoteRepository noteRepository;
 
     /**
      * Constructor for the collection controller.
      * Used to inject the database repositories as dependencies.
      *
      * @param collectionRepository              The collection repository.
+     * @param collectionContainsNotesRepository The repository managing relationships between
+     *                                          collections and notes.
      * @param noteRepository                    The note repository.
-     * @param collectionContainsNotesRepository
-     * The repository managing relationships between collections and notes.
+     * @param serverUtils                       An instance of the server utilities.
      */
     @Autowired
     public CollectionController(CollectionRepository collectionRepository,
-                                NoteRepository noteRepository,
                                 CollectionContainsNotesRepository
-                                        collectionContainsNotesRepository) {
+                                        collectionContainsNotesRepository,
+                                ServerUtils serverUtils, NoteRepository noteRepository) {
         this.collectionRepository = collectionRepository;
-        this.noteRepository = noteRepository;
         this.collectionContainsNotesRepository = collectionContainsNotesRepository;
+        this.serverUtils = serverUtils;
+        this.noteRepository = noteRepository;
     }
 
     /**
@@ -60,19 +63,8 @@ public class CollectionController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Server field cannot be empty.");
         }
-        // check if the collection exists by searching
-        // through the existing collections using unique name
-        List<Collection> allCollections = collectionRepository.findAll();
-        boolean collectionExists = false;
-        for (Collection existingCollection : allCollections) {
-            if (existingCollection.getCollectionUniqueName()
-                    .equals(collection.getCollectionUniqueName())) {
-                collectionExists = true;
-                break;
-            }
-        }
 
-        if (collectionExists) {
+        if (collectionRepository.existsById(collection.getCollectionUniqueName())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("A collection with this unique name already exists.");
         }
@@ -102,12 +94,7 @@ public class CollectionController {
     @GetMapping("/{uniqueName}")
     public ResponseEntity<Collection> getCollectionByUniqueName
     (@PathVariable("uniqueName") String uniqueName) {
-        List<Collection> allCollections = collectionRepository.findAll();
-        // find the collection by unique name
-        Optional<Collection> collectionOptional = allCollections
-                .stream()
-                .filter(x -> x.getCollectionUniqueName().equals(uniqueName))
-                .findFirst();
+        Optional<Collection> collectionOptional = collectionRepository.findById(uniqueName);
 
         return collectionOptional.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
@@ -122,10 +109,9 @@ public class CollectionController {
      */
     @PostMapping("/{uniqueName}")
     public ResponseEntity<String> updateCollectionAlias
-    (@PathVariable("uniqueName") String uniqueName,
-                          @RequestBody Collection updatedCollection) {
+    (@PathVariable("uniqueName") String uniqueName, @RequestBody Collection updatedCollection) {
         // find the collection by unique name
-        Optional<Collection> collectionOptional = findCollectionByUniqueName(uniqueName);
+        Optional<Collection> collectionOptional = collectionRepository.findById(uniqueName);
         if (collectionOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Collection not found.");
@@ -151,10 +137,7 @@ public class CollectionController {
      */
     @DeleteMapping("/{uniqueName}")
     public ResponseEntity<String> deleteCollection(@PathVariable("uniqueName") String uniqueName) {
-        // find the collection by unique name
-        List<Collection> allCollections = collectionRepository.findAll();
-
-        Optional<Collection> collectionOptional = findCollectionByUniqueName(uniqueName);
+        Optional<Collection> collectionOptional = collectionRepository.findById(uniqueName);
 
         if (collectionOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -163,23 +146,45 @@ public class CollectionController {
 
         Collection collection = collectionOptional.get();
 
-        // remove relationships with notes
         List<CollectionContainsNotes> relationships = collectionContainsNotesRepository.findAll();
         for (CollectionContainsNotes relationship : relationships) {
             if (relationship.getCollectionId().equals(collection.getCollectionUniqueName())) {
-                // remove relationship
                 collectionContainsNotesRepository.delete(relationship);
             }
         }
 
-        // delete the collection from the list
         collectionRepository.deleteById(collection.getCollectionUniqueName());
 
-        // save the updated list of collections
-        collectionRepository.saveAll(allCollections);
-
         return ResponseEntity.ok("Collection deleted successfully.");
+    }
 
+    /**
+     * Gets all the notes from the collection with the given name
+     *
+     * @param uniqueName The name of the collection from which to fetch all the notes
+     * @return A list of all the notes in that collection, if the collection exists.
+     */
+    @GetMapping("/{uniqueName}/notes")
+    public ResponseEntity<List<Note>> getAllNotesInCollection(
+            @PathVariable("uniqueName") String uniqueName) {
+
+        Optional<Collection> collectionOptional = collectionRepository.findById(uniqueName);
+
+        if (collectionOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+
+        List<Note> notes = collectionContainsNotesRepository
+                .findAll()
+                .stream()
+                .filter(entry -> entry.getCollectionId().equals(uniqueName))
+                .map(CollectionContainsNotes::getNoteId)
+                .map(noteId -> noteRepository.findById(noteId).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+
+        return ResponseEntity.ok(notes);
     }
 
     /**
@@ -193,32 +198,20 @@ public class CollectionController {
     public ResponseEntity<String> addNoteToCollection(@PathVariable("uniqueName") String uniqueName,
                                                       @PathVariable("noteTitle") String noteTitle) {
 
-        // find the collection by unique name
-        List<Collection> allCollections = collectionRepository.findAll();
-        Optional<Collection> collectionOptional = allCollections
-                .stream()
-                .filter(x -> x.getCollectionUniqueName().equals(uniqueName))
-                .findFirst();
+        Optional<Collection> collectionOptional = collectionRepository.findById(uniqueName);
 
         if (collectionOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Collection with the specified unique name does not exist.");
         }
 
-        // find the note by title
-        List<Note> allNotes = noteRepository.findAll();
-        Optional<Note> noteOptional = allNotes
-                .stream()
-                .filter(note -> note.getTitle().equals(noteTitle))
-                .findFirst();
+        Optional<Note> noteOptional = serverUtils.getNoteByTitle(noteTitle);
 
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Note with the specified title does not exist.");
         }
 
-        // retrieve the collection unique name and
-        // note id
         String collectionUniqueName = collectionOptional
                 .get().getCollectionUniqueName();
         Long noteId = noteOptional.get().getNoteId();
@@ -232,7 +225,6 @@ public class CollectionController {
         collectionContainsNotesRepository.save(relation);
 
         return ResponseEntity.ok("Note added to collection successfully.");
-
     }
 
     /**
@@ -245,10 +237,10 @@ public class CollectionController {
      * @return A response entity containing a status message.
      */
     @PostMapping("/{uniqueName}/notes/{noteTitle}/move/{targetUniqueName}")
-    public ResponseEntity<String>
-           moveNoteToAnotherCollection( @PathVariable("uniqueName") String uniqueName,
-                                 @PathVariable("noteTitle") String noteTitle,
-                                 @PathVariable("targetUniqueName") String targetUniqueName) {
+    public ResponseEntity<String> moveNoteToAnotherCollection(
+            @PathVariable("uniqueName") String uniqueName,
+            @PathVariable("noteTitle") String noteTitle,
+            @PathVariable("targetUniqueName") String targetUniqueName) {
 
         // find the current collection and target collection by unique name
         Optional<Collection> currentCollection = collectionRepository.findById(uniqueName);
@@ -259,41 +251,21 @@ public class CollectionController {
                     .body("One or both collections do not exist.");
         }
 
-        // find the note by title
-        List<Note> allNotes = noteRepository.findAll();
-        Optional<Note> noteOptional = allNotes
-                .stream()
-                .filter(note -> note.getTitle().equals(noteTitle))
-                .findFirst();
+        Optional<Note> noteOptional = serverUtils.getNoteByTitle(noteTitle);
 
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-
                     .body("Note with the specified title does not exist.");
         }
 
-        // Retrieve all CollectionContainsNotes relationships
-        List<CollectionContainsNotes> allRelations = collectionContainsNotesRepository.findAll();
+        CollectionContainsNotesId relId =
+                new CollectionContainsNotesId(uniqueName, noteOptional.get().getNoteId());
 
-        // find the relationship where the note exists in the current collection
-        CollectionContainsNotes currentRelation = allRelations
-                .stream()
-                .filter(relation ->
-                        relation.getCollectionId()
-                                .equals(currentCollection
-                                        .get().getCollectionUniqueName()) &&
-                        relation.getNoteId().equals(noteOptional.get().getNoteId()))
-                .findFirst()
-                .orElse(null);
-
-        if (currentRelation == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Note is not part of the current collection.");
+        if (!collectionContainsNotesRepository.existsById(relId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Note is not part of this collection.");
         }
-
-
-        // remove the note from the current collection
-        collectionContainsNotesRepository.delete(currentRelation);
+        collectionContainsNotesRepository.deleteById(relId);
 
         // add the note to the target collection
         CollectionContainsNotes newRelation = new CollectionContainsNotes(
@@ -302,32 +274,43 @@ public class CollectionController {
         );
 
         collectionContainsNotesRepository.save(newRelation);
-
-
         return ResponseEntity.ok("Note moved successfully.");
     }
 
-
     /**
-     * Method to find a collection by its unique name.
-     * This method retrieves all collections and searches for the first collection
-     * which has a unique name that matches the provided one.
-     * It returns an {@link Optional} that contains the
-     * collection if found, or an empty {@link Optional} if no collection matches the unique name.
+     * After successfully calling this method, the note with the given title
+     * will no longer be part of the collection with the given name.
      *
-     * @param uniqueName The unique name of the collection to search for.
-     * @return An {@link Optional} containing the collection if found, or an empty {@link Optional}
-     * if no collection matches the provided unique name.
+     * @param uniqueName The name of the collection to remove the note from.
+     * @param noteTitle  The name of the note to be removed.
+     * @return A message detailing whether the removal was successful or not.
      */
-    public Optional<Collection> findCollectionByUniqueName(String uniqueName) {
-        List<Collection> allCollections = collectionRepository.findAll();
-        return allCollections
-                .stream()
-                .filter(x -> x.getCollectionUniqueName().equals(uniqueName))
-                .findFirst();
+    @DeleteMapping("/{uniqueName}/notes/{noteTitle}")
+    public ResponseEntity<String> removeNoteFromCollection(
+            @PathVariable("uniqueName") String uniqueName,
+            @PathVariable("noteTitle") String noteTitle) {
+
+        Optional<Collection> collectionOptional = collectionRepository.findById(uniqueName);
+        Optional<Note> noteOptional = serverUtils.getNoteByTitle(noteTitle);
+
+        if (collectionOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("The collection with the given title does not exist.");
+        }
+        if (noteOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("The note with the given title does not exist.");
+        }
+
+        CollectionContainsNotesId relId =
+                new CollectionContainsNotesId(uniqueName, noteOptional.get().getNoteId());
+
+        if (!collectionContainsNotesRepository.existsById(relId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Note is not part of this collection.");
+        }
+
+        collectionContainsNotesRepository.deleteById(relId);
+        return ResponseEntity.ok("The note is no longer part of this collection");
     }
 }
-
-
-
-

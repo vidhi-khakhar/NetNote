@@ -1,5 +1,6 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -45,6 +46,7 @@ public class EmbeddedFile {
      * The MapsId annotation maps the noteId field in EmbeddedFileId
      */
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "note_id", nullable = false)
     private Note note;
