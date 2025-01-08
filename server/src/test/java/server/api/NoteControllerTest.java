@@ -20,7 +20,7 @@ public class NoteControllerTest {
         n2 = new Note("Note2", "Note 2 content");
         db.save(n1);
         db.save(n2);
-        sut = new NoteController(db, new ServerUtils(db));
+        sut = new NoteController(db, new ServerUtils(db, null));
     }
 
     @Test

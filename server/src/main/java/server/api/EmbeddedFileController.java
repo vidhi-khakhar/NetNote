@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import server.database.EmbeddedFileRepository;
-import server.database.NoteRepository;
+import server.utils.ServerUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,18 +18,19 @@ import java.util.Optional;
 @RequestMapping("/api/files")
 public class EmbeddedFileController {
 
-    private final NoteRepository noteRepository;
     private final EmbeddedFileRepository embeddedFileRepository;
+
+    private final ServerUtils serverUtils;
 
     /**
      * Constructor for the EmbeddedFileController
-     * @param noteRepository The note repository
+     * @param serverUtils Service with helper methods
      * @param embeddedFileRepository The embedded file repository
      */
 
-    public EmbeddedFileController(NoteRepository noteRepository,
+    public EmbeddedFileController(ServerUtils serverUtils,
                                   EmbeddedFileRepository embeddedFileRepository) {
-        this.noteRepository = noteRepository;
+        this.serverUtils = serverUtils;
         this.embeddedFileRepository = embeddedFileRepository;
     }
 
@@ -50,7 +51,7 @@ public class EmbeddedFileController {
 
     @GetMapping("/notes/{noteName}")
     public List<EmbeddedFile> getFilesFromNote(@PathVariable String noteName){
-        Optional<Note> note = checkIfNoteExists(noteName);
+        Optional<Note> note = serverUtils.getNoteByTitle(noteName);
         if(note.isPresent())
             if(!note.get().getEmbeddedFiles().isEmpty()) {
                 return note.get().getEmbeddedFiles();
@@ -76,12 +77,12 @@ public class EmbeddedFileController {
         embeddedFile.setData(file.getBytes());
 
         Optional<EmbeddedFile> fileAlreadyExists =
-                checkIfFileExists(embeddedFile.getName(), noteName);
+                serverUtils.checkIfFileExists(embeddedFile.getName(), noteName);
         if(fileAlreadyExists.isPresent())
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("A file with the same name already exists");
 
-        Optional<Note> note = checkIfNoteExists(noteName);
+        Optional<Note> note = serverUtils.getNoteByTitle(noteName);
         if(note.isPresent()) {
             embeddedFile.setNote(note.get());
             note.get().addEmbeddedFile(embeddedFile);
@@ -100,12 +101,12 @@ public class EmbeddedFileController {
      * went through properly.
      */
 
-    @PostMapping("/{noteName}/{fileName}")
+    @PostMapping("/{noteName}/content/{fileName}")
     public ResponseEntity<String> updateFileTitle
     (@PathVariable String noteName, @PathVariable String fileName, @RequestBody String title) {
         if(title.isBlank())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Title cannot be empty");
-        Optional<EmbeddedFile> file = checkIfFileExists(fileName, noteName);
+        Optional<EmbeddedFile> file = serverUtils.checkIfFileExists(fileName, noteName);
         if (file.isPresent()) {
             String type = file.get().getType().substring(file.get().getType().indexOf("/") + 1);
             file.get().setName(title + "." + type);
@@ -125,10 +126,10 @@ public class EmbeddedFileController {
      * display the contents of the file if everything goes well.
      */
 
-    @GetMapping("/{noteName}/{fileName}")
+    @GetMapping("/{noteName}/content/{fileName}")
     public ResponseEntity<byte[]> getFile(@PathVariable String noteName,
                                           @PathVariable String fileName){
-        Optional<EmbeddedFile> file = checkIfFileExists(fileName, noteName);
+        Optional<EmbeddedFile> file = serverUtils.checkIfFileExists(fileName, noteName);
         if(file.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK).contentType(MediaType
                     .parseMediaType(file.get().getType())).body(file.get().getData());
@@ -144,10 +145,10 @@ public class EmbeddedFileController {
      * went through properly.
      */
 
-    @DeleteMapping("/{noteName}/{fileName}")
+    @DeleteMapping("/{noteName}/content/{fileName}")
     public ResponseEntity<String> deleteFile(@PathVariable String noteName,
                                              @PathVariable String fileName){
-        Optional<EmbeddedFile> file = checkIfFileExists(fileName, noteName);
+        Optional<EmbeddedFile> file = serverUtils.checkIfFileExists(fileName, noteName);
         if(file.isPresent()) {
             EmbeddedFile embeddedFile = file.get();
             Note note = embeddedFile.getNote();
@@ -157,33 +158,4 @@ public class EmbeddedFileController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
     }
-
-    /**
-     * Helper method that checks if a file exists by its name.
-     * @param fileName name of the file
-     * @param noteName name of the note it belongs to
-     * @return An optional that either contains a file or not.
-     */
-
-    public Optional<EmbeddedFile> checkIfFileExists(String fileName, String noteName){
-        return embeddedFileRepository.findAll()
-                .stream()
-                .filter(x -> x.getNote().getTitle().equals(noteName))
-                .filter(x -> x.getName().equals(fileName))
-                .findFirst();
-    }
-
-    /**
-     * Helper method that checks if a note exists by its name.
-     * @param noteName name of the note
-     * @return An optional that either contains a note or not.
-     */
-
-    public Optional<Note> checkIfNoteExists(String noteName){
-        return noteRepository.findAll()
-                .stream()
-                .filter(x -> x.getTitle().equals(noteName))
-                .findFirst();
-    }
-
 }
