@@ -4,6 +4,7 @@ import client.config.ConfigLoader;
 import client.components.Notification;
 import client.utils.NoteSearchUtils;
 import client.utils.LangUtils;
+import client.utils.UiUtils;
 import client.utils.undo.*;
 import com.google.inject.Inject;
 import commons.Note;
@@ -62,6 +63,9 @@ public class MainCtrl {
 
     @Inject
     private LangUtils langUtils;
+
+    @Inject
+    private UiUtils uiUtils;
 
     @FXML
     private TextField searchBar;
@@ -267,20 +271,19 @@ public class MainCtrl {
             handleSearch("");
         }
 
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.titleProperty().bind(props.get("addDialogTitle"));
-        dialog.contentTextProperty().bind(props.get("addDialogText"));
-        dialog.setHeaderText(null);
-
-        Optional<String> result = dialog.showAndWait();
+        Optional<String> result = uiUtils.askUserForInput(
+                props.get("addDialogTitle").get(),
+                props.get("addDialogText").get(),
+                null
+        );
         result.ifPresent(title -> {
             if (title.trim().isEmpty()) {
-                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                uiUtils.showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertText").get(),
                         Alert.AlertType.ERROR);
             } else if (isTitlePresent(title)) {
 
-                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                uiUtils.showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertTitleExists").get(),
                         Alert.AlertType.ERROR);
             } else {
@@ -342,7 +345,7 @@ public class MainCtrl {
             handleSearch("");
         }
         if (index == -1) {
-            showPopUp(props.get("deleteNoteWarningTitle").get(),
+            uiUtils.showPopUp(props.get("deleteNoteWarningTitle").get(),
                     props.get("deleteNoteWarningText").get(),
                     Alert.AlertType.WARNING);
             return false;
@@ -350,7 +353,7 @@ public class MainCtrl {
 
         Note deletedNote = savedNotes.get(index);
 
-        if (showPopUp(props.get("deleteNoteConfirmationTitle").get(),
+        if (uiUtils.showPopUp(props.get("deleteNoteConfirmationTitle").get(),
                 props.get("deleteNoteConfirmationText").get() + '\n' + deletedNote.getTitle(),
                 Alert.AlertType.CONFIRMATION)) {
 
@@ -394,23 +397,6 @@ public class MainCtrl {
         renderedNoteView.getEngine().loadContent(deletedNote.getText());
     }
 
-    /**
-     * A Warning pop-up message (only option is to say OK)
-     *
-     * @param title   The title of the pop-up message
-     * @param message The body of the pop-up message
-     * @param type    The type of the alert object
-     * @return True if the user presses 'OK', false otherwise
-     */
-    public boolean showPopUp(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
-    }
 
     /**
      * Modifies the note list by deleting the note at a given index.
@@ -512,27 +498,27 @@ public class MainCtrl {
      * The user is notified whether the change was successful or unsuccessful.
      */
     public void handleConfigureIP() {
-        TextInputDialog dialog = new TextInputDialog();
         String localAddressText = "\n" +
                 props.get("addressConfigLocalAddress").get() +
                 ": " +
                 NoteServerUtils.getLocalAddress();
-        dialog.titleProperty().bind(props.get("addressConfigDialogName"));
-        dialog.setContentText(props.get("addressConfigCurrentAddress").get() +
-                ": " +
-                noteServerUtils.getServerAddress() +
-                localAddressText);
-        dialog.setHeaderText(null);
-        Optional<String> result = dialog.showAndWait();
+        Optional<String> result = uiUtils.askUserForInput(
+                props.get("addressConfigDialogName").get(),
+                props.get("addressConfigCurrentAddress").get() +
+                        ": " +
+                        noteServerUtils.getServerAddress() +
+                        localAddressText,
+                null
+        );
         if (result.isPresent()) {
             String newAddress = result.get();
             if (noteServerUtils.isServerAvailable(newAddress)) {
                 noteServerUtils.setServerAddress(newAddress);
-                showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
+                uiUtils.showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
                         props.get("addressConfigSuccessAlertText").get(),
                         Alert.AlertType.INFORMATION);
             } else {
-                showPopUp(props.get("addressConfigAddressErrorTitle").get(),
+                uiUtils.showPopUp(props.get("addressConfigAddressErrorTitle").get(),
                         props.get("addressConfigAddressErrorText").get(),
                         Alert.AlertType.ERROR);
             }
@@ -578,7 +564,7 @@ public class MainCtrl {
 
         renderedNoteTitleLabel.textProperty().unbind();
         if (updatedTitle.isEmpty()) {
-            showPopUp(props.get("invalidTitleAlertTitle").get(),
+            uiUtils.showPopUp(props.get("invalidTitleAlertTitle").get(),
                     props.get("invalidTitleAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
@@ -590,7 +576,7 @@ public class MainCtrl {
         if (selectedNote != null) {
             previousTitle = selectedNote.getTitle();
             if (!updatedTitle.equals(previousTitle) && isTitlePresent(updatedTitle)) {
-                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                uiUtils.showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertTitleExists").get(),
                         Alert.AlertType.ERROR);
             }
@@ -836,4 +822,3 @@ public class MainCtrl {
         secondaryStage.show();
     }
 }
-
