@@ -29,7 +29,7 @@
          </padding>
          <ListView fx:id="collectionsList" minWidth="150.0" prefHeight="314.0" prefWidth="134.0" style="-fx-border-color: BLACK;" VBox.vgrow="ALWAYS" />
          <HBox alignment="CENTER" fillHeight="false" prefHeight="30.0" prefWidth="200.0" spacing="8.0" VBox.vgrow="NEVER">
-            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="+">
+            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddCollection" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="+">
                <font>
                   <Font size="14.0" />
                </font>

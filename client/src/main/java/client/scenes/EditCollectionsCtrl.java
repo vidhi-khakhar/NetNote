@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.utils.CollectionServerUtils;
+import client.utils.CollectionUtils;
 import client.utils.LangUtils;
 import com.google.inject.Inject;
 import commons.Collection;
@@ -9,8 +10,10 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
 
@@ -26,6 +29,9 @@ public class EditCollectionsCtrl {
 
     @Inject
     private ConfigLoader configLoader;
+
+    @Inject
+    private CollectionUtils collectionUtils;
 
     private final ObservableList<Collection> collections = FXCollections.observableArrayList();
     private Map<String, StringProperty> props;
@@ -64,6 +70,21 @@ public class EditCollectionsCtrl {
         collections.addAll(configLoader.getCollections());
         collectionsList.setItems(collections);
 
+        // The callback below is used to only display the name of the collection
+        // in the list, instead of the whole output of `toString()`.
+        // This implementation is borrowed from the one used in the MainCtrl class.
+        collectionsList.setCellFactory(_ -> new ListCell<>() {
+            @Override
+            protected void updateItem(Collection collection, boolean empty) {
+                super.updateItem(collection, empty);
+                if (empty || collection == null) {
+                    setText(null);
+                } else {
+                    setText(collection.getAlias());
+                }
+            }
+        });
+
         initializeTextProperties();
     }
 
@@ -75,5 +96,14 @@ public class EditCollectionsCtrl {
         labelStatus.textProperty().bind(props.get("editCollectionsMenuLabelStatus"));
         buttonMakeDefault.textProperty().bind(props.get("buttonMakeDefault"));
         buttonSave.textProperty().bind(props.get("buttonSave"));
+    }
+
+    /**
+     * Creates a new collection with the default title of "New collection" and
+     * selects it. Does not send the data to the server until the user presses "Save".
+     */
+    public void handleAddCollection() {
+        int newIndex = collectionUtils.createNewCollection(collections);
+        collectionsList.getSelectionModel().selectIndices(newIndex);
     }
 }
