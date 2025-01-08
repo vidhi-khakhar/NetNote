@@ -48,7 +48,7 @@ class EmbeddedFileTest {
     }
 
     @Test
-    void equalsTest() throws IOException {
+    void equalsTest1() throws IOException {
         EmbeddedFile ef1 = new EmbeddedFile();
         EmbeddedFile ef2 = new EmbeddedFile();
         String path1 = "src/test/java/test.jpg";
@@ -67,11 +67,50 @@ class EmbeddedFileTest {
     }
 
     @Test
-    void hashCodeTest() throws IOException {
+    void equalsTest2() throws IOException {
+        EmbeddedFile ef1 = new EmbeddedFile();
+        EmbeddedFile ef2 = new EmbeddedFile();
+        String path1 = "src/test/java/test.jpg";
+        File file1 = new File(path1);
+        ef1.setName(file1.getName());
+        ef2.setName(file1.getName());
+        byte[] content1 = Files.readAllBytes(file1.toPath());
+        ef1.setData(content1);
+        ef2.setData(content1);
+        ef1.setType(Files.probeContentType(file1.toPath()));
+        ef2.setType(Files.probeContentType(file1.toPath()));
+        assertEquals(ef1, ef2);
+    }
+
+    @Test
+    void hashCodeTest1() throws IOException {
+        String path1 = "src/test/java/test.jpg";
+        String path2 = "src/test/java/download.jpg";
+        File file1 = new File(path1);
+        File file2 = new File(path2);
+        byte[] content1 = Files.readAllBytes(file1.toPath());
+        byte[] content2 = Files.readAllBytes(file2.toPath());
         EmbeddedFile ef = new EmbeddedFile("stuff",
-                "image/png", null, new Note("title", "hello"));
+                "image/jpeg", content1, new Note("title", "hello"));
         EmbeddedFile ef2 = new EmbeddedFile("stuff",
-                "image/png", null, new Note("title", "hello"));
-        assertEquals(ef.hashCode(), ef2.hashCode());
+                "image/jpeg", content2, new Note("title", "hello"));
+        assertNotEquals(ef.hashCode(), ef2.hashCode());
+    }
+
+    @Test
+    void hashCodeTest2() throws IOException {
+        EmbeddedFile ef1 = new EmbeddedFile();
+        EmbeddedFile ef2 = new EmbeddedFile();
+        String path1 = "src/test/java/test.jpg";
+        File file1 = new File(path1);
+        byte[] content1 = Files.readAllBytes(file1.toPath());
+        byte[] content2 = Files.readAllBytes(file1.toPath());
+        ef1.setName(file1.getName());
+        ef2.setName(file1.getName());
+        ef1.setData(content1);
+        ef2.setData(content2);
+        ef1.setType(Files.probeContentType(file1.toPath()));
+        ef2.setType(Files.probeContentType(file1.toPath()));
+        assertEquals(ef1.hashCode(), ef2.hashCode());
     }
 }
