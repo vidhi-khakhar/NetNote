@@ -1,6 +1,7 @@
 package client.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import commons.Collection;
 import commons.Note;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -26,6 +27,7 @@ public class CollectionServerUtils {
      *
      * @param mapper The ObjectMapper instance used for converting objects to JSON.
      */
+    @Inject
     public CollectionServerUtils(ObjectMapper mapper) {
         this.serverAddress = getLocalAddress();
         this.mapper = mapper;
