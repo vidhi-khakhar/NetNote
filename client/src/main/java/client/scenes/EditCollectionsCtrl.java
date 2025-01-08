@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
+import java.util.List;
 import java.util.Map;
 
 public class EditCollectionsCtrl {
@@ -135,20 +136,7 @@ public class EditCollectionsCtrl {
 
     public void handleSave() {
         switch (currentAction) {
-            case ADD_COLLECTION -> {
-                if (!noteServerUtils.isServerAvailable(serverInput.getText())) {
-                    mainCtrl.showPopUp("Server not reachable",
-                            "Server not reachable",
-                            Alert.AlertType.ERROR);
-                    return;
-                }
-                Collection newCollection = new Collection(
-                        uniqueNameInput.getText(),
-                        serverInput.getText(),
-                        aliasInput.getText()
-                );
-                //TODO Handle server
-            }
+            case ADD_COLLECTION -> storeCollection();
         }
     }
 
@@ -161,5 +149,35 @@ public class EditCollectionsCtrl {
                 currentAction = CollectionAction.NO_ACTION;
             }
         }
+    }
+
+    public void storeCollection() {
+        if (!noteServerUtils.isServerAvailable(serverInput.getText())) {
+            mainCtrl.showPopUp("Server not reachable",
+                    "Server not reachable",
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        String uniqueName = uniqueNameInput.getText();
+        String server = serverInput.getText();
+        String alias = aliasInput.getText();
+        Collection newCollection = new Collection(
+                uniqueName,
+                alias,
+                server
+        );
+        if (collectionUtils.collectionAlreadyExists(collections, uniqueName)) {
+            mainCtrl.showPopUp("Note already added",
+                    "Note already added",
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        List<Collection> serverCollections =
+                collectionServerUtils.getAllCollections(server);
+        if (!collectionUtils.collectionAlreadyExists(serverCollections, uniqueName)) {
+            collectionServerUtils.createCollection(newCollection, server);
+        }
+        configLoader.addCollection(newCollection);
+        currentAction = CollectionAction.NO_ACTION;
     }
 }

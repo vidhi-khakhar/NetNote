@@ -10,15 +10,12 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import org.jvnet.hk2.annotations.Service;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CollectionServerUtils {
 
-    private String serverAddress;
     private final ObjectMapper mapper;
 
     /**
@@ -29,31 +26,17 @@ public class CollectionServerUtils {
      */
     @Inject
     public CollectionServerUtils(ObjectMapper mapper) {
-        this.serverAddress = getLocalAddress();
         this.mapper = mapper;
-    }
-
-    /**
-     * Getter for the local address of the current device in the network.
-     *
-     * @return The local address of the current device.
-     */
-    public static String getLocalAddress() {
-        try {
-            return "http://" + InetAddress.getLocalHost().getHostAddress() + ":8080/";
-        } catch (UnknownHostException e) {
-            System.out.println("Unknown host");
-            return "";
-        }
     }
 
     /**
      * This method sends a GET request to the "api/collections/" endpoint to fetch all notes.
      *
+     * @param serverAddress The address of the server to send the request to
      * @return a list of all collections if the server responds with an HTTP status code 200
      * and an empty list if the request fails
      */
-    public List<Collection> getAllCollections() {
+    public List<Collection> getAllCollections(String serverAddress) {
         List<Collection> collections = new ArrayList<>();
         try {
             var response = ClientBuilder.newClient()
@@ -80,8 +63,9 @@ public class CollectionServerUtils {
      * Sends a PUT request with the Collection object as the request body.
      *
      * @param collection The collection to created and stored on the server.
+     * @param serverAddress The address of the server to send the request to
      */
-    public void createCollection(Collection collection) {
+    public void createCollection(Collection collection, String serverAddress) {
         try {
             String jsonData = mapper.writeValueAsString(collection);
 
@@ -108,8 +92,9 @@ public class CollectionServerUtils {
      *
      * @param uniqueName The unique name of the collection.
      * @param newAlias   The new alias.
+     * @param serverAddress The address of the server to send the request to
      */
-    public void updateCollectionAlias(String uniqueName, String newAlias) {
+    public void updateCollectionAlias(String uniqueName, String newAlias, String serverAddress) {
         try {
             var updatedCollection = new Collection();
             updatedCollection.setAlias(newAlias);
@@ -138,8 +123,9 @@ public class CollectionServerUtils {
      * Sends a DELETE request to the "api/collections/{uniqueName} endpoint.
      *
      * @param uniqueName The uniqueName of the collection to delete.
+     * @param serverAddress The address of the server to send the request to
      */
-    public void deleteCollection(String uniqueName) {
+    public void deleteCollection(String uniqueName, String serverAddress) {
         try {
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/" + uniqueName)
@@ -162,10 +148,11 @@ public class CollectionServerUtils {
      * Makes a GET request to "api/collections/unique-name/notes"
      *
      * @param uniqueName The name of the collection to retrieve the notes from.
+     * @param serverAddress The address of the server to send the request to
      * @return The list of notes in that collection,
      * if the collection exists.
      */
-    public List<Note> getAllNotesInCollection(String uniqueName) {
+    public List<Note> getAllNotesInCollection(String uniqueName, String serverAddress) {
         try {
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/" + uniqueName + "/notes/")
@@ -192,9 +179,10 @@ public class CollectionServerUtils {
      * Sends a POST request to the "api/collections/{uniqueName}/notes/{noteTitle}" endpoint.
      *
      * @param uniqueName The unique name of the collection.
+     * @param serverAddress The address of the server to send the request to
      * @param noteTitle  The title of the note to added.
      */
-    public void addNoteToCollection(String uniqueName, String noteTitle) {
+    public void addNoteToCollection(String uniqueName, String noteTitle, String serverAddress) {
         try {
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/" + uniqueName + "/notes/" + noteTitle)
@@ -221,9 +209,10 @@ public class CollectionServerUtils {
      * @param uniqueName       The unique name of the source collection.
      * @param noteTitle        The title of the note to move.
      * @param targetUniqueName The unique name of the target collection.
+     * @param serverAddress The address of the server to send the request to
      */
     public void moveNoteToAnotherCollection
-    (String uniqueName, String noteTitle, String targetUniqueName) {
+    (String uniqueName, String noteTitle, String targetUniqueName, String serverAddress) {
         try {
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/"
@@ -252,8 +241,11 @@ public class CollectionServerUtils {
      *
      * @param collectionName The name of the collection from which to remove the note
      * @param noteTitle      The title used to identify the note to be removed
+     * @param serverAddress The address of the server to send the request to
      */
-    public void removeNoteFromCollection(String collectionName, String noteTitle) {
+    public void removeNoteFromCollection(String collectionName,
+                                         String noteTitle,
+                                         String serverAddress) {
         try {
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/"

@@ -52,4 +52,10 @@ public class CollectionUtils {
             currentIndex--;
         return currentIndex;
     }
+
+    public boolean collectionAlreadyExists(List<Collection> collections, String uniqueName) {
+        return collections
+                .stream()
+                .anyMatch(c -> c.getCollectionUniqueName().equals(uniqueName));
+    }
 }
