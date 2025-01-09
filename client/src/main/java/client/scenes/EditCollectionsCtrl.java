@@ -19,6 +19,10 @@ import javafx.scene.text.Text;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller for the "Edit collections..." menu
+ * Methods starting with "handle" are directly referenced in the FXML code
+ */
 public class EditCollectionsCtrl {
 
     @Inject
@@ -42,6 +46,7 @@ public class EditCollectionsCtrl {
     private final ObservableList<Collection> collections = FXCollections.observableArrayList();
     private CollectionAction currentAction = CollectionAction.NO_ACTION;
     private Map<String, StringProperty> props;
+    private boolean isSelectedCollectionListenerDisabled = false;
 
     @FXML
     private Text menuTitle;
@@ -84,7 +89,8 @@ public class EditCollectionsCtrl {
 
     /**
      * Initializes the {@link EditCollectionsCtrl} controller by
-     * setting the binding the appropriate text properties.
+     * binding the appropriate text properties and adding the
+     * appropriate event listeners.
      */
     public void initialize() {
         props = langUtils.getProps();
@@ -106,6 +112,24 @@ public class EditCollectionsCtrl {
                 }
             }
         });
+
+        collectionsList
+                .getSelectionModel()
+                .selectedItemProperty()
+                .addListener((_, oldValue, newValue) -> {
+                    if (isSelectedCollectionListenerDisabled) return;
+                    if (currentAction != CollectionAction.NO_ACTION) {
+                        mainCtrl.showPopUp("Action already in progress",
+                                "Please discard the current action to proceed.",
+                                Alert.AlertType.ERROR);
+                        isSelectedCollectionListenerDisabled = true; // Avoid infinite loop
+                        collectionsList.getSelectionModel().select(oldValue);
+                        isSelectedCollectionListenerDisabled = false;
+                    }
+                    aliasInput.setText(newValue.getAlias());
+                    serverInput.setText(newValue.getServer());
+                    uniqueNameInput.setText(newValue.getCollectionUniqueName());
+                });
 
         initializeTextProperties();
     }
@@ -132,12 +156,17 @@ public class EditCollectionsCtrl {
                     Alert.AlertType.ERROR);
             return;
         }
-        currentAction = CollectionAction.ADD_COLLECTION;
         int newIndex = collectionUtils.createNewCollection(collections);
         collectionsList.getSelectionModel().selectIndices(newIndex);
-
+        currentAction = CollectionAction.ADD_COLLECTION;
     }
 
+    /**
+     * Saves the local changes to the database.
+     * Performs a different database call depending on the currently
+     * initiated action. <br>
+     * Called when pressing the "Save" button.
+     */
     public void handleSave() {
         switch (currentAction) {
             case ADD_COLLECTION -> storeCollection();
@@ -145,17 +174,26 @@ public class EditCollectionsCtrl {
         updateServerStatusText();
     }
 
+    /**
+     * Discards the current action and reverts the local state
+     * to be in sync with the server. <br>
+     * Called when pressing the "Discard" button.
+     */
     public void handleDiscard() {
         switch (currentAction) {
             case ADD_COLLECTION -> {
+                currentAction = CollectionAction.NO_ACTION;
                 collectionUtils.removeLastCollection(
                         collections,
                         collectionsList.getSelectionModel().getSelectedIndex());
-                currentAction = CollectionAction.NO_ACTION;
             }
         }
     }
 
+    /**
+     * Disallows changes to the server address of an already added collection. <br>
+     * Called when the text in the server input changes.
+     */
     public void handleServerChange() {
         if (currentAction != CollectionAction.ADD_COLLECTION) {
             serverInput.undo();
@@ -165,6 +203,10 @@ public class EditCollectionsCtrl {
         }
     }
 
+    /**
+     * Disallows changes to the unique name for an already added collection. <br>
+     * Called when the text in the "Collection" input changes.
+     */
     public void handleUniqueNameChange() {
         if (currentAction != CollectionAction.ADD_COLLECTION) {
             uniqueNameInput.undo();
@@ -174,13 +216,13 @@ public class EditCollectionsCtrl {
         }
     }
 
-    public void handleSelectCollection() {
-        Collection collection = collectionsList.getSelectionModel().getSelectedItem();
-        aliasInput.setText(collection.getAlias());
-        serverInput.setText(collection.getServer());
-        uniqueNameInput.setText(collection.getCollectionUniqueName());
-    }
-
+    /**
+     * Adds a new collection to the local list of collections in "config.json",
+     * and creates it on the server if it doesn't already exist. <br>
+     * Fails if the same collection was already added or if the server is not reachable.
+     * Called when pressing "Save" if the current {@link CollectionAction} is
+     * {@code ADD_COLLECTION}.
+     */
     public void storeCollection() {
         if (!noteServerUtils.isServerAvailable(serverInput.getText())) {
             mainCtrl.showPopUp("Server not reachable",
@@ -210,6 +252,12 @@ public class EditCollectionsCtrl {
         currentAction = CollectionAction.NO_ACTION;
     }
 
+    /**
+     * Get the current collection server status based on the server address and collection name.
+     * @param serverAddress The address of the server to ping
+     * @param uniqueName The name of the collection to search for on the server
+     * @return The server status based on the provided address and collection name
+     */
     public CollectionServerStatus getStatus(String serverAddress, String uniqueName) {
         if (!noteServerUtils.isServerAvailable(serverAddress))
             return CollectionServerStatus.SERVER_NOT_REACHABLE;
@@ -220,6 +268,10 @@ public class EditCollectionsCtrl {
                 CollectionServerStatus.COLLECTION_WILL_BE_CREATED;
     }
 
+    /**
+     * Updates the server status text in the UI based on the current server status
+     * for the current collection.
+     */
     public void updateServerStatusText() {
         String server = serverInput.getText();
         String uniqueName = uniqueNameInput.getText();
