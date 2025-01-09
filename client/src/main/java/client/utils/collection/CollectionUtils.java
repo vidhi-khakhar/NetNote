@@ -69,6 +69,8 @@ public class CollectionUtils {
         currentCollections.remove(targetIndex);
         if (currentIndex == currentCollections.size())
             return currentIndex - 1;
+        if (targetIndex < currentIndex)
+            return currentIndex - 1;
         return currentIndex;
     }
 
