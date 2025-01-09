@@ -124,6 +124,7 @@ public class EditCollectionsCtrl {
                         isSelectedCollectionListenerDisabled = true; // Avoid infinite loop
                         collectionsList.getSelectionModel().select(oldValue);
                         isSelectedCollectionListenerDisabled = false;
+                        return;
                     }
                     if (newValue == null) {
                         aliasInput.setText("");
@@ -165,7 +166,7 @@ public class EditCollectionsCtrl {
     }
 
     /**
-     * Removes the currently selected note with a confirmation from the user.
+     * Removes the currently selected collection with a confirmation from the user.
      * Also commits the changes to the local list of collections.
      */
     public void handleRemoveCollection() {
@@ -231,10 +232,11 @@ public class EditCollectionsCtrl {
      */
     public void handleAliasChange() {
         if (collectionsList.getSelectionModel().getSelectedIndex() == -1) {
-            int newIndex = collectionUtils.createNewCollection(collections, aliasInput.getText());
-            collectionsList.getSelectionModel().selectIndices(newIndex);
-            currentAction = CollectionAction.ADD_COLLECTION;
-            aliasInput.positionCaret(1);
+            mainCtrl.showPopUp("Please select a collection",
+                    "Cannot change the alias because no collection is selected.",
+                    Alert.AlertType.ERROR);
+            aliasInput.setText("");
+            return;
         }
         if (currentAction == CollectionAction.NO_ACTION) {
             currentAction = CollectionAction.CHANGE_COLLECTION_ALIAS;
@@ -251,7 +253,7 @@ public class EditCollectionsCtrl {
         if (currentAction != CollectionAction.ADD_COLLECTION) {
             serverInput.undo();
             mainCtrl.showPopUp("Cannot modify server",
-                    "Cannot modify the server of an already created note.",
+                    "Cannot modify the server of an already created collection.",
                     Alert.AlertType.ERROR);
         }
     }
@@ -264,7 +266,7 @@ public class EditCollectionsCtrl {
         if (currentAction != CollectionAction.ADD_COLLECTION) {
             uniqueNameInput.undo();
             mainCtrl.showPopUp("Cannot modify the unique name",
-                    "Cannot modify the unique name of an already created note.",
+                    "Cannot modify the unique name of an already created collection.",
                     Alert.AlertType.ERROR);
         }
     }
@@ -297,12 +299,12 @@ public class EditCollectionsCtrl {
                     Alert.AlertType.ERROR);
             return;
         }
+        currentAction = CollectionAction.NO_ACTION;
         if (getStatus(server, uniqueName) == CollectionServerStatus.COLLECTION_WILL_BE_CREATED) {
             collectionServerUtils.createCollection(newCollection, server);
         }
         configLoader.addCollection(newCollection);
         collections.set(collections.size() - 1, newCollection);
-        currentAction = CollectionAction.NO_ACTION;
     }
 
     /**
@@ -360,8 +362,8 @@ public class EditCollectionsCtrl {
      * another action is already in progress.
      */
     public void showActionConflictPopup() {
-        mainCtrl.showPopUp("Action already in progress",
-                "Please discard the current action to proceed.",
+        mainCtrl.showPopUp("Unsaved changes",
+                "You have unsaved changes. Please save or discard the current action to proceed.",
                 Alert.AlertType.ERROR);
     }
 }
