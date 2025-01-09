@@ -41,15 +41,22 @@ public class CollectionUtils {
     }
 
     /**
-     * Removes the last collection in a list of collections
+     * Removes a collection in a list of collections
+     *
      * @param currentCollections The current list of collections
-     * @param currentIndex The index of the currently selected collection
+     * @param currentIndex       The index of the currently selected collection
+     * @param targetIndex        The index of the collection to delete
      * @return The index of the selected collection after the deletion
      */
-    public int removeLastCollection(List<Collection> currentCollections, int currentIndex) {
-        currentCollections.removeLast();
+    public int removeCollection(
+            List<Collection> currentCollections,
+            int currentIndex,
+            int targetIndex) {
+        if (targetIndex > currentCollections.size() - 1 ||
+                targetIndex < 0) return currentIndex;
+        currentCollections.remove(targetIndex);
         if (currentIndex == currentCollections.size())
-            currentIndex--;
+            return currentIndex - 1;
         return currentIndex;
     }
 

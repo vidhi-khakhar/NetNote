@@ -34,7 +34,7 @@
                   <Font size="14.0" />
                </font>
             </Button>
-            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="-">
+            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleRemoveCollection" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="-">
                <font>
                   <Font size="14.0" />
                </font>

@@ -119,12 +119,16 @@ public class EditCollectionsCtrl {
                 .addListener((_, oldValue, newValue) -> {
                     if (isSelectedCollectionListenerDisabled) return;
                     if (currentAction != CollectionAction.NO_ACTION) {
-                        mainCtrl.showPopUp("Action already in progress",
-                                "Please discard the current action to proceed.",
-                                Alert.AlertType.ERROR);
+                        showActionConflictPopup();
                         isSelectedCollectionListenerDisabled = true; // Avoid infinite loop
                         collectionsList.getSelectionModel().select(oldValue);
                         isSelectedCollectionListenerDisabled = false;
+                    }
+                    if (newValue == null) {
+                        aliasInput.setText("");
+                        serverInput.setText("");
+                        uniqueNameInput.setText("");
+                        return;
                     }
                     aliasInput.setText(newValue.getAlias());
                     serverInput.setText(newValue.getServer());
@@ -151,14 +155,35 @@ public class EditCollectionsCtrl {
      */
     public void handleAddCollection() {
         if (currentAction != CollectionAction.NO_ACTION) {
-            mainCtrl.showPopUp("Action already in progress",
-                    "Please discard the current action to proceed.",
-                    Alert.AlertType.ERROR);
+            showActionConflictPopup();
             return;
         }
         int newIndex = collectionUtils.createNewCollection(collections);
         collectionsList.getSelectionModel().selectIndices(newIndex);
         currentAction = CollectionAction.ADD_COLLECTION;
+    }
+
+    /**
+     * Removes the currently selected note with a confirmation from the user.
+     * Also commits the changes to the local list of collections.
+     */
+    public void handleRemoveCollection() {
+        int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
+        if (currentIndex == -1) {
+            mainCtrl.showPopUp("No collection selected",
+                    "Please select a collection to be removed",
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        if (mainCtrl.showPopUp("Remove collection",
+                "Are you sure you want to remove this collection?",
+                Alert.AlertType.CONFIRMATION)) {
+            currentAction = CollectionAction.NO_ACTION;
+            configLoader.removeCollection(collections.get(currentIndex).getCollectionUniqueName());
+            collectionsList.getSelectionModel().selectIndices(
+                    collectionUtils.removeCollection(collections, currentIndex, currentIndex)
+            );
+        }
     }
 
     /**
@@ -169,7 +194,7 @@ public class EditCollectionsCtrl {
      */
     public void handleSave() {
         switch (currentAction) {
-            case ADD_COLLECTION -> storeCollection();
+            case ADD_COLLECTION -> addCollection();
         }
         updateServerStatusText();
     }
@@ -183,9 +208,12 @@ public class EditCollectionsCtrl {
         switch (currentAction) {
             case ADD_COLLECTION -> {
                 currentAction = CollectionAction.NO_ACTION;
-                collectionUtils.removeLastCollection(
-                        collections,
-                        collectionsList.getSelectionModel().getSelectedIndex());
+                collectionsList.getSelectionModel().selectIndices(
+                        collectionUtils.removeCollection(
+                                collections,
+                                collectionsList.getSelectionModel().getSelectedIndex(),
+                                collections.size() - 1)
+                );
             }
         }
     }
@@ -223,7 +251,7 @@ public class EditCollectionsCtrl {
      * Called when pressing "Save" if the current {@link CollectionAction} is
      * {@code ADD_COLLECTION}.
      */
-    public void storeCollection() {
+    public void addCollection() {
         if (!noteServerUtils.isServerAvailable(serverInput.getText())) {
             mainCtrl.showPopUp("Server not reachable",
                     "Server not reachable",
@@ -254,8 +282,9 @@ public class EditCollectionsCtrl {
 
     /**
      * Get the current collection server status based on the server address and collection name.
+     *
      * @param serverAddress The address of the server to ping
-     * @param uniqueName The name of the collection to search for on the server
+     * @param uniqueName    The name of the collection to search for on the server
      * @return The server status based on the provided address and collection name
      */
     public CollectionServerStatus getStatus(String serverAddress, String uniqueName) {
@@ -278,5 +307,15 @@ public class EditCollectionsCtrl {
         CollectionServerStatus status = getStatus(server, uniqueName);
         serverStatusText.textProperty().unbind();
         serverStatusText.textProperty().bind(props.get(status.getBundleLabel()));
+    }
+
+    /**
+     * Alerts the user that they cannot perform an action because
+     * another action is already in progress.
+     */
+    public void showActionConflictPopup() {
+        mainCtrl.showPopUp("Action already in progress",
+                "Please discard the current action to proceed.",
+                Alert.AlertType.ERROR);
     }
 }
