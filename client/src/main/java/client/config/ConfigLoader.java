@@ -118,7 +118,7 @@ public class ConfigLoader {
     /**
      * Writes the current state of the configuration object to the config.json file.
      */
-    private void save() {
+    public void save() {
         try {
             INJECTOR
                     .getInstance(ObjectMapper.class)

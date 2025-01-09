@@ -47,6 +47,7 @@ public class EditCollectionsCtrl {
     private CollectionAction currentAction = CollectionAction.NO_ACTION;
     private Map<String, StringProperty> props;
     private boolean isSelectedCollectionListenerDisabled = false;
+    private String oldAlias;
 
     @FXML
     private Text menuTitle;
@@ -195,6 +196,7 @@ public class EditCollectionsCtrl {
     public void handleSave() {
         switch (currentAction) {
             case ADD_COLLECTION -> addCollection();
+            case CHANGE_COLLECTION_ALIAS -> changeCollectionAlias();
         }
         updateServerStatusText();
     }
@@ -215,6 +217,29 @@ public class EditCollectionsCtrl {
                                 collections.size() - 1)
                 );
             }
+            case CHANGE_COLLECTION_ALIAS -> {
+                currentAction = CollectionAction.NO_ACTION;
+                aliasInput.setText(oldAlias);
+            }
+        }
+    }
+
+    /**
+     * Creates a new collection if no collection is currently selected.
+     * It otherwise initiates an alias change action for the currently selected collection. <br>
+     * Called when the text in the alias input changes.
+     */
+    public void handleAliasChange() {
+        if (collectionsList.getSelectionModel().getSelectedIndex() == -1) {
+            int newIndex = collectionUtils.createNewCollection(collections, aliasInput.getText());
+            collectionsList.getSelectionModel().selectIndices(newIndex);
+            currentAction = CollectionAction.ADD_COLLECTION;
+            aliasInput.positionCaret(1);
+        }
+        if (currentAction == CollectionAction.NO_ACTION) {
+            currentAction = CollectionAction.CHANGE_COLLECTION_ALIAS;
+            oldAlias = collections.get(collectionsList.getSelectionModel().getSelectedIndex())
+                    .getAlias();
         }
     }
 
@@ -267,8 +292,8 @@ public class EditCollectionsCtrl {
                 server
         );
         if (collectionUtils.collectionAlreadyExists(collections, uniqueName)) {
-            mainCtrl.showPopUp("Note already added",
-                    "Note already added",
+            mainCtrl.showPopUp("Collection already added",
+                    "Collection already added",
                     Alert.AlertType.ERROR);
             return;
         }
@@ -277,6 +302,27 @@ public class EditCollectionsCtrl {
         }
         configLoader.addCollection(newCollection);
         collections.set(collections.size() - 1, newCollection);
+        currentAction = CollectionAction.NO_ACTION;
+    }
+
+    /**
+     * Changes the alias of a collection in the configuration file and on the server. <br>
+     * Returns the menu to its default state by setting the {@link CollectionAction} to
+     * {@code NO_ACTION}.
+     */
+    public void changeCollectionAlias() {
+        int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
+        Collection currentCollection = collections.get(currentIndex);
+        String newAlias = aliasInput.getText();
+
+        currentCollection.setAlias(newAlias);
+        collectionServerUtils.updateCollectionAlias(currentCollection.getCollectionUniqueName(),
+                newAlias,
+                currentCollection.getServer());
+        List<Collection> configCollections = configLoader.getCollections();
+        configCollections.get(currentIndex).setAlias(newAlias);
+        configLoader.save();
+        collectionsList.refresh();
         currentAction = CollectionAction.NO_ACTION;
     }
 

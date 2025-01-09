@@ -47,7 +47,7 @@
          </padding>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelTitle" text="%label.editCollectionsMenuLabelTitle" HBox.hgrow="NEVER" />
-            <TextField fx:id="aliasInput" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="aliasInput" maxWidth="-Infinity" minWidth="-Infinity" onKeyTyped="#handleAliasChange" prefWidth="200.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS" />
          </HBox>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelServer" text="%label.editCollectionsMenuLabelServer" textAlignment="RIGHT" HBox.hgrow="NEVER" />
