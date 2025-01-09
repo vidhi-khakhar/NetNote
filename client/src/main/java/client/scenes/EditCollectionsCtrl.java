@@ -119,7 +119,10 @@ public class EditCollectionsCtrl {
                 .selectedItemProperty()
                 .addListener((_, oldValue, newValue) -> {
                     if (isSelectedCollectionListenerDisabled) return;
-                    if (currentAction != CollectionAction.NO_ACTION) {
+
+                    if (currentAction == CollectionAction.NO_ACTION) {
+                        updateServerStatusText(CollectionServerStatus.COLLECTION_EXISTS);
+                    } else {
                         showActionConflictPopup();
                         isSelectedCollectionListenerDisabled = true; // Avoid infinite loop
                         collectionsList.getSelectionModel().select(oldValue);
@@ -163,6 +166,7 @@ public class EditCollectionsCtrl {
         int newIndex = collectionUtils.createNewCollection(collections);
         collectionsList.getSelectionModel().selectIndices(newIndex);
         currentAction = CollectionAction.ADD_COLLECTION;
+        updateServerStatusText(CollectionServerStatus.SERVER_NOT_REACHABLE);
     }
 
     /**
@@ -352,7 +356,15 @@ public class EditCollectionsCtrl {
     public void updateServerStatusText() {
         String server = serverInput.getText();
         String uniqueName = uniqueNameInput.getText();
-        CollectionServerStatus status = getStatus(server, uniqueName);
+        updateServerStatusText(getStatus(server, uniqueName));
+    }
+
+    /**
+     * Updates the server status text in the UI with the given value.
+     *
+     * @param status The status to display in the text.
+     */
+    public void updateServerStatusText(CollectionServerStatus status) {
         serverStatusText.textProperty().unbind();
         serverStatusText.textProperty().bind(props.get(status.getBundleLabel()));
     }
