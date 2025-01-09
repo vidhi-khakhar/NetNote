@@ -1,5 +1,6 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -14,13 +15,16 @@ public class EmbeddedFile {
      * Composite primary key for this entity, consisting of
      * the fileId and the noteId
      */
-    @EmbeddedId
-    private EmbeddedFileId id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     /**
      * Name of the Embedded File
      */
 
+    @Column(nullable = false)
     private String name;
 
     /**
@@ -42,8 +46,9 @@ public class EmbeddedFile {
      * The MapsId annotation maps the noteId field in EmbeddedFileId
      */
 
+    @JsonIgnore
     @ManyToOne
-    @MapsId("noteId")
+    @JoinColumn(name = "note_id", nullable = false)
     private Note note;
 
     /**
@@ -55,17 +60,13 @@ public class EmbeddedFile {
     }
 
     /**
-     * @param fileId ID of an Embedded File
-     * @param noteId ID of a Note
      * @param name Name of the Embedded File
      * @param type The file type of the Embedded File
      * @param data The binary data for the Embedded File, stored as a large object
      * @param note Note linked to the Embedded File
      */
 
-    public EmbeddedFile(Long fileId, Long noteId, String name,
-                        String type, byte[] data, Note note) {
-        this.id = new EmbeddedFileId(fileId, noteId);
+    public EmbeddedFile(String name, String type, byte[] data, Note note) {
         this.name = name;
         this.type = type;
         this.data = data;
@@ -95,7 +96,7 @@ public class EmbeddedFile {
      * @return ID of the associated Embedded File
      */
 
-    public EmbeddedFileId getId() {
+    public Long getId() {
         return id;
     }
 
