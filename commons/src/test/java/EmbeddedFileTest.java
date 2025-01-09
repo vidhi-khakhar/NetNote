@@ -48,7 +48,7 @@ class EmbeddedFileTest {
     }
 
     @Test
-    void equalsTest1() throws IOException {
+    void equalsTestDifferentImages() throws IOException {
         EmbeddedFile ef1 = new EmbeddedFile();
         EmbeddedFile ef2 = new EmbeddedFile();
         String path1 = "src/test/java/test.jpg";
@@ -67,7 +67,7 @@ class EmbeddedFileTest {
     }
 
     @Test
-    void equalsTest2() throws IOException {
+    void equalsTestSameImage() throws IOException {
         EmbeddedFile ef1 = new EmbeddedFile();
         EmbeddedFile ef2 = new EmbeddedFile();
         String path1 = "src/test/java/test.jpg";
@@ -83,7 +83,7 @@ class EmbeddedFileTest {
     }
 
     @Test
-    void hashCodeTest1() throws IOException {
+    void hashCodeTestDifferentImages() throws IOException {
         String path1 = "src/test/java/test.jpg";
         String path2 = "src/test/java/download.jpg";
         File file1 = new File(path1);
@@ -98,7 +98,7 @@ class EmbeddedFileTest {
     }
 
     @Test
-    void hashCodeTest2() throws IOException {
+    void hashCodeTestSameImage() throws IOException {
         EmbeddedFile ef1 = new EmbeddedFile();
         EmbeddedFile ef2 = new EmbeddedFile();
         String path1 = "src/test/java/test.jpg";
@@ -112,5 +112,21 @@ class EmbeddedFileTest {
         ef1.setType(Files.probeContentType(file1.toPath()));
         ef2.setType(Files.probeContentType(file1.toPath()));
         assertEquals(ef1.hashCode(), ef2.hashCode());
+    }
+
+    @Test
+    void getIdTest(){
+        EmbeddedFile embeddedFile = new EmbeddedFile("name", "type", null, null);
+        Long id = embeddedFile.getId();
+        assertNull(id);
+    }
+
+    @Test
+    void toStringTest(){
+        EmbeddedFile embeddedFile = new EmbeddedFile("name", "type", null, null);
+        String representation = embeddedFile.toString();
+        System.out.println(representation);
+        assertTrue(representation.contains("data=<null>") &&
+                representation.contains("name=name"));
     }
 }
