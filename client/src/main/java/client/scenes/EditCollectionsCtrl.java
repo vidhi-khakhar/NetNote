@@ -176,13 +176,13 @@ public class EditCollectionsCtrl {
     public void handleRemoveCollection() {
         int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
         if (currentIndex == -1) {
-            mainCtrl.showPopUp("No collection selected",
-                    "Please select a collection to be removed",
+            mainCtrl.showPopUp(props.get("noCollectionSelectedAlertTitle").get(),
+                    props.get("noCollectionSelectedAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
         }
-        if (mainCtrl.showPopUp("Remove collection",
-                "Are you sure you want to remove this collection?",
+        if (mainCtrl.showPopUp(props.get("removeCollectionConfirmationTitle").get(),
+                props.get("removeCollectionConfirmationText").get(),
                 Alert.AlertType.CONFIRMATION)) {
             currentAction = CollectionAction.NO_ACTION;
             configLoader.removeCollection(collections.get(currentIndex).getCollectionUniqueName());
@@ -236,8 +236,8 @@ public class EditCollectionsCtrl {
      */
     public void handleAliasChange() {
         if (collectionsList.getSelectionModel().getSelectedIndex() == -1) {
-            mainCtrl.showPopUp("Please select a collection",
-                    "Cannot change the alias because no collection is selected.",
+            mainCtrl.showPopUp(props.get("cannotChangeAliasOfUnselectedCollectionAlertTitle").get(),
+                    props.get("cannotChangeAliasOfUnselectedCollectionAlertText").get(),
                     Alert.AlertType.ERROR);
             aliasInput.setText("");
             return;
@@ -256,8 +256,8 @@ public class EditCollectionsCtrl {
     public void handleServerChange() {
         if (currentAction != CollectionAction.ADD_COLLECTION) {
             serverInput.undo();
-            mainCtrl.showPopUp("Cannot modify server",
-                    "Cannot modify the server of an already created collection.",
+            mainCtrl.showPopUp(props.get("cannotModifyServerAlertTitle").get(),
+                    props.get("cannotModifyServerAlertText").get(),
                     Alert.AlertType.ERROR);
         }
     }
@@ -269,8 +269,8 @@ public class EditCollectionsCtrl {
     public void handleUniqueNameChange() {
         if (currentAction != CollectionAction.ADD_COLLECTION) {
             uniqueNameInput.undo();
-            mainCtrl.showPopUp("Cannot modify the unique name",
-                    "Cannot modify the unique name of an already created collection.",
+            mainCtrl.showPopUp(props.get("cannotModifyUniqueNameAlertTitle").get(),
+                    props.get("cannotModifyUniqueNameAlertText").get(),
                     Alert.AlertType.ERROR);
         }
     }
@@ -284,8 +284,8 @@ public class EditCollectionsCtrl {
      */
     public void addCollection() {
         if (!noteServerUtils.isServerAvailable(serverInput.getText())) {
-            mainCtrl.showPopUp("Server not reachable",
-                    "Server not reachable",
+            mainCtrl.showPopUp(props.get("serverNotReachableAlertTitle").get(),
+                    props.get("serverNotReachableAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
         }
@@ -298,8 +298,8 @@ public class EditCollectionsCtrl {
                 server
         );
         if (collectionUtils.collectionAlreadyExists(collections, uniqueName)) {
-            mainCtrl.showPopUp("Collection already added",
-                    "Collection already added",
+            mainCtrl.showPopUp(props.get("collectionAlreadyAddedAlertTitle").get(),
+                    props.get("collectionAlreadyAddedAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
         }
@@ -374,8 +374,8 @@ public class EditCollectionsCtrl {
      * another action is already in progress.
      */
     public void showActionConflictPopup() {
-        mainCtrl.showPopUp("Unsaved changes",
-                "You have unsaved changes. Please save or discard the current action to proceed.",
+        mainCtrl.showPopUp(props.get("actionConflictAlertTitle").get(),
+                props.get("actionConflictAlertText").get(),
                 Alert.AlertType.ERROR);
     }
 }
