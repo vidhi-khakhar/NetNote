@@ -135,7 +135,7 @@
                      <Insets bottom="5.0" left="7.0" top="7.0" />
                   </HBox.margin>
                </Label>
-               <MenuButton fx:id="CollectionDropdown" accessibleRole="COMBO_BOX" mnemonicParsing="false" onMouseClicked="#populateCollectionsDropdown" prefWidth="150.0" style="-fx-border-color: BLACK; -fx-border-radius: 2," text="%label.currentCollectionName" HBox.hgrow="ALWAYS">
+               <MenuButton fx:id="collectionDropdown" accessibleRole="COMBO_BOX" mnemonicParsing="false" onMouseClicked="#populateCollectionsDropdown" prefWidth="150.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.currentCollectionName" HBox.hgrow="ALWAYS">
                   <items>
                      <MenuItem fx:id="editCollectionsDropdownOption" mnemonicParsing="false" onAction="#showEditCollectionsMenu" text="%label.collectionsDropdownEditCollections" />
                   </items>
