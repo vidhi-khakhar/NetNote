@@ -61,7 +61,7 @@ public class MainCtrl {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private CollectionServerUtils collectionServerUtils= new CollectionServerUtils(mapper);
+    private CollectionServerUtils collectionServerUtils = new CollectionServerUtils(mapper);
 
     @Inject
     private ConfigLoader configLoader;
@@ -109,12 +109,12 @@ public class MainCtrl {
     private MenuItem editCollectionsDropdownOption;
 
     @FXML
-    private MenuButton CollectionDropdown;
+    private MenuButton collectionDropdown;
 
     @FXML
     private void populateCollectionsDropdown() {
         // Clear existing items to avoid duplicates
-        CollectionDropdown.getItems().clear();
+        collectionDropdown.getItems().clear();
 
         // Fetch collections (assuming CollectionServerUtils.getAll() returns a List<String>)
         List<commons.Collection> collections = collectionServerUtils.getAllCollections();
@@ -122,19 +122,18 @@ public class MainCtrl {
         for (commons.Collection collection : collections) {
             MenuItem itemCollection = new MenuItem(collection.getAlias());
             itemCollection.setOnAction(event -> handleCollectionSelection(collection));
-            CollectionDropdown.getItems().add(itemCollection);
+            collectionDropdown.getItems().add(itemCollection);
         }
-        CollectionDropdown.getItems().add(editCollectionsDropdownOption);
+        collectionDropdown.getItems().add(editCollectionsDropdownOption);
     }
 
     private void handleCollectionSelection(commons.Collection collection) {
         savedNotes.clear();
-        List<Note> notes = collectionServerUtils.getAllNotesInCollection(collection.getCollectionUniqueName().trim());
-        for(Note note : notes) {
-            savedNotes.add(note);
-        }
-        CollectionDropdown.textProperty().unbind();
-        CollectionDropdown.setText(collection.getAlias());
+        List<Note> notes = collectionServerUtils
+                .getAllNotesInCollection(collection.getCollectionUniqueName());
+        savedNotes.addAll(notes);
+        collectionDropdown.textProperty().unbind();
+        collectionDropdown.setText(collection.getAlias());
     }
 
     @FXML
@@ -262,7 +261,7 @@ public class MainCtrl {
         problemsCheckbox.textProperty().bind(props.get("markdownCheckboxLabel"));
         searchBar.promptTextProperty().bind(props.get("searchPlaceholder"));
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
-        CollectionDropdown.textProperty().bind(props.get("currentCollectionName"));
+        collectionDropdown.textProperty().bind(props.get("currentCollectionName"));
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
         filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
         editCollectionsDropdownOption.textProperty().bind(
@@ -290,9 +289,12 @@ public class MainCtrl {
         noteServerUtils.storeNote(n2);
         noteServerUtils.storeNote(n3);
 
-        collectionServerUtils.addNoteToCollection(c1.getCollectionUniqueName(),n1.getTitle().trim());
-        collectionServerUtils.addNoteToCollection(c1.getCollectionUniqueName(),n2.getTitle().trim());
-        collectionServerUtils.addNoteToCollection(c2.getCollectionUniqueName(),n3.getTitle().trim());
+        collectionServerUtils.
+                addNoteToCollection(c1.getCollectionUniqueName(),n1.getTitle().trim());
+        collectionServerUtils.
+                addNoteToCollection(c1.getCollectionUniqueName(),n2.getTitle().trim());
+        collectionServerUtils.
+                addNoteToCollection(c2.getCollectionUniqueName(),n3.getTitle().trim());
     }
 
     /**
@@ -886,7 +888,7 @@ public class MainCtrl {
     }
 
     /**
-     * Opens the "Edit Collections" scene to manage the current collections
+     * Opens the "Edit Collections" scene to manage the current collections.
      */
     public void showEditCollectionsMenu() {
         Stage secondaryStage = new Stage();
