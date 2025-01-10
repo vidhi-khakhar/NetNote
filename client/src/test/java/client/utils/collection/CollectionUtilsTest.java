@@ -26,6 +26,12 @@ public class CollectionUtilsTest {
     }
 
     @Test
+    public void generateDefaultNewCollectionAliasTest() {
+        List<String> takenAliases = List.of(CollectionUtils.NEW_COLLECTION_DEFAULT_ALIAS + " (2)", "ASDF", "my-notes");
+        assertEquals(CollectionUtils.NEW_COLLECTION_DEFAULT_ALIAS, sut.generateAlias(takenAliases));
+    }
+
+    @Test
     public void addCollectionWithGivenAliasChangesIndexTest() {
         int newIndex = sut.createNewCollection(collections, "Dutch weather notes");
         assertEquals(2, newIndex); // Assert whether the newly created collection is selected

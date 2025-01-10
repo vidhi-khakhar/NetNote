@@ -13,6 +13,27 @@ public class CollectionUtils {
     public static final String NEW_COLLECTION_DEFAULT_ALIAS = "New Collection";
 
     /**
+     * Generates a new alias of the form "New Collection (n)",
+     * where n is the smallest number so that the alias is still unique.
+     *
+     * @param unavailableAliases The list of aliases that cannot be returned by this method.
+     *                           The new alias must be unique.
+     * @return The newly created unique alias.
+     */
+    public String generateAlias(List<String> unavailableAliases) {
+        List<String> conflictingAliases = unavailableAliases.stream()
+                .filter(a -> a.startsWith(NEW_COLLECTION_DEFAULT_ALIAS))
+                .toList();
+        if (!conflictingAliases.contains(NEW_COLLECTION_DEFAULT_ALIAS)) {
+            return NEW_COLLECTION_DEFAULT_ALIAS;
+        }
+        int i = 2;
+        while (conflictingAliases.contains(NEW_COLLECTION_DEFAULT_ALIAS + " (" + i + ")"))
+            i++;
+        return NEW_COLLECTION_DEFAULT_ALIAS + " (" + i + ")";
+    }
+
+    /**
      * Creates a new collection with the alias "New Collection (n)",
      * where n is the smallest number so that the name is still unique.
      * Adds it to the provided list of collections.
@@ -22,22 +43,12 @@ public class CollectionUtils {
      */
     public int createNewCollection(List<Collection> currentCollections) {
         if (currentCollections == null) return -1; // Prevent NullPointerException
-        String newCollectionAlias;
-
-        List<String> conflictingTitles = currentCollections.stream()
-                .map(Collection::getAlias)
-                .filter(a -> a.startsWith(NEW_COLLECTION_DEFAULT_ALIAS))
-                .toList();
-
-        if (!conflictingTitles.contains(NEW_COLLECTION_DEFAULT_ALIAS)) {
-            newCollectionAlias = NEW_COLLECTION_DEFAULT_ALIAS;
-        } else {
-            int i = 2;
-            while (conflictingTitles.contains(NEW_COLLECTION_DEFAULT_ALIAS + " (" + i + ")"))
-                i++;
-            newCollectionAlias = NEW_COLLECTION_DEFAULT_ALIAS + " (" + i + ")";
-        }
-        return createNewCollection(currentCollections, newCollectionAlias);
+        return createNewCollection(currentCollections,
+                generateAlias(currentCollections
+                        .stream()
+                        .map(Collection::getAlias)
+                        .toList()
+        ));
     }
 
     /**
