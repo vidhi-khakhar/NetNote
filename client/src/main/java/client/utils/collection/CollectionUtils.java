@@ -21,6 +21,7 @@ public class CollectionUtils {
      * @return The index of the newly created collection
      */
     public int createNewCollection(List<Collection> currentCollections) {
+        if (currentCollections == null) return -1; // Prevent NullPointerException
         String newCollectionAlias;
 
         List<String> conflictingTitles = currentCollections.stream()
@@ -48,6 +49,7 @@ public class CollectionUtils {
      * @return The index of the newly created collection
      */
     public int createNewCollection(List<Collection> currentCollections, String alias) {
+        if (currentCollections == null) return -1; // Prevent NullPointerException
         currentCollections.add(new Collection("", alias, ""));
         return currentCollections.size() - 1;
     }

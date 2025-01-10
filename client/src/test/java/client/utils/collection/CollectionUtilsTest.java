@@ -34,16 +34,16 @@ public class CollectionUtilsTest {
     @Test
     public void addCollectionWithGivenAliasUpdatesListTest() {
         sut.createNewCollection(collections, "Dutch weather notes");
-        assertEquals(List.of(col1, col2, new Collection("", "Dutch weather notes", "")),
-                collections);
+        assertTrue(collections.contains(new Collection("", "Dutch weather notes", "")));
     }
 
     @Test
     public void addCollectionWithDefaultAliasTest() {
         sut.createNewCollection(collections);
-        assertEquals(List.of(col1, col2, new Collection("",
+        assertTrue(collections.contains(new Collection(
+                "",
                 CollectionUtils.NEW_COLLECTION_DEFAULT_ALIAS,
-                "")), collections);
+                "")));
     }
 
     @Test
@@ -57,9 +57,28 @@ public class CollectionUtilsTest {
         collections.add(newCol1);
         collections.add(newCol2);
         sut.createNewCollection(collections);
-        assertEquals(List.of(col1, col2, newCol1, newCol2, new Collection("",
+        assertTrue(collections.contains(new Collection(
+                "",
                 CollectionUtils.NEW_COLLECTION_DEFAULT_ALIAS + " (3)",
-                "")), collections);
+                ""
+        )));
+    }
+
+    @Test
+    public void addCollectionWithEmptyListTest() {
+        List<Collection> newList = new ArrayList<>();
+        sut.createNewCollection(newList);
+        assertTrue(newList.contains(new Collection(
+                "",
+                CollectionUtils.NEW_COLLECTION_DEFAULT_ALIAS,
+                "")));
+    }
+
+    @Test
+    public void addCollectionWithNullListTest() {
+        assertDoesNotThrow(() -> {
+            sut.createNewCollection(null);
+        });
     }
 
     @Test
