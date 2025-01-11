@@ -6,7 +6,7 @@ import client.utils.NoteSearchUtils;
 import client.utils.LangUtils;
 import client.utils.undo.*;
 import client.utils.NoteServerUtils;
-import client.utils.CollectionServerUtils;
+import client.utils.collection.CollectionServerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import commons.Note;
@@ -58,9 +58,9 @@ public class MainCtrl {
     @Inject
     private NoteServerUtils noteServerUtils;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    private CollectionServerUtils collectionServerUtils = new CollectionServerUtils(mapper);
+    private final CollectionServerUtils collectionServerUtils = new CollectionServerUtils(mapper);
 
     @Inject
     private ConfigLoader configLoader;
@@ -115,7 +115,7 @@ public class MainCtrl {
 
         collectionDropdown.getItems().clear();
         // Fetch collections (assuming CollectionServerUtils.getAll() returns a List<String>)
-        List<commons.Collection> collections = collectionServerUtils.getAllCollections();
+        List<commons.Collection> collections = collectionServerUtils.getAllCollections(noteServerUtils.getServerAddress());
         // Create and add MenuItems for each collection
         for (commons.Collection collection : collections) {
             MenuItem itemCollection = new MenuItem(collection.getAlias());
@@ -124,7 +124,7 @@ public class MainCtrl {
                 collectionDropdown.setText(collection.getAlias());
                 // Example: process or display the notes
                 processNotes(collectionServerUtils
-                        .getAllNotesInCollection(collection.getCollectionUniqueName()));
+                        .getAllNotesInCollection(collection.getCollectionUniqueName(),collection.getServer()));
             });
             collectionDropdown.getItems().add(itemCollection);
         }
