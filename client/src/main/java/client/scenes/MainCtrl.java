@@ -12,7 +12,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -790,11 +789,12 @@ public class MainCtrl {
     }
 
     /**
-     * Draft GUI representation of Embedded Files - specifically how adding a file would look
+     * A local test version of adding an embedded file
      */
     public void handleAddFile() {
         HBox fileContainer = new HBox(5);
-        fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white; -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
+        fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
+                " -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
 
         Label fileNameLabel = new Label("testFile.jpg");
 
