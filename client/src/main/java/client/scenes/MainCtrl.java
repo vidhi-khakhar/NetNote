@@ -113,27 +113,53 @@ public class MainCtrl {
 
     @FXML
     private void populateCollectionsDropdown() {
-        // Clear existing items to avoid duplicates
-        collectionDropdown.getItems().clear();
 
+        collectionDropdown.getItems().clear();
         // Fetch collections (assuming CollectionServerUtils.getAll() returns a List<String>)
         List<commons.Collection> collections = collectionServerUtils.getAllCollections();
         // Create and add MenuItems for each collection
         for (commons.Collection collection : collections) {
             MenuItem itemCollection = new MenuItem(collection.getAlias());
-            itemCollection.setOnAction(event -> handleCollectionSelection(collection));
+            itemCollection.setOnAction(event -> {
+                collectionDropdown.textProperty().unbind();
+                collectionDropdown.setText(collection.getAlias());
+                // Example: process or display the notes
+                processNotes(collectionServerUtils
+                        .getAllNotesInCollection(collection.getCollectionUniqueName()));
+            });
             collectionDropdown.getItems().add(itemCollection);
         }
         collectionDropdown.getItems().add(editCollectionsDropdownOption);
     }
 
-    private void handleCollectionSelection(commons.Collection collection) {
-        savedNotes.clear();
-        List<Note> notes = collectionServerUtils
-                .getAllNotesInCollection(collection.getCollectionUniqueName());
-        savedNotes.addAll(notes);
-        collectionDropdown.textProperty().unbind();
-        collectionDropdown.setText(collection.getAlias());
+    private void processNotes(List<Note> notesInCollection) {
+        Note currentNote = getCurrentNote();
+
+        List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
+
+        for(Note noteSaved : savedNotes) {
+            for(Note noteRetrieved : notesInCollection) {
+                if(noteSaved.getTitle().equals(noteRetrieved.getTitle())) {
+                    matchedRetrievedNotesWithActualNotes.add(noteSaved);
+                }
+            }
+        }
+
+        indexMap.clear();
+        for (Note note : matchedRetrievedNotesWithActualNotes) {
+            indexMap.put(note, savedNotes.indexOf(note));
+        }
+
+        ObservableList<Note> filteredNotes = FXCollections.
+                observableArrayList(matchedRetrievedNotesWithActualNotes);
+        notesList.setItems(filteredNotes);
+
+        if (currentNote != null && !filteredNotes.contains(currentNote)) {
+            selectedNoteIndex = savedNotes.indexOf(currentNote);
+        }
+        if (!filteredNotes.isEmpty() && currentNote == null) {
+            notesList.getSelectionModel().clearSelection();
+        }
     }
 
     @FXML
@@ -209,7 +235,7 @@ public class MainCtrl {
         searchBar.textProperty().addListener((_, _, newValue) ->
                 handleSearch(newValue)
         );
-        initializeDropdownTest(); //optional
+
         initializeShortcuts();
         initializeTextProperties();
 
@@ -269,32 +295,6 @@ public class MainCtrl {
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
 
         setLocale(configLoader.getLocale());
-    }
-
-    /**
-     * This is a temporary function to test the Collection Dropdown
-     */
-    public void initializeDropdownTest() {
-        Collection c1 = new Collection("collection1","Males","http://localhost:8080/");
-        collectionServerUtils.createCollection(c1);
-
-        Collection c2 = new Collection("collection2","Females","http://localhost:8080/");
-        collectionServerUtils.createCollection(c2);
-
-        Note n1 = new Note("Radu's Notes","Radu likes pancakes");
-        Note n2 = new Note("Serban's Notes","Serban likes Shakshouka");
-        Note n3 = new Note("Vidhi's Notes","Vidhi likes curry");
-
-        noteServerUtils.storeNote(n1);
-        noteServerUtils.storeNote(n2);
-        noteServerUtils.storeNote(n3);
-
-        collectionServerUtils.
-                addNoteToCollection(c1.getCollectionUniqueName(),n1.getTitle().trim());
-        collectionServerUtils.
-                addNoteToCollection(c1.getCollectionUniqueName(),n2.getTitle().trim());
-        collectionServerUtils.
-                addNoteToCollection(c2.getCollectionUniqueName(),n3.getTitle().trim());
     }
 
     /**
