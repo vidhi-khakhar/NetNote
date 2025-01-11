@@ -68,12 +68,14 @@ public class EmbeddedFileServerUtils {
     }
 
     /**
-     *
+     * This should retrieve the files based upon the note name.
+     * @param serverAddress - The server address because some files
+     *                      may be stored on different servers.
      * @param noteName - the note name which is used to correlate files to the correct note
      * @return - a list of all files if the server responds with an HTTP status code 200
      * and an empty list if the request files.
      */
-    public List<EmbeddedFile> getFilesFromNote(String noteName) {
+    public List<EmbeddedFile> getFilesFromNote(String serverAddress, String noteName) {
         List<EmbeddedFile> files = new ArrayList<>();
         try {
             Response response = ClientBuilder.newClient()
@@ -93,20 +95,22 @@ public class EmbeddedFileServerUtils {
         return files;
     }
 
+
     /**
      * Sends a POST request to store a file on the server.
      * The method uses the REST API endpoint at "api/files/" to store the provided note.
      *
+     * @param serverAddress - The server address because some files m
+     *                      ay be stored on different servers.
      * @param noteName - used to match embedded files with the correct note based on key: noteName
      * @param file - the embedded file.
      */
-    public void storeEmbeddedFile(String noteName, EmbeddedFile file) {
+    public void storeEmbeddedFile(String serverAddress, String noteName, EmbeddedFile file) {
         try {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress + "api/files/" + noteName)
                     .request(MediaType.APPLICATION_JSON)
                     .post(Entity.entity(file, MediaType.APPLICATION_JSON));
-
 
             if (response.getStatus() == 201) {
                 System.out.println("Embedded file stored successfully.");
@@ -120,22 +124,21 @@ public class EmbeddedFileServerUtils {
     }
 
 
+
     /**
      * Sends a PATCH request to update the title of an existing embedded file on the server.
-     *
+     * @param serverAddress - The server address because some files
+     *                      may be stored on different servers.
      * @param oldTitle    - The current title of the embedded file to be updated.
      * @param newTitle    - The new title to be assigned to the embedded file.
      */
-    public void renameEmbeddedFile(String oldTitle, String newTitle) {
+    public void renameEmbeddedFile(String serverAddress, String oldTitle, String newTitle) {
         try {
-            // Prepare the update data as a map
             Map<String, String> updateData = new HashMap<>();
             updateData.put("title", newTitle); // Key "title" matches the server's expected field
 
-            // Convert the map to a JSON string
             String jsonData = new ObjectMapper().writeValueAsString(updateData);
 
-            // Perform the PATCH request using the X-HTTP-Method-Override header
             Response response = ClientBuilder.newClient()
                     .target(serverAddress)
                     .path("api/files/" + oldTitle)
@@ -158,13 +161,16 @@ public class EmbeddedFileServerUtils {
     }
 
 
+
     /**
      * Sends an HTTP DELETE request to the server to remove
      * the embedded file with the given title.
+     * @param serverAddress - The server address because some files
+     *                        may be stored on different servers.
      * @param noteName - Name of the note selected
      * @param fileName - Name of the file to be deleted.
      */
-    public void deleteEmbeddedFile(String noteName, String fileName) {
+    public void deleteEmbeddedFile(String serverAddress, String noteName, String fileName) {
         try {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress + "api/files/" + noteName + "/content/" + fileName)
