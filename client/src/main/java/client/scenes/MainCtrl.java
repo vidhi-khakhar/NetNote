@@ -115,7 +115,8 @@ public class MainCtrl {
 
         collectionDropdown.getItems().clear();
         // Fetch collections (assuming CollectionServerUtils.getAll() returns a List<String>)
-        List<commons.Collection> collections = collectionServerUtils.getAllCollections(noteServerUtils.getServerAddress());
+        List<commons.Collection> collections = collectionServerUtils
+                .getAllCollections(noteServerUtils.getServerAddress());
         // Create and add MenuItems for each collection
         for (commons.Collection collection : collections) {
             MenuItem itemCollection = new MenuItem(collection.getAlias());
@@ -124,7 +125,9 @@ public class MainCtrl {
                 collectionDropdown.setText(collection.getAlias());
                 // Example: process or display the notes
                 processNotes(collectionServerUtils
-                        .getAllNotesInCollection(collection.getCollectionUniqueName(),collection.getServer()));
+                        .getAllNotesInCollection(
+                                collection.getCollectionUniqueName(),
+                                collection.getServer()));
             });
             collectionDropdown.getItems().add(itemCollection);
         }
