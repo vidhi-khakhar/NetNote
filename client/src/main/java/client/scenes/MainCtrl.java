@@ -9,7 +9,6 @@ import client.utils.NoteServerUtils;
 import client.utils.CollectionServerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
-import commons.Collection;
 import commons.Note;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
