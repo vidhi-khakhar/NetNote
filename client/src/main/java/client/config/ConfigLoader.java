@@ -17,13 +17,14 @@ public class ConfigLoader {
 
     private static final Injector INJECTOR = Guice.createInjector(new MyModule());
     private Config data;
-    private String filePath;
+    private final String filePath;
 
     /**
      * Default constructor used by Guice
      */
     @SuppressWarnings("unused")
     public ConfigLoader() {
+        this("config.json");
     }
 
     /**

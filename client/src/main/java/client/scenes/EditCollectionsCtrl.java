@@ -189,6 +189,7 @@ public class EditCollectionsCtrl {
             collectionsList.getSelectionModel().selectIndices(
                     collectionUtils.removeCollection(collections, currentIndex, currentIndex)
             );
+            mainCtrl.populateCollectionsDropdown();
         }
     }
 
@@ -204,6 +205,7 @@ public class EditCollectionsCtrl {
             case CHANGE_COLLECTION_ALIAS -> changeCollectionAlias();
         }
         updateServerStatusText();
+        mainCtrl.populateCollectionsDropdown();
     }
 
     /**
