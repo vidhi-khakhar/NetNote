@@ -656,19 +656,20 @@ public class MainCtrl {
                 showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertTitleExists").get(),
                         Alert.AlertType.ERROR);
-            }
+            } else {
 
-            selectedNote.setTitle(updatedTitle);
+                selectedNote.setTitle(updatedTitle);
 
-            try {
-                noteServerUtils.updateNote(previousTitle, Map.of("title", updatedTitle));
-            } catch (Exception e) {
-                selectedNote.setTitle(previousTitle);
-                return;
-            }
+                try {
+                    noteServerUtils.updateNote(previousTitle, Map.of("title", updatedTitle));
+                } catch (Exception e) {
+                    selectedNote.setTitle(previousTitle);
+                    return;
+                }
 
-            if (notesList.getItems().contains(selectedNote)) {
-                notesList.refresh();
+                if (notesList.getItems().contains(selectedNote)) {
+                    notesList.refresh();
+                }
             }
         } else if (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty()) {
             // Ensure the first note is created when only content exists
