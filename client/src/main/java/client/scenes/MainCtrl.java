@@ -9,6 +9,7 @@ import client.utils.NoteServerUtils;
 import client.utils.collection.CollectionServerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import commons.Collection;
 import commons.Note;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -109,60 +110,6 @@ public class MainCtrl {
 
     @FXML
     private MenuButton collectionDropdown;
-
-    @FXML
-    private void populateCollectionsDropdown() {
-
-        collectionDropdown.getItems().clear();
-        // Fetch collections (assuming CollectionServerUtils.getAll() returns a List<String>)
-        List<commons.Collection> collections = collectionServerUtils
-                .getAllCollections(noteServerUtils.getServerAddress());
-        // Create and add MenuItems for each collection
-        for (commons.Collection collection : collections) {
-            MenuItem itemCollection = new MenuItem(collection.getAlias());
-            itemCollection.setOnAction(event -> {
-                collectionDropdown.textProperty().unbind();
-                collectionDropdown.setText(collection.getAlias());
-                // Example: process or display the notes
-                processNotes(collectionServerUtils
-                        .getAllNotesInCollection(
-                                collection.getCollectionUniqueName(),
-                                collection.getServer()));
-            });
-            collectionDropdown.getItems().add(itemCollection);
-        }
-        collectionDropdown.getItems().add(editCollectionsDropdownOption);
-    }
-
-    private void processNotes(List<Note> notesInCollection) {
-        Note currentNote = getCurrentNote();
-
-        List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
-
-        for(Note noteSaved : savedNotes) {
-            for(Note noteRetrieved : notesInCollection) {
-                if(noteSaved.getTitle().equals(noteRetrieved.getTitle())) {
-                    matchedRetrievedNotesWithActualNotes.add(noteSaved);
-                }
-            }
-        }
-
-        indexMap.clear();
-        for (Note note : matchedRetrievedNotesWithActualNotes) {
-            indexMap.put(note, savedNotes.indexOf(note));
-        }
-
-        ObservableList<Note> filteredNotes = FXCollections.
-                observableArrayList(matchedRetrievedNotesWithActualNotes);
-        notesList.setItems(filteredNotes);
-
-        if (currentNote != null && !filteredNotes.contains(currentNote)) {
-            selectedNoteIndex = savedNotes.indexOf(currentNote);
-        }
-        if (!filteredNotes.isEmpty() && currentNote == null) {
-            notesList.getSelectionModel().clearSelection();
-        }
-    }
 
     @FXML
     private Label renderedNoteLabel;
@@ -899,5 +846,64 @@ public class MainCtrl {
         secondaryStage.setScene(editCollectionsMenu);
         secondaryStage.show();
     }
+
+    /**
+     * Reloads all the elements inside the collections dropdown menu.
+     */
+    public void populateCollectionsDropdown() {
+        collectionDropdown.getItems().clear();
+        // Fetch collections (assuming CollectionServerUtils.getAll() returns a List<String>)
+        List<Collection> collections = configLoader.getCollections();
+        // Create and add MenuItems for each collection
+        for (Collection collection : collections) {
+            MenuItem itemCollection = new MenuItem(collection.getAlias());
+            itemCollection.setOnAction(event -> {
+                collectionDropdown.textProperty().unbind();
+                collectionDropdown.setText(collection.getAlias());
+                // Example: process or display the notes
+                processNotes(collectionServerUtils
+                        .getAllNotesInCollection(
+                                collection.getCollectionUniqueName(),
+                                collection.getServer()));
+            });
+            collectionDropdown.getItems().add(itemCollection);
+        }
+        collectionDropdown.getItems().add(editCollectionsDropdownOption);
+    }
+
+    /**
+     * Updates the list of notes to show only the notes in the current collection.
+     * @param notesInCollection The list of notes in the currently selected collection.
+     */
+    public void processNotes(List<Note> notesInCollection) {
+        Note currentNote = getCurrentNote();
+
+        List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
+
+        for(Note noteSaved : savedNotes) {
+            for(Note noteRetrieved : notesInCollection) {
+                if(noteSaved.getTitle().equals(noteRetrieved.getTitle())) {
+                    matchedRetrievedNotesWithActualNotes.add(noteSaved);
+                }
+            }
+        }
+
+        indexMap.clear();
+        for (Note note : matchedRetrievedNotesWithActualNotes) {
+            indexMap.put(note, savedNotes.indexOf(note));
+        }
+
+        ObservableList<Note> filteredNotes = FXCollections.
+                observableArrayList(matchedRetrievedNotesWithActualNotes);
+        notesList.setItems(filteredNotes);
+
+        if (currentNote != null && !filteredNotes.contains(currentNote)) {
+            selectedNoteIndex = savedNotes.indexOf(currentNote);
+        }
+        if (!filteredNotes.isEmpty() && currentNote == null) {
+            notesList.getSelectionModel().clearSelection();
+        }
+    }
+
 }
 

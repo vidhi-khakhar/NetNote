@@ -22,7 +22,6 @@ import client.utils.LangUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.google.inject.Provides;
 import com.google.inject.Scopes;
 
 public class MyModule implements Module {
@@ -38,17 +37,6 @@ public class MyModule implements Module {
         binder.bind(EditCollectionsCtrl.class).in(Scopes.SINGLETON);
         binder.bind(ObjectMapper.class).in(Scopes.SINGLETON);
         binder.bind(LangUtils.class).in(Scopes.SINGLETON);
-    }
-
-    /**
-     * Specifies how to instantiate the {@link ConfigLoader} when
-     * injecting it.
-     *
-     * @return The default instance of the {@link ConfigLoader} which
-     * stores the configuration data in the {@code config.json} file.
-     */
-    @Provides
-    public ConfigLoader configLoader() {
-        return new ConfigLoader("config.json");
+        binder.bind(ConfigLoader.class).in(Scopes.SINGLETON);
     }
 }
