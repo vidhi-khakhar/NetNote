@@ -1,3 +1,8 @@
+
+/*
+The tests were created with the aid of ChatGPT to speed up the process
+ */
+
 import commons.CollectionContainsNotes;
 import commons.CollectionContainsNotesId;
 

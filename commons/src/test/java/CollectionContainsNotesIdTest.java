@@ -1,3 +1,8 @@
+
+/*
+The tests were created with the aid of ChatGPT to speed up the process
+ */
+
 import commons.CollectionContainsNotesId;
 import org.junit.jupiter.api.Test;
 
