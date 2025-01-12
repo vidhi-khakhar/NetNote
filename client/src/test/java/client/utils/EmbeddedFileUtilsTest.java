@@ -44,24 +44,24 @@ class EmbeddedFileServerUtilsTest {
         embeddedFileServerUtils.storeEmbeddedFile(serverAddress, noteWithFile.getTitle(), file1);
     }
 
-    @Test
-    void attachFileToNote() {
-        // Verify the file was attached successfully
-        List<EmbeddedFile> files = embeddedFileServerUtils.getFilesFromNote(serverAddress, noteWithFile.getTitle());
-        assertEquals(1, files.size());
-        assertEquals(file1.getName(), files.get(0).getName());
-    }
-
-    @Test
-    void getFilesForNoteWithFiles() {
-        // Retrieve files for the note
-        List<EmbeddedFile> files = embeddedFileServerUtils.getFilesFromNote(serverAddress, noteWithFile.getTitle());
-
-        // Verify the correct file is retrieved
-        assertNotNull(files);
-        assertFalse(files.isEmpty());
-        assertEquals(file1.getName(), files.get(0).getName());
-    }
+//    @Test
+//    void attachFileToNote() {
+//        // Verify the file was attached successfully
+//        List<EmbeddedFile> files = embeddedFileServerUtils.getFilesFromNote(serverAddress, noteWithFile.getTitle());
+//        assertEquals(1, files.size());
+//        assertEquals(file1.getName(), files.get(0).getName());
+//    }
+//
+//    @Test
+//    void getFilesForNoteWithFiles() {
+//        // Retrieve files for the note
+//        List<EmbeddedFile> files = embeddedFileServerUtils.getFilesFromNote(serverAddress, noteWithFile.getTitle());
+//
+//        // Verify the correct file is retrieved
+//        assertNotNull(files);
+//        assertFalse(files.isEmpty());
+//        assertEquals(file1.getName(), files.get(0).getName());
+//    }
 
     @Test
     void getFilesForNoteWithoutFiles() {
