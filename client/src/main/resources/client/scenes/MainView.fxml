@@ -126,7 +126,7 @@
             <Insets right="5.0" />
          </HBox.margin>
          <HBox prefHeight="40.0" prefWidth="800.0">
-            <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="250.0" spacing="4.0" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_RIGHT" onKeyPressed="#setRO" prefHeight="40.0" prefWidth="250.0" spacing="4.0" HBox.hgrow="ALWAYS">
                <Label fx:id="collectionLabel" maxWidth="90.0" style="-fx-font-weight: bold;" text="%label.collectionLabel" HBox.hgrow="NEVER">
                   <font>
                      <Font size="14.0" />
@@ -135,7 +135,7 @@
                      <Insets bottom="5.0" left="7.0" top="7.0" />
                   </HBox.margin>
                </Label>
-               <MenuButton mnemonicParsing="false" prefWidth="150.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="ALWAYS">
+               <MenuButton fx:id="collectionDropdown" accessibleRole="COMBO_BOX" mnemonicParsing="false" onMouseClicked="#populateCollectionsDropdown" prefWidth="150.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.currentCollectionName" HBox.hgrow="ALWAYS">
                   <items>
                      <MenuItem fx:id="editCollectionsDropdownOption" mnemonicParsing="false" onAction="#showEditCollectionsMenu" text="%label.collectionsDropdownEditCollections" />
                   </items>

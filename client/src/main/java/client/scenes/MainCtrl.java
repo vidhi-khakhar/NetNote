@@ -5,6 +5,9 @@ import client.components.Notification;
 import client.utils.NoteSearchUtils;
 import client.utils.LangUtils;
 import client.utils.undo.*;
+import client.utils.NoteServerUtils;
+import client.utils.collection.CollectionServerUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import commons.Note;
 import javafx.beans.property.StringProperty;
@@ -23,8 +26,6 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.*;
-
-import client.utils.NoteServerUtils;
 
 public class MainCtrl {
 
@@ -56,6 +57,10 @@ public class MainCtrl {
 
     @Inject
     private NoteServerUtils noteServerUtils;
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    private final CollectionServerUtils collectionServerUtils = new CollectionServerUtils(mapper);
 
     @Inject
     private ConfigLoader configLoader;
@@ -101,6 +106,63 @@ public class MainCtrl {
 
     @FXML
     private MenuItem editCollectionsDropdownOption;
+
+    @FXML
+    private MenuButton collectionDropdown;
+
+    @FXML
+    private void populateCollectionsDropdown() {
+
+        collectionDropdown.getItems().clear();
+        // Fetch collections (assuming CollectionServerUtils.getAll() returns a List<String>)
+        List<commons.Collection> collections = collectionServerUtils
+                .getAllCollections(noteServerUtils.getServerAddress());
+        // Create and add MenuItems for each collection
+        for (commons.Collection collection : collections) {
+            MenuItem itemCollection = new MenuItem(collection.getAlias());
+            itemCollection.setOnAction(event -> {
+                collectionDropdown.textProperty().unbind();
+                collectionDropdown.setText(collection.getAlias());
+                // Example: process or display the notes
+                processNotes(collectionServerUtils
+                        .getAllNotesInCollection(
+                                collection.getCollectionUniqueName(),
+                                collection.getServer()));
+            });
+            collectionDropdown.getItems().add(itemCollection);
+        }
+        collectionDropdown.getItems().add(editCollectionsDropdownOption);
+    }
+
+    private void processNotes(List<Note> notesInCollection) {
+        Note currentNote = getCurrentNote();
+
+        List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
+
+        for(Note noteSaved : savedNotes) {
+            for(Note noteRetrieved : notesInCollection) {
+                if(noteSaved.getTitle().equals(noteRetrieved.getTitle())) {
+                    matchedRetrievedNotesWithActualNotes.add(noteSaved);
+                }
+            }
+        }
+
+        indexMap.clear();
+        for (Note note : matchedRetrievedNotesWithActualNotes) {
+            indexMap.put(note, savedNotes.indexOf(note));
+        }
+
+        ObservableList<Note> filteredNotes = FXCollections.
+                observableArrayList(matchedRetrievedNotesWithActualNotes);
+        notesList.setItems(filteredNotes);
+
+        if (currentNote != null && !filteredNotes.contains(currentNote)) {
+            selectedNoteIndex = savedNotes.indexOf(currentNote);
+        }
+        if (!filteredNotes.isEmpty() && currentNote == null) {
+            notesList.getSelectionModel().clearSelection();
+        }
+    }
 
     @FXML
     private Label renderedNoteLabel;
@@ -227,6 +289,7 @@ public class MainCtrl {
         problemsCheckbox.textProperty().bind(props.get("markdownCheckboxLabel"));
         searchBar.promptTextProperty().bind(props.get("searchPlaceholder"));
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
+        collectionDropdown.textProperty().bind(props.get("currentCollectionName"));
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
         filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
         editCollectionsDropdownOption.textProperty().bind(
@@ -827,7 +890,7 @@ public class MainCtrl {
     }
 
     /**
-     * Opens the "Edit Collections" scene to manage the current collections
+     * Opens the "Edit Collections" scene to manage the current collections.
      */
     public void showEditCollectionsMenu() {
         Stage secondaryStage = new Stage();
