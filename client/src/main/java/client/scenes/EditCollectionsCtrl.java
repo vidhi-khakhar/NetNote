@@ -166,6 +166,7 @@ public class EditCollectionsCtrl {
         int newIndex = collectionUtils.createNewCollection(collections);
         collectionsList.getSelectionModel().selectIndices(newIndex);
         currentAction = CollectionAction.ADD_COLLECTION;
+        serverInput.setText("http://localhost:8080/");
         updateServerStatusText(CollectionServerStatus.SERVER_NOT_REACHABLE);
     }
 
