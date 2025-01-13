@@ -6,7 +6,11 @@ import client.utils.NoteSearchUtils;
 import client.utils.LangUtils;
 import client.utils.UiUtils;
 import client.utils.undo.*;
+import client.utils.NoteServerUtils;
+import client.utils.collection.CollectionServerUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import commons.Collection;
 import commons.Note;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -24,8 +28,6 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.*;
-
-import client.utils.NoteServerUtils;
 
 public class MainCtrl {
 
@@ -57,6 +59,10 @@ public class MainCtrl {
 
     @Inject
     private NoteServerUtils noteServerUtils;
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    private final CollectionServerUtils collectionServerUtils = new CollectionServerUtils(mapper);
 
     @Inject
     private ConfigLoader configLoader;
@@ -105,6 +111,9 @@ public class MainCtrl {
 
     @FXML
     private MenuItem editCollectionsDropdownOption;
+
+    @FXML
+    private MenuButton collectionDropdown;
 
     @FXML
     private Label renderedNoteLabel;
@@ -231,6 +240,7 @@ public class MainCtrl {
         problemsCheckbox.textProperty().bind(props.get("markdownCheckboxLabel"));
         searchBar.promptTextProperty().bind(props.get("searchPlaceholder"));
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
+        collectionDropdown.textProperty().bind(props.get("currentCollectionName"));
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
         filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
         editCollectionsDropdownOption.textProperty().bind(
@@ -579,19 +589,20 @@ public class MainCtrl {
                 uiUtils.showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertTitleExists").get(),
                         Alert.AlertType.ERROR);
-            }
+            } else {
 
-            selectedNote.setTitle(updatedTitle);
+                selectedNote.setTitle(updatedTitle);
 
-            try {
-                noteServerUtils.updateNote(previousTitle, Map.of("title", updatedTitle));
-            } catch (Exception e) {
-                selectedNote.setTitle(previousTitle);
-                return;
-            }
+                try {
+                    noteServerUtils.updateNote(previousTitle, Map.of("title", updatedTitle));
+                } catch (Exception e) {
+                    selectedNote.setTitle(previousTitle);
+                    return;
+                }
 
-            if (notesList.getItems().contains(selectedNote)) {
-                notesList.refresh();
+                if (notesList.getItems().contains(selectedNote)) {
+                    notesList.refresh();
+                }
             }
         } else if (!savedNotes.isEmpty() || !noteEditor.getText().isEmpty()) {
             // Ensure the first note is created when only content exists
@@ -813,7 +824,7 @@ public class MainCtrl {
     }
 
     /**
-     * Opens the "Edit Collections" scene to manage the current collections
+     * Opens the "Edit Collections" scene to manage the current collections.
      */
     public void showEditCollectionsMenu() {
         Stage secondaryStage = new Stage();
@@ -821,4 +832,63 @@ public class MainCtrl {
         secondaryStage.setScene(editCollectionsMenu);
         secondaryStage.show();
     }
+
+    /**
+     * Reloads all the elements inside the collections dropdown menu.
+     */
+    public void populateCollectionsDropdown() {
+        collectionDropdown.getItems().clear();
+        // Fetch collections (assuming CollectionServerUtils.getAll() returns a List<String>)
+        List<Collection> collections = configLoader.getCollections();
+        // Create and add MenuItems for each collection
+        for (Collection collection : collections) {
+            MenuItem itemCollection = new MenuItem(collection.getAlias());
+            itemCollection.setOnAction(event -> {
+                collectionDropdown.textProperty().unbind();
+                collectionDropdown.setText(collection.getAlias());
+                // Example: process or display the notes
+                processNotes(collectionServerUtils
+                        .getAllNotesInCollection(
+                                collection.getCollectionUniqueName(),
+                                collection.getServer()));
+            });
+            collectionDropdown.getItems().add(itemCollection);
+        }
+        collectionDropdown.getItems().add(editCollectionsDropdownOption);
+    }
+
+    /**
+     * Updates the list of notes to show only the notes in the current collection.
+     * @param notesInCollection The list of notes in the currently selected collection.
+     */
+    public void processNotes(List<Note> notesInCollection) {
+        Note currentNote = getCurrentNote();
+
+        List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
+
+        for(Note noteSaved : savedNotes) {
+            for(Note noteRetrieved : notesInCollection) {
+                if(noteSaved.getTitle().equals(noteRetrieved.getTitle())) {
+                    matchedRetrievedNotesWithActualNotes.add(noteSaved);
+                }
+            }
+        }
+
+        indexMap.clear();
+        for (Note note : matchedRetrievedNotesWithActualNotes) {
+            indexMap.put(note, savedNotes.indexOf(note));
+        }
+
+        ObservableList<Note> filteredNotes = FXCollections.
+                observableArrayList(matchedRetrievedNotesWithActualNotes);
+        notesList.setItems(filteredNotes);
+
+        if (currentNote != null && !filteredNotes.contains(currentNote)) {
+            selectedNoteIndex = savedNotes.indexOf(currentNote);
+        }
+        if (!filteredNotes.isEmpty() && currentNote == null) {
+            notesList.getSelectionModel().clearSelection();
+        }
+    }
+
 }
