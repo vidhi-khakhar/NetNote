@@ -1,7 +1,7 @@
 package client.scenes;
 
 import client.config.ConfigLoader;
-import client.utils.NoteServerUtils;
+import client.utils.note.NoteServerUtils;
 import client.utils.UiUtils;
 import client.utils.collection.CollectionServerStatus;
 import client.utils.collection.CollectionServerUtils;

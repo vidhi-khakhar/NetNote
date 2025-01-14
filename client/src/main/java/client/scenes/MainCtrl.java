@@ -2,12 +2,12 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.components.Notification;
-import client.utils.NoteSearchUtils;
+import client.utils.note.NoteSearchUtils;
 import client.utils.LangUtils;
 import client.utils.UiUtils;
 import client.utils.markdown.MarkdownShortcutUtils;
 import client.utils.undo.*;
-import client.utils.NoteServerUtils;
+import client.utils.note.NoteServerUtils;
 import client.utils.collection.CollectionServerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
