@@ -3,6 +3,7 @@ package client.scenes;
 import client.config.ConfigLoader;
 import client.components.Notification;
 import client.utils.note.NoteSearchUtils;
+import client.utils.note.NoteUtils;
 import client.utils.LangUtils;
 import client.utils.UiUtils;
 import client.utils.markdown.MarkdownShortcutUtils;
@@ -50,6 +51,9 @@ public class MainCtrl {
 
     @Inject
     private NoteServerUtils noteServerUtils;
+
+    @Inject
+    private NoteUtils noteUtils;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -288,12 +292,7 @@ public class MainCtrl {
                         Alert.AlertType.ERROR);
             } else {
                 Note newNote = new Note(title.trim(), "");
-                savedNotes.add(newNote);
-                noteServerUtils.storeNote(newNote);
-                notesList.setItems(savedNotes);
-                notesList.getSelectionModel().select(savedNotes.size() - 1);
-                noteTitleInput.setText(newNote.getTitle());
-                noteEditor.setText(newNote.getText());
+                commitAddNote(newNote, savedNotes.size());
 
                 // Default message for empty note text
                 props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
@@ -354,9 +353,6 @@ public class MainCtrl {
         if (uiUtils.showPopUp(props.get("deleteNoteConfirmationTitle").get(),
                 props.get("deleteNoteConfirmationText").get() + '\n' + deletedNote.getTitle(),
                 Alert.AlertType.CONFIRMATION)) {
-
-            noteServerUtils.deleteNote(deletedNote.getTitle());
-
             if (isAddedToUndoStack) {
                 undoHandler.pushAction(new DeleteNoteAction(
                         deletedNote,
@@ -375,23 +371,21 @@ public class MainCtrl {
     }
 
     /**
-     * Undoes the deletion / redoes the creation of a note by
-     * reinstating it in the list of notes and selecting it.
+     * Adds a new note to the list of notes without checks.
      *
-     * @param deletedNote The entity corresponding to the deleted note.
-     * @param noteIndex   The position the deleted noted had in the list of notes.
+     * @param note  The entity corresponding to the new note.
+     * @param index The position of the new note in the list.
      */
-    public void handleReAddNote(Note deletedNote, int noteIndex) {
-        savedNotes.add(noteIndex, deletedNote);
-        noteServerUtils.storeNote(deletedNote);
-        notesList.getSelectionModel().select(noteIndex);
-        noteTitleInput.setText(deletedNote.getTitle());
-        noteEditor.setText(deletedNote.getText());
+    public void commitAddNote(Note note, int index) {
+        savedNotes.add(index, note);
+        noteServerUtils.storeNote(note);
+        notesList.setItems(savedNotes);
+        notesList.getSelectionModel().select(index);
+        noteTitleInput.setText(note.getTitle());
+        noteEditor.setText(note.getText());
 
         renderedNoteTitleLabel.textProperty().unbind();
-        renderedNoteTitleLabel.setText(deletedNote.getTitle());
-        props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-        renderedNoteView.getEngine().loadContent(deletedNote.getText());
+        renderedNoteTitleLabel.setText(note.getTitle());
     }
 
 
@@ -400,8 +394,8 @@ public class MainCtrl {
      *
      * @param noteIndex The index (in the note list) of the note to be deleted.
      */
-
     public void commitDeleteNote(int noteIndex) {
+        noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle());
         savedNotes.remove(noteIndex);
         if (!savedNotes.isEmpty()) {
             int newIndex = Math.min(noteIndex, savedNotes.size() - 1);
@@ -409,7 +403,6 @@ public class MainCtrl {
         } else {
             notesList.getSelectionModel().clearSelection();
         }
-        displaySavedNote(savedNotes.get(noteIndex));
     }
 
     /**
@@ -472,19 +465,8 @@ public class MainCtrl {
      * and adds them to the list.
      */
     public void handleRefreshNote() {
-        List<String> titlesOfCurrentNotes = savedNotes
-                .stream()
-                .map(Note::getTitle)
-                .toList();
         List<Note> serverNotes = noteServerUtils.getAllNotes();
-        serverNotes.forEach(note -> {
-
-            // This ignores the case in which the server has a different
-            // version of a note with the same title.
-            if (!titlesOfCurrentNotes.contains(note.getTitle())) {
-                savedNotes.add(note);
-            }
-        });
+        savedNotes.setAll(noteUtils.sync(savedNotes, serverNotes));
         notesList.refresh();
     }
 
@@ -745,6 +727,7 @@ public class MainCtrl {
 
     /**
      * Updates the list of notes to show only the notes in the current collection.
+     *
      * @param notesInCollection The list of notes in the currently selected collection.
      */
     public void processNotes(List<Note> notesInCollection) {
@@ -752,9 +735,9 @@ public class MainCtrl {
 
         List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
 
-        for(Note noteSaved : savedNotes) {
-            for(Note noteRetrieved : notesInCollection) {
-                if(noteSaved.getTitle().equals(noteRetrieved.getTitle())) {
+        for (Note noteSaved : savedNotes) {
+            for (Note noteRetrieved : notesInCollection) {
+                if (noteSaved.getTitle().equals(noteRetrieved.getTitle())) {
                     matchedRetrievedNotesWithActualNotes.add(noteSaved);
                 }
             }

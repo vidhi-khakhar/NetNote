@@ -28,6 +28,6 @@ public record CreateNoteAction(Note createdNote,
      */
     @Override
     public void redo() {
-        mainCtrl.handleReAddNote(createdNote, noteIndex);
+        mainCtrl.commitAddNote(createdNote, noteIndex);
     }
 }
