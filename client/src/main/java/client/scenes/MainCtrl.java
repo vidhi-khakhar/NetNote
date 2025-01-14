@@ -33,21 +33,10 @@ import java.util.*;
 
 public class MainCtrl {
 
-    /**
-     * The {@code selectedNoteIndex} variable tracks the index of the currently selected or
-     * edited note in the {@code savedNotes} observable list.<br>
-     * <br>
-     * If {@code selectedNoteIndex == -1},  no note is being edited, and thus a new note
-     * is ADDED<br>
-     * If {@code selectedNoteIndex != -1}, an existing note is being updated, and the note at the
-     * {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
-     **/
-    private int selectedNoteIndex = -1;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private Map<String, StringProperty> props;
 
-    private final Map<Note, Integer> indexMap = new HashMap<>();
     private Scene editCollectionsMenu;
     private Scene mainView;
     private Stage stage;
@@ -164,17 +153,13 @@ public class MainCtrl {
                 .getSelectionModel()
                 .selectedItemProperty()
                 .addListener((_, _, selectedNote) -> {
-                    if (indexMap.containsKey(selectedNote)) {
-                        selectedNoteIndex = indexMap.get(selectedNote);
-                    } else {
-                        selectedNoteIndex = savedNotes.indexOf(selectedNote);
-                    }
-
                     if (selectedNote != null) {
-                        System.out.println("The selected note is on index:" + selectedNoteIndex);
+                        System.out.println("The selected note is on index: " +
+                                notesList.getSelectionModel().getSelectedIndex());
                         noteTitleInput.setText(selectedNote.getTitle());
                         noteEditor.setText(selectedNote.getText());
                     }
+                    displaySavedNote(selectedNote);
                 });
 
         noteTitleInput.textProperty().addListener(noteTitleInputListener);
@@ -305,7 +290,6 @@ public class MainCtrl {
                 Note newNote = new Note(title.trim(), "");
                 savedNotes.add(newNote);
                 noteServerUtils.storeNote(newNote);
-                indexMap.put(newNote, savedNotes.size() - 1);
                 notesList.setItems(savedNotes);
                 notesList.getSelectionModel().select(savedNotes.size() - 1);
                 noteTitleInput.setText(newNote.getTitle());
@@ -314,13 +298,12 @@ public class MainCtrl {
                 // Default message for empty note text
                 props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
-                selectedNoteIndex = savedNotes.size() - 1;
 
                 undoHandler.pushAction(new CreateNoteAction(
                         newNote,
                         newNote.getTitle(),
                         newNote.getText(),
-                        selectedNoteIndex,
+                        notesList.getSelectionModel().getSelectedIndex(),
                         this));
 
                 noteEditor.requestFocus();
@@ -341,7 +324,7 @@ public class MainCtrl {
      * or the user cancelled the operation.
      */
     public boolean handleDeleteNote() {
-        return handleDeleteNote(selectedNoteIndex, true);
+        return handleDeleteNote(notesList.getSelectionModel().getSelectedIndex(), true);
     }
 
     /**
@@ -402,7 +385,6 @@ public class MainCtrl {
         savedNotes.add(noteIndex, deletedNote);
         noteServerUtils.storeNote(deletedNote);
         notesList.getSelectionModel().select(noteIndex);
-        selectedNoteIndex = noteIndex;
         noteTitleInput.setText(deletedNote.getTitle());
         noteEditor.setText(deletedNote.getText());
 
@@ -427,28 +409,27 @@ public class MainCtrl {
         } else {
             notesList.getSelectionModel().clearSelection();
         }
-        displaySavedNote();
+        displaySavedNote(savedNotes.get(noteIndex));
     }
 
     /**
      * Updates the contents of the editor and the rendered view
      * after the user select a different note to load.
+     *
+     * @param note The note to display
      */
-    public void displaySavedNote() {
-        if (selectedNoteIndex != -1 && selectedNoteIndex < savedNotes.size()) {
-            Note selectedNote = savedNotes.get(selectedNoteIndex);
-            noteTitleInput.setText(selectedNote.getTitle());
-            noteEditor.setText(selectedNote.getText());
+    public void displaySavedNote(Note note) {
+        if (note != null) {
+            noteTitleInput.setText(note.getTitle());
+            noteEditor.setText(note.getText());
 
             renderedNoteTitleLabel.textProperty().unbind();
-            renderedNoteTitleLabel.setText(selectedNote.getTitle());
-            if (selectedNote.getText().isEmpty()) {
+            renderedNoteTitleLabel.setText(note.getTitle());
+            if (note.getText().isEmpty()) {
                 props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
         } else {
-            selectedNoteIndex = -1;
-
             noteTitleInput.textProperty().removeListener(noteTitleInputListener);
             noteTitleInput.clear();
             noteTitleInput.textProperty().addListener(noteTitleInputListener);
@@ -468,10 +449,9 @@ public class MainCtrl {
      * so that they are automatically propagated in the rendered view.
      */
     public void updateDisplay() {
-        if (selectedNoteIndex != -1) {
-            // If a note is selected, update the content of that note
-            Note selectedNote = savedNotes.get(selectedNoteIndex);
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
+        if (selectedNote != null) {
             //calling the noteServerUtils
             HashMap<String, String> patch = new HashMap<>();
             patch.put("title", selectedNote.getTitle());
@@ -586,7 +566,7 @@ public class MainCtrl {
         } else {
             renderedNoteTitleLabel.setText(updatedTitle);
         }
-        Note selectedNote = getCurrentNote();
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         if (selectedNote != null) {
             previousTitle = selectedNote.getTitle();
@@ -614,10 +594,10 @@ public class MainCtrl {
             String noteContent = noteEditor.getText();
             Note firstNote = new Note(updatedTitle, noteContent);
             savedNotes.add(firstNote);
-            selectedNoteIndex = savedNotes.size() - 1;
-            indexMap.put(firstNote, savedNotes.size() - 1);
+
+            int newIndex = savedNotes.size() - 1;
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
-            notesList.getSelectionModel().select(selectedNoteIndex);
+            notesList.getSelectionModel().select(newIndex);
             notesList.refresh();
             noteServerUtils.storeNote(firstNote);
 
@@ -657,54 +637,24 @@ public class MainCtrl {
     }
 
     /**
-     * Returns the currently opened note.
-     *
-     * @return currently displayed note.
-     */
-    public Note getCurrentNote() {
-        Note currentNote = null;
-        if (selectedNoteIndex >= 0 && selectedNoteIndex < savedNotes.size()) {
-            currentNote = savedNotes.get(selectedNoteIndex);
-        }
-        return currentNote;
-    }
-
-    /**
      * This method filters the notesList based on a given search query,
      * and it refreshes the notesList to display only the matching notes.
      *
      * @param query the text entered by the user in the search bar
      */
     public void handleSearch(String query) {
-        Note currentNote = getCurrentNote();
+        Note currentNote = notesList.getSelectionModel().getSelectedItem();
 
-        if (query.trim().isEmpty()) {
+        if (query.isBlank()) {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
-            indexMap.clear();
-            for (int i = 0; i < savedNotes.size(); i++) {
-                indexMap.put(savedNotes.get(i), i);
-            }
-
-            if (currentNote != null) {
-                selectedNoteIndex = savedNotes.indexOf(currentNote);
-                notesList.getSelectionModel().select(selectedNoteIndex);
-            }
             return;
         }
 
         List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
 
-        indexMap.clear();
-        for (Note note : searchedNotes) {
-            indexMap.put(note, savedNotes.indexOf(note));
-        }
-
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
 
-        if (currentNote != null && !filteredNotes.contains(currentNote)) {
-            selectedNoteIndex = savedNotes.indexOf(currentNote);
-        }
         if (!filteredNotes.isEmpty() && currentNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
@@ -779,7 +729,7 @@ public class MainCtrl {
         // Create and add MenuItems for each collection
         for (Collection collection : collections) {
             MenuItem itemCollection = new MenuItem(collection.getAlias());
-            itemCollection.setOnAction(event -> {
+            itemCollection.setOnAction(_ -> {
                 collectionDropdown.textProperty().unbind();
                 collectionDropdown.setText(collection.getAlias());
                 // Example: process or display the notes
@@ -798,7 +748,7 @@ public class MainCtrl {
      * @param notesInCollection The list of notes in the currently selected collection.
      */
     public void processNotes(List<Note> notesInCollection) {
-        Note currentNote = getCurrentNote();
+        Note currentNote = notesList.getSelectionModel().getSelectedItem();
 
         List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
 
@@ -810,21 +760,12 @@ public class MainCtrl {
             }
         }
 
-        indexMap.clear();
-        for (Note note : matchedRetrievedNotesWithActualNotes) {
-            indexMap.put(note, savedNotes.indexOf(note));
-        }
-
         ObservableList<Note> filteredNotes = FXCollections.
                 observableArrayList(matchedRetrievedNotesWithActualNotes);
         notesList.setItems(filteredNotes);
 
-        if (currentNote != null && !filteredNotes.contains(currentNote)) {
-            selectedNoteIndex = savedNotes.indexOf(currentNote);
-        }
         if (!filteredNotes.isEmpty() && currentNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
     }
-
 }
