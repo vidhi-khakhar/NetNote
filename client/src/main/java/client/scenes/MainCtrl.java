@@ -466,7 +466,7 @@ public class MainCtrl {
      */
     public void handleRefreshNote() {
         List<Note> serverNotes = noteServerUtils.getAllNotes();
-        savedNotes.setAll(noteUtils.sync(savedNotes, serverNotes));
+        noteUtils.sync(savedNotes, serverNotes);
         notesList.refresh();
     }
 
