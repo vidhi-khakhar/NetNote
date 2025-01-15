@@ -792,22 +792,29 @@ public class MainCtrl {
      * A local test version of adding an embedded file
      */
     public void handleAddFile() {
-        HBox fileContainer = new HBox(5);
-        fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
-                " -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
+        if (selectedNoteIndex == -1) {
+            showPopUp(props.get("FileAddWarningTitle").get(),
+                    props.get("FileAddWarningText").get(),
+                    Alert.AlertType.WARNING);
+        } else {
 
-        Label fileNameLabel = new Label("testFile.jpg");
+            HBox fileContainer = new HBox(5);
+            fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
+                    " -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
 
-        Button renameButton = new Button("✎");
-        renameButton.setOnAction(e -> handleRenameFile(fileNameLabel));
+            Label fileNameLabel = new Label("testFile.jpg");
 
-        Button deleteButton = new Button("ⓧ");
-        deleteButton.setOnAction(e -> handleDeleteFile(fileContainer));
+            Button renameButton = new Button("✎");
+            renameButton.setOnAction(e -> handleRenameFile(fileNameLabel));
 
-        fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
+            Button deleteButton = new Button("ⓧ");
+            deleteButton.setOnAction(e -> handleDeleteFile(fileContainer));
 
-        filesHBox.getChildren().add(fileContainer);
+            fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
 
+            filesHBox.getChildren().add(fileContainer);
+
+        }
 
     }
 
