@@ -43,6 +43,7 @@ public class MainCtrl {
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private Map<String, StringProperty> props;
+    private boolean areMarkdownProblemsShown = false;
 
     private final Map<Note, Integer> indexMap = new HashMap<>();
     private Scene editCollectionsMenu;
@@ -184,6 +185,11 @@ public class MainCtrl {
         searchBar.textProperty().addListener((_, _, newValue) ->
                 handleSearch(newValue)
         );
+
+        problemsCheckbox.selectedProperty().addListener((_, _, isSelected) -> {
+            areMarkdownProblemsShown = isSelected;
+            toggleMarkdownProblems();
+        });
 
         initializeShortcuts();
         initializeTextProperties();
@@ -552,24 +558,37 @@ public class MainCtrl {
     /**
      * Displays the problems with Markdown rendering in the webview.
      */
-    public void showProblems() {
+    public void toggleMarkdownProblems() {
         String renderedContent = markdownCtrl.markdownToHtml(content);
-        if (problemsCheckbox.isSelected()) {
+        boolean isChecked = problemsCheckbox.isSelected();
+        if (isChecked) {
             noteEditor.setEditable(false);
-            List<String> problems = markdownCtrl.getProblems(content);
-            StringBuilder result = new StringBuilder();
-            for (int i = 0; i < problems.size(); i++) {
-                result.append(problems.get(i));
-                if (i < problems.size() - 1)
-                    result.append("\n");
-            }
+            renderMarkdownProblems();
             props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-            renderedNoteView.getEngine().loadContent(result.toString());
         } else {
             noteEditor.setEditable(true);
-            props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-            renderedNoteView.getEngine().loadContent(renderedContent);
+            if (content.isEmpty()) {
+                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
+                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
+            } else {
+                props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
+                renderedNoteView.getEngine().loadContent(renderedContent);
+            }
         }
+    }
+
+    /**
+     * Changes the contents of the WebView to show the Markdown problems
+     */
+    public void renderMarkdownProblems() {
+        List<String> problems = markdownCtrl.getProblems(content);
+        StringBuilder result = new StringBuilder();
+        result.append("<ul>");
+        for (String problem : problems) {
+            result.append("<li>").append(problem).append("</li>");
+        }
+        result.append("</ul>");
+        renderedNoteView.getEngine().loadContent(result.toString());
     }
 
     /**
@@ -814,6 +833,7 @@ public class MainCtrl {
         }
         configLoader.setLocale(l);
         langUtils.setLocale(l);
+        if (areMarkdownProblemsShown) renderMarkdownProblems();
     }
 
     /**
