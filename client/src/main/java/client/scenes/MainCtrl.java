@@ -655,8 +655,8 @@ public class MainCtrl {
      * A local test version of adding an embedded file
      */
     public void handleAddFile() {
-        if (selectedNoteIndex == -1) {
-            showPopUp(props.get("FileAddWarningTitle").get(),
+        if (notesList.getSelectionModel().getSelectedIndex() == -1) {
+            uiUtils.showPopUp(props.get("FileAddWarningTitle").get(),
                     props.get("FileAddWarningText").get(),
                     Alert.AlertType.WARNING);
         } else {
@@ -668,10 +668,10 @@ public class MainCtrl {
             Label fileNameLabel = new Label("testFile.jpg");
 
             Button renameButton = new Button("✎");
-            renameButton.setOnAction(e -> handleRenameFile(fileNameLabel));
+            renameButton.setOnAction(_ -> handleRenameFile(fileNameLabel));
 
             Button deleteButton = new Button("ⓧ");
-            deleteButton.setOnAction(e -> handleDeleteFile(fileContainer));
+            deleteButton.setOnAction(_ -> handleDeleteFile(fileContainer));
 
             fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
 
@@ -691,11 +691,11 @@ public class MainCtrl {
         // label.RenameFileConfirmationTitle=Rename File
         // label.renameFileAlertText= Enter a new name for the file:
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(newName -> fileNameLabel.setText(newName));
+        result.ifPresent(fileNameLabel::setText);
     }
 
     /**
-     * Delete an embedded file (currently only removes from HBOX)
+     * Delete an embedded file (currently only removes from HBox)
      */
     private void handleDeleteFile(HBox fileContainer) {
         filesHBox.getChildren().remove(fileContainer);
