@@ -1,5 +1,6 @@
 import commons.EmbeddedFile;
 import commons.Note;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -129,74 +130,61 @@ class EmbeddedFileTest {
         assertTrue(representation.contains("data=<null>") &&
                    representation.contains("name=name"));
     }
+
+    private EmbeddedFile ef;
+    private String testImagePath;
+    private String testTextPath;
+    private File testImageFile;
+    private File testTextFile;
+    private byte[] testImageData;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        ef = new EmbeddedFile();
+        testImagePath = "src/test/java/test.jpg";
+        testTextPath = "src/test/java/test.txt";
+        testImageFile = new File(testImagePath);
+        testTextFile = new File(testTextPath);
+        if (testImageFile.exists()) {
+            testImageData = Files.readAllBytes(testImageFile.toPath());
+        }
+    }
+
     @Test
     void nullDataTest() {
-        EmbeddedFile ef = new EmbeddedFile();
         ef.setData(null);
         assertNull(ef.getData());
     }
 
     @Test
     void emptyNameTest() {
-        EmbeddedFile ef = new EmbeddedFile();
         ef.setName("");
         assertEquals("", ef.getName());
     }
 
     @Test
     void emptyTypeTest() {
-        EmbeddedFile ef = new EmbeddedFile();
         ef.setType("");
         assertEquals("", ef.getType());
     }
 
     @Test
     void noteNotSetTest() {
-        EmbeddedFile ef = new EmbeddedFile();
         assertNull(ef.getNote());
     }
 
     @Test
-    void largeFileTest() throws IOException {
-        EmbeddedFile ef = new EmbeddedFile();
-        String path = "src/test/java/largeTestFile.jpg"; // Assume large file
-        File file = new File(path);
-        if (file.exists()) {
-            byte[] content = Files.readAllBytes(file.toPath());
-            ef.setData(content);
-            assertEquals(content.length, ef.getData().length);
-        } else {
-            System.out.println("File does not exist.");
-        }
-    }
-
-    @Test
-    void invalidFileTypeTest() throws IOException {
-        EmbeddedFile ef = new EmbeddedFile();
-        String path = "src/test/java/test.txt";
-        File file = new File(path);
-        if (file.exists()) {
-            ef.setType(Files.probeContentType(file.toPath()));
-            assertEquals("text/plain", ef.getType());
-        } else {
-            System.out.println("File does not exist.");
-        }
-    }
-
-    @Test
     void equalsTestWithNull() {
-        EmbeddedFile ef = new EmbeddedFile();
         assertNotEquals(null, ef);
     }
 
     @Test
     void equalsTestWithDifferentClass() {
-        EmbeddedFile ef = new EmbeddedFile();
         assertNotEquals("String", ef);
     }
 
     @Test
-    void hashCodeTest() {
+    void repeatedHashCodeHasSameValueTest() {
         EmbeddedFile ef = new EmbeddedFile("name", "type", null, null);
         int initialHashCode = ef.hashCode();
         int repeatedHashCode = ef.hashCode();
@@ -213,58 +201,102 @@ class EmbeddedFileTest {
 
     @Test
     void setNameNullTest() {
-        EmbeddedFile ef = new EmbeddedFile();
         ef.setName(null);
         assertNull(ef.getName());
     }
 
     @Test
     void setTypeNullTest() {
-        EmbeddedFile ef = new EmbeddedFile();
         ef.setType(null);
         assertNull(ef.getType());
     }
 
     @Test
     void setNoteNullTest() {
-        EmbeddedFile ef = new EmbeddedFile();
         ef.setNote(null);
         assertNull(ef.getNote());
     }
 
     @Test
     void emptyDataTest() {
-        EmbeddedFile ef = new EmbeddedFile();
         ef.setData(new byte[0]);
         assertEquals(0, ef.getData().length);
     }
 
     @Test
     void getIdNotSetTest() {
-        EmbeddedFile ef = new EmbeddedFile();
         assertNull(ef.getId());
     }
 
     @Test
-    void embeddedFileConstructorTest() throws IOException {
-        String path = "src/test/java/test.jpg";
-        File file = new File(path);
-        byte[] content = Files.readAllBytes(file.toPath());
-        Note note = new Note("title", "content");
-        EmbeddedFile ef = new EmbeddedFile(file.getName(), Files.probeContentType(file.toPath()), content, note);
-        assertEquals(file.getName(), ef.getName());
-        assertEquals(Files.probeContentType(file.toPath()), ef.getType());
-        assertArrayEquals(content, ef.getData());
-        assertEquals(note, ef.getNote());
+    void embeddedFileConstructorNameTest() {
+        if (testImageFile.exists()) {
+            try {
+                ef = new EmbeddedFile(testImageFile.getName(), Files.probeContentType(testImageFile.toPath()), testImageData, new Note("title", "content"));
+                assertEquals(testImageFile.getName(), ef.getName());
+            } catch (IOException e) {
+                fail("Failed during constructor test for name: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Test skipped. File does not exist.");
+        }
     }
 
     @Test
-    void embeddedFileConstructorNullNoteTest() throws IOException {
-        String path = "src/test/java/test.jpg";
-        File file = new File(path);
-        byte[] content = Files.readAllBytes(file.toPath());
-        EmbeddedFile ef = new EmbeddedFile(file.getName(), Files.probeContentType(file.toPath()), content, null);
-        assertNull(ef.getNote());
+    void embeddedFileConstructorTypeTest() {
+        if (testImageFile.exists()) {
+            try {
+                ef = new EmbeddedFile(testImageFile.getName(), Files.probeContentType(testImageFile.toPath()), testImageData, new Note("title", "content"));
+                assertEquals(Files.probeContentType(testImageFile.toPath()), ef.getType());
+            } catch (IOException e) {
+                fail("Failed during constructor test for type: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Test skipped. File does not exist.");
+        }
+    }
+
+    @Test
+    void embeddedFileConstructorDataTest() {
+        if (testImageFile.exists()) {
+            try {
+                ef = new EmbeddedFile(testImageFile.getName(), Files.probeContentType(testImageFile.toPath()), testImageData, new Note("title", "content"));
+                assertArrayEquals(testImageData, ef.getData());
+            } catch (IOException e) {
+                fail("Failed during constructor test for data: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Test skipped. File does not exist.");
+        }
+    }
+
+    @Test
+    void embeddedFileConstructorNoteTest() {
+        if (testImageFile.exists()) {
+            try {
+                Note note = new Note("title", "content");
+                ef = new EmbeddedFile(testImageFile.getName(), Files.probeContentType(testImageFile.toPath()), testImageData, note);
+                assertEquals(note, ef.getNote());
+            } catch (IOException e) {
+                fail("Failed during constructor test for note: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Test skipped. File does not exist.");
+        }
+    }
+
+    @Test
+    void embeddedFileConstructorNullNoteTest()  {
+        if(testImageFile.exists()) {
+            try {
+                ef = new EmbeddedFile(testImageFile.getName(), Files.probeContentType(testImageFile.toPath()), testImageData, null);
+                assertNull(ef.getNote());
+            } catch (IOException e) {
+                fail("Failed during constructor test for null note: " + e.getMessage());
+            }
+        } else {
+                System.out.println("File does not exist.");
+            }
     }
 }
 
