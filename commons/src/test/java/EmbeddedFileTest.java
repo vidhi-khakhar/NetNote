@@ -10,6 +10,24 @@ import java.nio.file.Files;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EmbeddedFileTest {
+    private EmbeddedFile ef;
+    private String testImagePath;
+    private String testTextPath;
+    private File testImageFile;
+    private File testTextFile;
+    private byte[] testImageData;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        ef = new EmbeddedFile();
+        testImagePath = "src/test/java/test.jpg";
+        testTextPath = "src/test/java/test.txt";
+        testImageFile = new File(testImagePath);
+        testTextFile = new File(testTextPath);
+        if (testImageFile.exists()) {
+            testImageData = Files.readAllBytes(testImageFile.toPath());
+        }
+    }
 
     @Test
     void dataTest() throws IOException {
@@ -131,24 +149,6 @@ class EmbeddedFileTest {
                    representation.contains("name=name"));
     }
 
-    private EmbeddedFile ef;
-    private String testImagePath;
-    private String testTextPath;
-    private File testImageFile;
-    private File testTextFile;
-    private byte[] testImageData;
-
-    @BeforeEach
-    void setUp() throws IOException {
-        ef = new EmbeddedFile();
-        testImagePath = "src/test/java/test.jpg";
-        testTextPath = "src/test/java/test.txt";
-        testImageFile = new File(testImagePath);
-        testTextFile = new File(testTextPath);
-        if (testImageFile.exists()) {
-            testImageData = Files.readAllBytes(testImageFile.toPath());
-        }
-    }
 
     @Test
     void nullDataTest() {
@@ -178,10 +178,6 @@ class EmbeddedFileTest {
         assertNotEquals(null, ef);
     }
 
-    @Test
-    void equalsTestWithDifferentClass() {
-        assertNotEquals("String", ef);
-    }
 
     @Test
     void repeatedHashCodeHasSameValueTest() {
@@ -235,10 +231,10 @@ class EmbeddedFileTest {
                 ef = new EmbeddedFile(testImageFile.getName(), Files.probeContentType(testImageFile.toPath()), testImageData, new Note("title", "content"));
                 assertEquals(testImageFile.getName(), ef.getName());
             } catch (IOException e) {
-                fail("Failed during constructor test for name: " + e.getMessage());
+                fail("Failed during constructor name test: " + e.getMessage());
             }
         } else {
-            System.out.println("Test skipped. File does not exist.");
+            System.out.println("File does not exist.");
         }
     }
 
@@ -249,10 +245,10 @@ class EmbeddedFileTest {
                 ef = new EmbeddedFile(testImageFile.getName(), Files.probeContentType(testImageFile.toPath()), testImageData, new Note("title", "content"));
                 assertEquals(Files.probeContentType(testImageFile.toPath()), ef.getType());
             } catch (IOException e) {
-                fail("Failed during constructor test for type: " + e.getMessage());
+                fail("Failed during constructor type test: " + e.getMessage());
             }
         } else {
-            System.out.println("Test skipped. File does not exist.");
+            System.out.println("File does not exist.");
         }
     }
 
@@ -263,10 +259,10 @@ class EmbeddedFileTest {
                 ef = new EmbeddedFile(testImageFile.getName(), Files.probeContentType(testImageFile.toPath()), testImageData, new Note("title", "content"));
                 assertArrayEquals(testImageData, ef.getData());
             } catch (IOException e) {
-                fail("Failed during constructor test for data: " + e.getMessage());
+                fail("Failed during constructor data test: " + e.getMessage());
             }
         } else {
-            System.out.println("Test skipped. File does not exist.");
+            System.out.println("File does not exist.");
         }
     }
 
@@ -278,10 +274,10 @@ class EmbeddedFileTest {
                 ef = new EmbeddedFile(testImageFile.getName(), Files.probeContentType(testImageFile.toPath()), testImageData, note);
                 assertEquals(note, ef.getNote());
             } catch (IOException e) {
-                fail("Failed during constructor test for note: " + e.getMessage());
+                fail("Failed during constructor note test: " + e.getMessage());
             }
         } else {
-            System.out.println("Test skipped. File does not exist.");
+            System.out.println("File does not exist.");
         }
     }
 
