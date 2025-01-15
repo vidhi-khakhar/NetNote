@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -48,6 +49,7 @@ public class NoteServerUtils {
 
     /**
      * Getter for the server address
+     *
      * @return Getter for the server address
      */
     public String getServerAddress() {
@@ -56,6 +58,7 @@ public class NoteServerUtils {
 
     /**
      * Setter for the server address
+     *
      * @param serverAddress The new server address
      */
     public void setServerAddress(String serverAddress) {
@@ -64,6 +67,7 @@ public class NoteServerUtils {
 
     /**
      * Getter for the local address of the current device in the network.
+     *
      * @return The local address of the current device.
      */
     public static String getLocalAddress() {
@@ -85,8 +89,14 @@ public class NoteServerUtils {
      * {@code false} otherwise
      */
     public boolean isServerAvailable(String address) {
-        try {
-            if (ClientBuilder.newClient(new ClientConfig())
+        try (
+                Client client = ClientBuilder
+                        .newBuilder()
+                        .withConfig(new ClientConfig())
+                        .connectTimeout(2, TimeUnit.SECONDS)
+                        .build()
+        ) {
+            if (client
                     .target(address + "api/notes/")
                     .request(MediaType.APPLICATION_JSON)
                     .get()

@@ -166,6 +166,7 @@ public class EditCollectionsCtrl {
         int newIndex = collectionUtils.createNewCollection(collections);
         collectionsList.getSelectionModel().selectIndices(newIndex);
         currentAction = CollectionAction.ADD_COLLECTION;
+        serverInput.setText("http://localhost:8080/");
         updateServerStatusText(CollectionServerStatus.SERVER_NOT_REACHABLE);
     }
 
@@ -189,6 +190,7 @@ public class EditCollectionsCtrl {
             collectionsList.getSelectionModel().selectIndices(
                     collectionUtils.removeCollection(collections, currentIndex, currentIndex)
             );
+            mainCtrl.populateCollectionsDropdown();
         }
     }
 
@@ -204,6 +206,7 @@ public class EditCollectionsCtrl {
             case CHANGE_COLLECTION_ALIAS -> changeCollectionAlias();
         }
         updateServerStatusText();
+        mainCtrl.populateCollectionsDropdown();
     }
 
     /**

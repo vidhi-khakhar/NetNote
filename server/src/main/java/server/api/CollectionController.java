@@ -164,7 +164,7 @@ public class CollectionController {
      * @param uniqueName The name of the collection from which to fetch all the notes
      * @return A list of all the notes in that collection, if the collection exists.
      */
-    @GetMapping("/{uniqueName}/notes")
+    @GetMapping("/{uniqueName}/notes/")
     public ResponseEntity<List<Note>> getAllNotesInCollection(
             @PathVariable("uniqueName") String uniqueName) {
 
