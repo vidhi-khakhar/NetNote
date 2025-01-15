@@ -1,4 +1,4 @@
-package client.scenes;
+package client.utils.markdown;
 
 public enum MarkdownProblemType {
 

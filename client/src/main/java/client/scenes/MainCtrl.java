@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.components.Notification;
+import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
 import client.utils.note.NoteUtils;
 import client.utils.LangUtils;
@@ -45,7 +46,7 @@ public class MainCtrl {
     private Label noNotesMatchYourQueryLabel;
 
     @Inject
-    private MarkdownCtrl markdownCtrl;
+    private MarkdownUtils markdownUtils;
 
     @Inject
     private UndoHandler undoHandler;
@@ -511,7 +512,7 @@ public class MainCtrl {
      * Displays the problems with Markdown rendering in the webview.
      */
     public void handleMarkdownProblems() {
-        String renderedContent = markdownCtrl.markdownToHtml(content);
+        String renderedContent = markdownUtils.markdownToHtml(content);
         boolean isChecked = problemsCheckbox.isSelected();
         if (isChecked) {
             noteEditor.setEditable(false);
@@ -533,7 +534,7 @@ public class MainCtrl {
      * Changes the contents of the WebView to show the Markdown problems
      */
     public void renderMarkdownProblems() {
-        List<String> problems = markdownCtrl.getProblems(content);
+        List<String> problems = markdownUtils.getProblems(content);
         StringBuilder result = new StringBuilder();
         if (problems.isEmpty()) {
             result.append(props.get("markdownNoProblems").get());
@@ -607,7 +608,7 @@ public class MainCtrl {
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(updatedTitle);
-            renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(noteContent));
+            renderedNoteView.getEngine().loadContent(markdownUtils.markdownToHtml(noteContent));
         }
     }
 

@@ -1,4 +1,4 @@
-package client.scenes;
+package client.utils.markdown;
 
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class MarkdownCtrl {
+public class MarkdownUtils {
 
     /**
      * Method that parses a markdown string to html.
