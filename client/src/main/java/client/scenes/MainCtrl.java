@@ -816,8 +816,10 @@ public class MainCtrl {
      */
     private void handleRenameFile(Label fileNameLabel) {
         TextInputDialog dialog = new TextInputDialog(fileNameLabel.getText());
-        dialog.setTitle("Rename File");
-        dialog.setHeaderText("Enter a new name for the file:");
+        dialog.titleProperty().bind(props.get("RenameFileConfirmationTitle"));
+        dialog.headerTextProperty().bind(props.get("renameFileAlertText"));
+        // label.RenameFileConfirmationTitle=Rename File
+        // label.renameFileAlertText= Enter a new name for the file:
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(newName -> fileNameLabel.setText(newName));
     }
