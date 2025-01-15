@@ -74,6 +74,7 @@
     - Michał: Collection tests for controller
     - Lucas: Working on default collection
 
+
 ## Feedback round (1 min)
 
 - The chair performance was great. It was a productive meeting and we discussed well.
