@@ -38,7 +38,7 @@ class NoteUtilsTest {
     }
 
     @Test
-    public void doesNotDeleteNotesIfTheyAreNotOnTheIncomingSideTest () {
+    public void doesNotDeleteOutgoingNotesTest() {
         incoming.remove(n1);
         incoming.remove(n2);
         sut.sync(outgoing, incoming);
@@ -46,9 +46,17 @@ class NoteUtilsTest {
     }
 
     @Test
-    public void addsNewIncomingNotesTest () {
+    public void addsNewIncomingNotesTest() {
         incoming.add(n4);
         sut.sync(outgoing, incoming);
         assertEquals(List.of(n1, n2, n3, n4), outgoing);
+    }
+
+    @Test
+    public void ignoresChangesInSameTitledNotes() {
+        Note newNote = new Note("Note 1", "12345");
+        incoming.remove(n1);
+        incoming.add(newNote);
+        assertEquals(List.of(n1, n2, n3), outgoing);
     }
 }
