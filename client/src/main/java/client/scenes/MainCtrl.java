@@ -24,6 +24,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -80,6 +81,12 @@ public class MainCtrl {
 
     @FXML
     private Label filterByTagLabel;
+
+    @FXML
+    private Label addedFilesLabel;
+
+    @FXML
+    private HBox filesHBox; // HBox in the FXML file
 
     @FXML
     private ListView<Note> notesList;
@@ -235,6 +242,7 @@ public class MainCtrl {
         collectionDropdown.textProperty().bind(props.get("currentCollectionName"));
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
         filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
+        addedFilesLabel.textProperty().bind(props.get("addedFilesName"));
         editCollectionsDropdownOption.textProperty().bind(
                 props.get("collectionsDropdownEditCollections"));
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
@@ -642,6 +650,57 @@ public class MainCtrl {
             notesList.setPlaceholder(noNotesMatchYourQueryLabel);
         }
     }
+
+    /**
+     * A local test version of adding an embedded file
+     */
+    public void handleAddFile() {
+        if (selectedNoteIndex == -1) {
+            showPopUp(props.get("FileAddWarningTitle").get(),
+                    props.get("FileAddWarningText").get(),
+                    Alert.AlertType.WARNING);
+        } else {
+
+            HBox fileContainer = new HBox(5);
+            fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
+                    " -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
+
+            Label fileNameLabel = new Label("testFile.jpg");
+
+            Button renameButton = new Button("✎");
+            renameButton.setOnAction(e -> handleRenameFile(fileNameLabel));
+
+            Button deleteButton = new Button("ⓧ");
+            deleteButton.setOnAction(e -> handleDeleteFile(fileContainer));
+
+            fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
+
+            filesHBox.getChildren().add(fileContainer);
+
+        }
+
+    }
+
+    /**
+     * Renaming a file Pop-up
+     */
+    private void handleRenameFile(Label fileNameLabel) {
+        TextInputDialog dialog = new TextInputDialog(fileNameLabel.getText());
+        dialog.titleProperty().bind(props.get("RenameFileConfirmationTitle"));
+        dialog.headerTextProperty().bind(props.get("renameFileAlertText"));
+        // label.RenameFileConfirmationTitle=Rename File
+        // label.renameFileAlertText= Enter a new name for the file:
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(newName -> fileNameLabel.setText(newName));
+    }
+
+    /**
+     * Delete an embedded file (currently only removes from HBOX)
+     */
+    private void handleDeleteFile(HBox fileContainer) {
+        filesHBox.getChildren().remove(fileContainer);
+    }
+
 
     /**
      * Returns the currently searched query
