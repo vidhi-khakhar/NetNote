@@ -1,4 +1,4 @@
-package client.utils;
+package client.utils.note;
 
 import commons.Note;
 import org.junit.jupiter.api.Test;
