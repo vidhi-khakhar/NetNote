@@ -176,13 +176,7 @@ public class MainCtrl {
 
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
-            if (content.isEmpty()) {
-                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
-                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
-            } else {
-                props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-                renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
-            }
+            handleMarkdownProblems();
         });
 
         searchBar.textProperty().addListener((_, _, newValue) ->
@@ -191,12 +185,11 @@ public class MainCtrl {
 
         problemsCheckbox.selectedProperty().addListener((_, _, isSelected) -> {
             areMarkdownProblemsShown = isSelected;
-            toggleMarkdownProblems();
+            handleMarkdownProblems();
         });
 
         initializeShortcuts();
         initializeTextProperties();
-
         updateDisplay();
     }
 
@@ -430,7 +423,7 @@ public class MainCtrl {
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
-            if (note.getText().isEmpty()) {
+            if (note.getText().isEmpty() && !areMarkdownProblemsShown) {
                 props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
@@ -517,7 +510,7 @@ public class MainCtrl {
     /**
      * Displays the problems with Markdown rendering in the webview.
      */
-    public void toggleMarkdownProblems() {
+    public void handleMarkdownProblems() {
         String renderedContent = markdownCtrl.markdownToHtml(content);
         boolean isChecked = problemsCheckbox.isSelected();
         if (isChecked) {
