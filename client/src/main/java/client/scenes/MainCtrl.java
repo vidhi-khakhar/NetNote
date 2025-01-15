@@ -10,7 +10,6 @@ import client.utils.markdown.MarkdownShortcutUtils;
 import client.utils.undo.*;
 import client.utils.note.NoteServerUtils;
 import client.utils.collection.CollectionServerUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import commons.Collection;
 import commons.Note;
@@ -55,9 +54,8 @@ public class MainCtrl {
     @Inject
     private NoteUtils noteUtils;
 
-    private final ObjectMapper mapper = new ObjectMapper();
-
-    private final CollectionServerUtils collectionServerUtils = new CollectionServerUtils(mapper);
+    @Inject
+    private CollectionServerUtils collectionServerUtils;
 
     @Inject
     private ConfigLoader configLoader;
