@@ -583,11 +583,15 @@ public class MainCtrl {
     public void renderMarkdownProblems() {
         List<String> problems = markdownCtrl.getProblems(content);
         StringBuilder result = new StringBuilder();
-        result.append("<ul>");
-        for (String problem : problems) {
-            result.append("<li>").append(problem).append("</li>");
+        if (problems.isEmpty()) {
+            result.append(props.get("markdownNoProblems").get());
+        } else {
+            result.append("<ul>");
+            for (String problem : problems) {
+                result.append("<li>").append(problem).append("</li>");
+            }
+            result.append("</ul>");
         }
-        result.append("</ul>");
         renderedNoteView.getEngine().loadContent(result.toString());
     }
 
