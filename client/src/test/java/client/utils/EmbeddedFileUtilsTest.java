@@ -1,5 +1,6 @@
 package client.utils;
 
+import client.utils.note.NoteServerUtils;
 import commons.EmbeddedFile;
 import commons.Note;
 import org.junit.jupiter.api.AfterEach;

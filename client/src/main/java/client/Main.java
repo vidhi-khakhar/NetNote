@@ -19,7 +19,7 @@ import static com.google.inject.Guice.createInjector;
 
 import client.scenes.EditCollectionsCtrl;
 import client.scenes.MainCtrl;
-import client.utils.NoteServerUtils;
+import client.utils.note.NoteServerUtils;
 import com.google.inject.Injector;
 
 import javafx.application.Application;

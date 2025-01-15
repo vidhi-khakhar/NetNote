@@ -1,7 +1,8 @@
 package client.scenes;
 
 import client.config.ConfigLoader;
-import client.utils.NoteServerUtils;
+import client.utils.note.NoteServerUtils;
+import client.utils.UiUtils;
 import client.utils.collection.CollectionServerStatus;
 import client.utils.collection.CollectionServerUtils;
 import client.utils.collection.CollectionUtils;
@@ -42,6 +43,9 @@ public class EditCollectionsCtrl {
 
     @Inject
     private MainCtrl mainCtrl;
+
+    @Inject
+    private UiUtils uiUtils;
 
     private final ObservableList<Collection> collections = FXCollections.observableArrayList();
     private CollectionAction currentAction = CollectionAction.NO_ACTION;
@@ -177,12 +181,12 @@ public class EditCollectionsCtrl {
     public void handleRemoveCollection() {
         int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
         if (currentIndex == -1) {
-            mainCtrl.showPopUp(props.get("noCollectionSelectedAlertTitle").get(),
+            uiUtils.showPopUp(props.get("noCollectionSelectedAlertTitle").get(),
                     props.get("noCollectionSelectedAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
         }
-        if (mainCtrl.showPopUp(props.get("removeCollectionConfirmationTitle").get(),
+        if (uiUtils.showPopUp(props.get("removeCollectionConfirmationTitle").get(),
                 props.get("removeCollectionConfirmationText").get(),
                 Alert.AlertType.CONFIRMATION)) {
             currentAction = CollectionAction.NO_ACTION;
@@ -239,7 +243,7 @@ public class EditCollectionsCtrl {
      */
     public void handleAliasChange() {
         if (collectionsList.getSelectionModel().getSelectedIndex() == -1) {
-            mainCtrl.showPopUp(props.get("cannotChangeAliasOfUnselectedCollectionAlertTitle").get(),
+            uiUtils.showPopUp(props.get("cannotChangeAliasOfUnselectedCollectionAlertTitle").get(),
                     props.get("cannotChangeAliasOfUnselectedCollectionAlertText").get(),
                     Alert.AlertType.ERROR);
             aliasInput.setText("");
@@ -259,7 +263,7 @@ public class EditCollectionsCtrl {
     public void handleServerChange() {
         if (currentAction != CollectionAction.ADD_COLLECTION) {
             serverInput.undo();
-            mainCtrl.showPopUp(props.get("cannotModifyServerAlertTitle").get(),
+            uiUtils.showPopUp(props.get("cannotModifyServerAlertTitle").get(),
                     props.get("cannotModifyServerAlertText").get(),
                     Alert.AlertType.ERROR);
         }
@@ -272,7 +276,7 @@ public class EditCollectionsCtrl {
     public void handleUniqueNameChange() {
         if (currentAction != CollectionAction.ADD_COLLECTION) {
             uniqueNameInput.undo();
-            mainCtrl.showPopUp(props.get("cannotModifyUniqueNameAlertTitle").get(),
+            uiUtils.showPopUp(props.get("cannotModifyUniqueNameAlertTitle").get(),
                     props.get("cannotModifyUniqueNameAlertText").get(),
                     Alert.AlertType.ERROR);
         }
@@ -287,7 +291,7 @@ public class EditCollectionsCtrl {
      */
     public void addCollection() {
         if (!noteServerUtils.isServerAvailable(serverInput.getText())) {
-            mainCtrl.showPopUp(props.get("serverNotReachableAlertTitle").get(),
+            uiUtils.showPopUp(props.get("serverNotReachableAlertTitle").get(),
                     props.get("serverNotReachableAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
@@ -301,7 +305,7 @@ public class EditCollectionsCtrl {
                 server
         );
         if (collectionUtils.collectionAlreadyExists(collections, uniqueName)) {
-            mainCtrl.showPopUp(props.get("collectionAlreadyAddedAlertTitle").get(),
+            uiUtils.showPopUp(props.get("collectionAlreadyAddedAlertTitle").get(),
                     props.get("collectionAlreadyAddedAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
@@ -377,7 +381,7 @@ public class EditCollectionsCtrl {
      * another action is already in progress.
      */
     public void showActionConflictPopup() {
-        mainCtrl.showPopUp(props.get("actionConflictAlertTitle").get(),
+        uiUtils.showPopUp(props.get("actionConflictAlertTitle").get(),
                 props.get("actionConflictAlertText").get(),
                 Alert.AlertType.ERROR);
     }
