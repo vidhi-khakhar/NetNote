@@ -39,7 +39,7 @@ public class MarkdownCtrl {
      *  make something italic, bold, or both.
      *  <br>8. checks if a sequenced that is between the symbol _ is separated from the rest
      *  of the text by whitespace on both sides.
-     *  <br>Doesn't check sublists yet (list within a list).
+     *  <br>Doesn't check sub-lists yet (list within a list).
      * @param content the String it is checking
      * @return List of the problems
      */
@@ -100,7 +100,7 @@ public class MarkdownCtrl {
     }
 
     /**
-     * Checks if a ist using '1.' is written correctly.
+     * Checks if a list using '1.' is written correctly.
      * @param lineNr   The current line number.
      * @param line     The current line content.
      * @param problems The list to add problems to.
