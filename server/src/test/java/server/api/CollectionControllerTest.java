@@ -48,4 +48,12 @@ public class CollectionControllerTest {
         assertTrue(collectionDb.findAll().stream().noneMatch(c -> c.getCollectionUniqueName().equals("Collection3")));
     }
 
+    @Test
+    public void createCollectionDuplicate() {
+        Collection collection = new Collection("Collection1", "Alias1", "Server1");
+        var response = sut.createCollection(collection);
+        assertEquals(409, response.getStatusCode().value());
+        assertEquals(2, collectionDb.findAll().size());
+        assertTrue(collectionDb.findById("Collection1").isPresent());
+    }
 }
