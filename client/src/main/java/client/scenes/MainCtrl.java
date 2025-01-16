@@ -417,8 +417,13 @@ public class MainCtrl {
             noteTitleInput.setText(note.getTitle());
             noteEditor.setText(note.getText());
 
+            // Highlight the search keyword (if any) in the WebView
+            String highlightedContent = highlightKeywordInText(note.getText(), getCurrentQuery());
+            renderedNoteView.getEngine().loadContent(highlightedContent);
+
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
+
             if (note.getText().isEmpty() && !areMarkdownProblemsShown) {
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
@@ -435,6 +440,23 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Highlights all occurrences of the keyword in 'text' by wrapping them in a <span>
+     * element with a yellow background color. The search is case-insensitive.
+     *
+     * @param text the text to search and highlight the keyword in
+     * @param keyword the keyword to highlight in the text
+     * @return the text with highlighted keyword occurrences
+     */
+    private String highlightKeywordInText(String text, String keyword) {
+        if (keyword == null || keyword.isEmpty()) return text;
+        String highlightedText = text.replaceAll("(?i)(" +
+                        keyword + ")", "<span style=\"background-color: yellow;\">$1</span>");
+
+        return highlightedText;
+    }
+
+
 
     /**
      * Adds a listener to the text editor to listen to changes made in the text,
@@ -444,7 +466,6 @@ public class MainCtrl {
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         if (selectedNote != null) {
-            //calling the noteServerUtils
             HashMap<String, String> patch = new HashMap<>();
             patch.put("title", selectedNote.getTitle());
             patch.put("text", content);
@@ -638,7 +659,7 @@ public class MainCtrl {
      * @param query the text entered by the user in the search bar
      */
     public void handleSearch(String query) {
-        Note currentNote = notesList.getSelectionModel().getSelectedItem();
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         if (query.isBlank()) {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
@@ -646,17 +667,23 @@ public class MainCtrl {
         }
 
         List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
-
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
 
-        if (!filteredNotes.isEmpty() && currentNote == null) {
+        if (!filteredNotes.isEmpty() && selectedNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
+
+        if (selectedNote != null) {
+            String highlightedContent = highlightKeywordInText(selectedNote.getText(), query);
+            renderedNoteView.getEngine().loadContent(highlightedContent);
+        }
+
         if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(noNotesMatchYourQueryLabel);
         }
     }
+
 
     /**
      * A local test version of adding an embedded file
