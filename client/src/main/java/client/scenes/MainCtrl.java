@@ -123,10 +123,6 @@ public class MainCtrl {
     @FXML
     private Label renderedNoteLabel;
 
-    private final ChangeListener<String> webViewContentPropertyListener =
-            (_, _, newValue) ->
-                    renderedNoteView.getEngine().loadContent(newValue);
-
     /**
      * Initializes the controller.
      *
@@ -301,7 +297,6 @@ public class MainCtrl {
                 commitAddNote(newNote, savedNotes.size());
 
                 // Default message for empty note text
-                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
 
                 undoHandler.pushAction(new CreateNoteAction(
@@ -425,7 +420,6 @@ public class MainCtrl {
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
             if (note.getText().isEmpty() && !areMarkdownProblemsShown) {
-                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
         } else {
@@ -437,7 +431,6 @@ public class MainCtrl {
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleLabelUntitled"));
 
-            props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
         }
     }
@@ -517,14 +510,11 @@ public class MainCtrl {
         if (isChecked) {
             noteEditor.setEditable(false);
             renderMarkdownProblems();
-            props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
         } else {
             noteEditor.setEditable(true);
             if (content.isEmpty()) {
-                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             } else {
-                props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(renderedContent);
             }
         }
