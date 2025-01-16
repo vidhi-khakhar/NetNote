@@ -6,11 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import server.database.EmbeddedFileRepository;
 import server.utils.ServerUtils;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +63,6 @@ public class EmbeddedFileController {
      * @param file The file that is being saved
      * @return HTTP response with a string message based if the action went
      * through properly.
-     * @throws IOException Thrown if the content of the file doesn't exist
      */
 
     @PutMapping("/{noteName}")
