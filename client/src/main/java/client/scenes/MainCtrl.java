@@ -2,12 +2,14 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.components.Notification;
-import client.utils.NoteSearchUtils;
+import client.utils.note.NoteSearchUtils;
+import client.utils.note.NoteUtils;
 import client.utils.LangUtils;
+import client.utils.UiUtils;
+import client.utils.markdown.MarkdownShortcutUtils;
 import client.utils.undo.*;
-import client.utils.NoteServerUtils;
+import client.utils.note.NoteServerUtils;
 import client.utils.collection.CollectionServerUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import commons.Collection;
 import commons.Note;
@@ -25,27 +27,17 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import java.net.URL;
 import java.util.*;
 
 public class MainCtrl {
 
-    /**
-     * The {@code selectedNoteIndex} variable tracks the index of the currently selected or
-     * edited note in the {@code savedNotes} observable list.<br>
-     * <br>
-     * If {@code selectedNoteIndex == -1},  no note is being edited, and thus a new note
-     * is ADDED<br>
-     * If {@code selectedNoteIndex != -1}, an existing note is being updated, and the note at the
-     * {@code selectedNoteIndex} is modified ({@code savedNotes.set()}).<br>
-     **/
-    private int selectedNoteIndex = -1;
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private Map<String, StringProperty> props;
 
-    private final Map<Note, Integer> indexMap = new HashMap<>();
     private Scene editCollectionsMenu;
     private Scene mainView;
     private Stage stage;
@@ -60,15 +52,23 @@ public class MainCtrl {
     @Inject
     private NoteServerUtils noteServerUtils;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Inject
+    private NoteUtils noteUtils;
 
-    private final CollectionServerUtils collectionServerUtils = new CollectionServerUtils(mapper);
+    @Inject
+    private CollectionServerUtils collectionServerUtils;
 
     @Inject
     private ConfigLoader configLoader;
 
     @Inject
     private LangUtils langUtils;
+
+    @Inject
+    private UiUtils uiUtils;
+
+    @Inject
+    private MarkdownShortcutUtils markdownShortcutUtils;
 
     @FXML
     private TextField searchBar;
@@ -162,17 +162,13 @@ public class MainCtrl {
                 .getSelectionModel()
                 .selectedItemProperty()
                 .addListener((_, _, selectedNote) -> {
-                    if (indexMap.containsKey(selectedNote)) {
-                        selectedNoteIndex = indexMap.get(selectedNote);
-                    } else {
-                        selectedNoteIndex = savedNotes.indexOf(selectedNote);
-                    }
-
                     if (selectedNote != null) {
-                        System.out.println("The selected note is on index:" + selectedNoteIndex);
+                        System.out.println("The selected note is on index: " +
+                                notesList.getSelectionModel().getSelectedIndex());
                         noteTitleInput.setText(selectedNote.getTitle());
                         noteEditor.setText(selectedNote.getText());
                     }
+                    displaySavedNote(selectedNote);
                 });
 
         noteTitleInput.textProperty().addListener(noteTitleInputListener);
@@ -228,9 +224,9 @@ public class MainCtrl {
                 }
                 case "Ctrl+N" -> handleAddNote();
                 case "Ctrl+D" -> handleDeleteNote();
-                case "Ctrl+B" -> boldMarkdown();
-                case "Ctrl+I" -> italicMarkdown();
-                case "Ctrl+U" -> underlineMarkdown();
+                case "Ctrl+B" -> applyMarkdownShortcut("**", "**");
+                case "Ctrl+I" -> applyMarkdownShortcut("*", "*");
+                case "Ctrl+U" -> applyMarkdownShortcut("<u>", "</u>");
             }
         });
     }
@@ -285,42 +281,34 @@ public class MainCtrl {
             handleSearch("");
         }
 
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.titleProperty().bind(props.get("addDialogTitle"));
-        dialog.contentTextProperty().bind(props.get("addDialogText"));
-        dialog.setHeaderText(null);
-
-        Optional<String> result = dialog.showAndWait();
+        Optional<String> result = uiUtils.askUserForInput(
+                props.get("addDialogTitle").get(),
+                props.get("addDialogText").get(),
+                null
+        );
         result.ifPresent(title -> {
             if (title.trim().isEmpty()) {
-                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                uiUtils.showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertText").get(),
                         Alert.AlertType.ERROR);
             } else if (isTitlePresent(title)) {
 
-                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                uiUtils.showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertTitleExists").get(),
                         Alert.AlertType.ERROR);
             } else {
                 Note newNote = new Note(title.trim(), "");
-                savedNotes.add(newNote);
-                noteServerUtils.storeNote(newNote);
-                indexMap.put(newNote, savedNotes.size() - 1);
-                notesList.setItems(savedNotes);
-                notesList.getSelectionModel().select(savedNotes.size() - 1);
-                noteTitleInput.setText(newNote.getTitle());
-                noteEditor.setText(newNote.getText());
+                commitAddNote(newNote, savedNotes.size());
 
                 // Default message for empty note text
                 props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
-                selectedNoteIndex = savedNotes.size() - 1;
 
                 undoHandler.pushAction(new CreateNoteAction(
                         newNote,
                         newNote.getTitle(),
                         newNote.getText(),
-                        selectedNoteIndex,
+                        notesList.getSelectionModel().getSelectedIndex(),
                         this));
 
                 noteEditor.requestFocus();
@@ -341,7 +329,7 @@ public class MainCtrl {
      * or the user cancelled the operation.
      */
     public boolean handleDeleteNote() {
-        return handleDeleteNote(selectedNoteIndex, true);
+        return handleDeleteNote(notesList.getSelectionModel().getSelectedIndex(), true);
     }
 
     /**
@@ -360,7 +348,7 @@ public class MainCtrl {
             handleSearch("");
         }
         if (index == -1) {
-            showPopUp(props.get("deleteNoteWarningTitle").get(),
+            uiUtils.showPopUp(props.get("deleteNoteWarningTitle").get(),
                     props.get("deleteNoteWarningText").get(),
                     Alert.AlertType.WARNING);
             return false;
@@ -368,12 +356,9 @@ public class MainCtrl {
 
         Note deletedNote = savedNotes.get(index);
 
-        if (showPopUp(props.get("deleteNoteConfirmationTitle").get(),
+        if (uiUtils.showPopUp(props.get("deleteNoteConfirmationTitle").get(),
                 props.get("deleteNoteConfirmationText").get() + '\n' + deletedNote.getTitle(),
                 Alert.AlertType.CONFIRMATION)) {
-
-            noteServerUtils.deleteNote(deletedNote.getTitle());
-
             if (isAddedToUndoStack) {
                 undoHandler.pushAction(new DeleteNoteAction(
                         deletedNote,
@@ -392,51 +377,31 @@ public class MainCtrl {
     }
 
     /**
-     * Undoes the deletion / redoes the creation of a note by
-     * reinstating it in the list of notes and selecting it.
+     * Adds a new note to the list of notes without checks.
      *
-     * @param deletedNote The entity corresponding to the deleted note.
-     * @param noteIndex   The position the deleted noted had in the list of notes.
+     * @param note  The entity corresponding to the new note.
+     * @param index The position of the new note in the list.
      */
-    public void handleReAddNote(Note deletedNote, int noteIndex) {
-        savedNotes.add(noteIndex, deletedNote);
-        noteServerUtils.storeNote(deletedNote);
-        notesList.getSelectionModel().select(noteIndex);
-        selectedNoteIndex = noteIndex;
-        noteTitleInput.setText(deletedNote.getTitle());
-        noteEditor.setText(deletedNote.getText());
+    public void commitAddNote(Note note, int index) {
+        savedNotes.add(index, note);
+        noteServerUtils.storeNote(note);
+        notesList.setItems(savedNotes);
+        notesList.getSelectionModel().select(index);
+        noteTitleInput.setText(note.getTitle());
+        noteEditor.setText(note.getText());
 
         renderedNoteTitleLabel.textProperty().unbind();
-        renderedNoteTitleLabel.setText(deletedNote.getTitle());
-        props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-        renderedNoteView.getEngine().loadContent(deletedNote.getText());
+        renderedNoteTitleLabel.setText(note.getTitle());
     }
 
-    /**
-     * A Warning pop-up message (only option is to say OK)
-     *
-     * @param title   The title of the pop-up message
-     * @param message The body of the pop-up message
-     * @param type    The type of the alert object
-     * @return True if the user presses 'OK', false otherwise
-     */
-    public boolean showPopUp(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
-    }
 
     /**
      * Modifies the note list by deleting the note at a given index.
      *
      * @param noteIndex The index (in the note list) of the note to be deleted.
      */
-
     public void commitDeleteNote(int noteIndex) {
+        noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle());
         savedNotes.remove(noteIndex);
         if (!savedNotes.isEmpty()) {
             int newIndex = Math.min(noteIndex, savedNotes.size() - 1);
@@ -444,28 +409,26 @@ public class MainCtrl {
         } else {
             notesList.getSelectionModel().clearSelection();
         }
-        displaySavedNote();
     }
 
     /**
      * Updates the contents of the editor and the rendered view
      * after the user select a different note to load.
+     *
+     * @param note The note to display
      */
-    public void displaySavedNote() {
-        if (selectedNoteIndex != -1 && selectedNoteIndex < savedNotes.size()) {
-            Note selectedNote = savedNotes.get(selectedNoteIndex);
-            noteTitleInput.setText(selectedNote.getTitle());
-            noteEditor.setText(selectedNote.getText());
+    public void displaySavedNote(Note note) {
+        if (note != null) {
+            noteTitleInput.setText(note.getTitle());
+            noteEditor.setText(note.getText());
 
             renderedNoteTitleLabel.textProperty().unbind();
-            renderedNoteTitleLabel.setText(selectedNote.getTitle());
-            if (selectedNote.getText().isEmpty()) {
+            renderedNoteTitleLabel.setText(note.getTitle());
+            if (note.getText().isEmpty()) {
                 props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
         } else {
-            selectedNoteIndex = -1;
-
             noteTitleInput.textProperty().removeListener(noteTitleInputListener);
             noteTitleInput.clear();
             noteTitleInput.textProperty().addListener(noteTitleInputListener);
@@ -485,10 +448,9 @@ public class MainCtrl {
      * so that they are automatically propagated in the rendered view.
      */
     public void updateDisplay() {
-        if (selectedNoteIndex != -1) {
-            // If a note is selected, update the content of that note
-            Note selectedNote = savedNotes.get(selectedNoteIndex);
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
+        if (selectedNote != null) {
             //calling the noteServerUtils
             HashMap<String, String> patch = new HashMap<>();
             patch.put("title", selectedNote.getTitle());
@@ -509,19 +471,8 @@ public class MainCtrl {
      * and adds them to the list.
      */
     public void handleRefreshNote() {
-        List<String> titlesOfCurrentNotes = savedNotes
-                .stream()
-                .map(Note::getTitle)
-                .toList();
         List<Note> serverNotes = noteServerUtils.getAllNotes();
-        serverNotes.forEach(note -> {
-
-            // This ignores the case in which the server has a different
-            // version of a note with the same title.
-            if (!titlesOfCurrentNotes.contains(note.getTitle())) {
-                savedNotes.add(note);
-            }
-        });
+        noteUtils.sync(savedNotes, serverNotes);
         notesList.refresh();
     }
 
@@ -530,27 +481,27 @@ public class MainCtrl {
      * The user is notified whether the change was successful or unsuccessful.
      */
     public void handleConfigureIP() {
-        TextInputDialog dialog = new TextInputDialog();
         String localAddressText = "\n" +
                 props.get("addressConfigLocalAddress").get() +
                 ": " +
                 NoteServerUtils.getLocalAddress();
-        dialog.titleProperty().bind(props.get("addressConfigDialogName"));
-        dialog.setContentText(props.get("addressConfigCurrentAddress").get() +
-                ": " +
-                noteServerUtils.getServerAddress() +
-                localAddressText);
-        dialog.setHeaderText(null);
-        Optional<String> result = dialog.showAndWait();
+        Optional<String> result = uiUtils.askUserForInput(
+                props.get("addressConfigDialogName").get(),
+                props.get("addressConfigCurrentAddress").get() +
+                        ": " +
+                        noteServerUtils.getServerAddress() +
+                        localAddressText,
+                null
+        );
         if (result.isPresent()) {
             String newAddress = result.get();
             if (noteServerUtils.isServerAvailable(newAddress)) {
                 noteServerUtils.setServerAddress(newAddress);
-                showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
+                uiUtils.showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
                         props.get("addressConfigSuccessAlertText").get(),
                         Alert.AlertType.INFORMATION);
             } else {
-                showPopUp(props.get("addressConfigAddressErrorTitle").get(),
+                uiUtils.showPopUp(props.get("addressConfigAddressErrorTitle").get(),
                         props.get("addressConfigAddressErrorText").get(),
                         Alert.AlertType.ERROR);
             }
@@ -596,19 +547,19 @@ public class MainCtrl {
 
         renderedNoteTitleLabel.textProperty().unbind();
         if (updatedTitle.isEmpty()) {
-            showPopUp(props.get("invalidTitleAlertTitle").get(),
+            uiUtils.showPopUp(props.get("invalidTitleAlertTitle").get(),
                     props.get("invalidTitleAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
         } else {
             renderedNoteTitleLabel.setText(updatedTitle);
         }
-        Note selectedNote = getCurrentNote();
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         if (selectedNote != null) {
             previousTitle = selectedNote.getTitle();
             if (!updatedTitle.equals(previousTitle) && isTitlePresent(updatedTitle)) {
-                showPopUp(props.get("invalidTitleAlertTitle").get(),
+                uiUtils.showPopUp(props.get("invalidTitleAlertTitle").get(),
                         props.get("invalidTitleAlertTitleExists").get(),
                         Alert.AlertType.ERROR);
             } else {
@@ -631,10 +582,10 @@ public class MainCtrl {
             String noteContent = noteEditor.getText();
             Note firstNote = new Note(updatedTitle, noteContent);
             savedNotes.add(firstNote);
-            selectedNoteIndex = savedNotes.size() - 1;
-            indexMap.put(firstNote, savedNotes.size() - 1);
+
+            int newIndex = savedNotes.size() - 1;
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
-            notesList.getSelectionModel().select(selectedNoteIndex);
+            notesList.getSelectionModel().select(newIndex);
             notesList.refresh();
             noteServerUtils.storeNote(firstNote);
 
@@ -658,101 +609,19 @@ public class MainCtrl {
     }
 
     /**
-     * Allows the user to make their text bold.<br>
-     * <br>
-     * This method is triggered whenever the user presses Ctrl + B<br>
-     * <br>
-     * It checks if text is currently selected, if so then it wraps it with the Markdown syntax **.
-     * If not, then it adds **|** where | represents user's cursor <br>
-     */
-    public void boldMarkdown() {
-        String selectedText = noteEditor.getSelectedText();
-        if (selectedText.isEmpty()) {
-            int cursorPosition = noteEditor.getCaretPosition();
-            String textBeforeCursor = noteEditor.getText(0, cursorPosition);
-            String textAfterCursor = noteEditor.getText(cursorPosition, noteEditor.getLength());
-
-            noteEditor.setText(textBeforeCursor + "**" + textAfterCursor + "**");
-            noteEditor.positionCaret(cursorPosition + 2);
-
-            noteEditor.requestFocus();
-        } else {
-            if (selectedText.startsWith("**") && selectedText.endsWith("**")) {
-                selectedText = selectedText.substring(2, selectedText.length() - 2);
-                noteEditor.replaceSelection(selectedText);
-            } else {
-                noteEditor.replaceSelection("**" + selectedText + "**");
-            }
-        }
-    }
-
-    /**
-     * Allows the user to make their text italic.<br>
-     * <br>
-     * This method is triggered whenever the user presses Ctrl + I<br>
-     * <br>
-     * It checks if text is currently selected, if so then it wraps it with the Markdown syntax *.
-     * If not, then it adds *|* where | represents user's cursor <br>
-     */
-    public void italicMarkdown() {
-        String selectedText = noteEditor.getSelectedText();
-        if (selectedText.isEmpty()) {
-            int cursorPosition = noteEditor.getCaretPosition();
-            String textBeforeCursor = noteEditor.getText(0, cursorPosition);
-            String textAfterCursor = noteEditor.getText(cursorPosition, noteEditor.getLength());
-
-            noteEditor.setText(textBeforeCursor + "*" + textAfterCursor + "*");
-            noteEditor.positionCaret(cursorPosition + 1);
-
-            noteEditor.requestFocus();
-        } else {
-            if (selectedText.startsWith("*") && selectedText.endsWith("*")) {
-                selectedText = selectedText.substring(1, selectedText.length() - 1);
-                noteEditor.replaceSelection(selectedText);
-            } else {
-                noteEditor.replaceSelection("*" + selectedText + "*");
-            }
-        }
-    }
-
-    /**
-     * Allows the user to make their text underlined.<br>
-     * <br>
-     * This method is triggered whenever the user presses Ctrl + U<br>
-     * <br>
-     * It follows the same logic as bold and italic. <br>
-     */
-    public void underlineMarkdown() {
-        String selectedText = noteEditor.getSelectedText();
-
-        if (!selectedText.isEmpty()) {
-            if (selectedText.startsWith("<u>") && selectedText.endsWith("</u>")) {
-                selectedText = selectedText.substring(3, selectedText.length() - 4);
-                noteEditor.replaceSelection(selectedText);
-            } else {
-                noteEditor.replaceSelection("<u>" + selectedText + "</u>");
-            }
-        } else {
-            int cursorPos = noteEditor.getCaretPosition();
-            String textBeforeCursor = noteEditor.getText(0, cursorPos);
-            String textAfterCursor = noteEditor.getText(cursorPos, noteEditor.getLength());
-            noteEditor.setText(textBeforeCursor + "<u>" + textAfterCursor + "</u>");
-            noteEditor.positionCaret(cursorPos + 3);
-            noteEditor.requestFocus();
-        }
-    }
-
-    /**
-     * Returns the currently opened note.
+     * Calls the {@link MarkdownShortcutUtils} to toggle the formatting for the current
+     * text selection using the provided prefix and suffix, which are in Markdown syntax.
      *
-     * @return currently displayed note.
+     * @param prefix The Markdown formatting before the selected text
+     * @param suffix The Markdown formatting after the selected text
      */
-    public Note getCurrentNote() {
-        Note currentNote = null;
-        if (selectedNoteIndex >= 0 && selectedNoteIndex < savedNotes.size()) {
-            currentNote = savedNotes.get(selectedNoteIndex);
-        }
-        return currentNote;
+    public void applyMarkdownShortcut(String prefix, String suffix) {
+        String selectedText = noteEditor.getSelectedText();
+        int pos = noteEditor.getCaretPosition();
+        Pair<String, Integer> newText =
+                markdownShortcutUtils.toggleShortcut(selectedText, pos, prefix, suffix);
+        noteEditor.replaceSelection(newText.getKey());
+        noteEditor.positionCaret(newText.getValue());
     }
 
     /**
@@ -762,35 +631,18 @@ public class MainCtrl {
      * @param query the text entered by the user in the search bar
      */
     public void handleSearch(String query) {
-        Note currentNote = getCurrentNote();
+        Note currentNote = notesList.getSelectionModel().getSelectedItem();
 
-        if (query.trim().isEmpty()) {
+        if (query.isBlank()) {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
-            indexMap.clear();
-            for (int i = 0; i < savedNotes.size(); i++) {
-                indexMap.put(savedNotes.get(i), i);
-            }
-
-            if (currentNote != null) {
-                selectedNoteIndex = savedNotes.indexOf(currentNote);
-                notesList.getSelectionModel().select(selectedNoteIndex);
-            }
             return;
         }
 
         List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
 
-        indexMap.clear();
-        for (Note note : searchedNotes) {
-            indexMap.put(note, savedNotes.indexOf(note));
-        }
-
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
 
-        if (currentNote != null && !filteredNotes.contains(currentNote)) {
-            selectedNoteIndex = savedNotes.indexOf(currentNote);
-        }
         if (!filteredNotes.isEmpty() && currentNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
@@ -803,8 +655,8 @@ public class MainCtrl {
      * A local test version of adding an embedded file
      */
     public void handleAddFile() {
-        if (selectedNoteIndex == -1) {
-            showPopUp(props.get("FileAddWarningTitle").get(),
+        if (notesList.getSelectionModel().getSelectedIndex() == -1) {
+            uiUtils.showPopUp(props.get("FileAddWarningTitle").get(),
                     props.get("FileAddWarningText").get(),
                     Alert.AlertType.WARNING);
         } else {
@@ -816,10 +668,10 @@ public class MainCtrl {
             Label fileNameLabel = new Label("testFile.jpg");
 
             Button renameButton = new Button("✎");
-            renameButton.setOnAction(e -> handleRenameFile(fileNameLabel));
+            renameButton.setOnAction(_ -> handleRenameFile(fileNameLabel));
 
             Button deleteButton = new Button("ⓧ");
-            deleteButton.setOnAction(e -> handleDeleteFile(fileContainer));
+            deleteButton.setOnAction(_ -> handleDeleteFile(fileContainer));
 
             fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
 
@@ -839,11 +691,11 @@ public class MainCtrl {
         // label.RenameFileConfirmationTitle=Rename File
         // label.renameFileAlertText= Enter a new name for the file:
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(newName -> fileNameLabel.setText(newName));
+        result.ifPresent(fileNameLabel::setText);
     }
 
     /**
-     * Delete an embedded file (currently only removes from HBOX)
+     * Delete an embedded file (currently only removes from HBox)
      */
     private void handleDeleteFile(HBox fileContainer) {
         filesHBox.getChildren().remove(fileContainer);
@@ -916,7 +768,7 @@ public class MainCtrl {
         // Create and add MenuItems for each collection
         for (Collection collection : collections) {
             MenuItem itemCollection = new MenuItem(collection.getAlias());
-            itemCollection.setOnAction(event -> {
+            itemCollection.setOnAction(_ -> {
                 collectionDropdown.textProperty().unbind();
                 collectionDropdown.setText(collection.getAlias());
                 // Example: process or display the notes
@@ -932,37 +784,28 @@ public class MainCtrl {
 
     /**
      * Updates the list of notes to show only the notes in the current collection.
+     *
      * @param notesInCollection The list of notes in the currently selected collection.
      */
     public void processNotes(List<Note> notesInCollection) {
-        Note currentNote = getCurrentNote();
+        Note currentNote = notesList.getSelectionModel().getSelectedItem();
 
         List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
 
-        for(Note noteSaved : savedNotes) {
-            for(Note noteRetrieved : notesInCollection) {
-                if(noteSaved.getTitle().equals(noteRetrieved.getTitle())) {
+        for (Note noteSaved : savedNotes) {
+            for (Note noteRetrieved : notesInCollection) {
+                if (noteSaved.getTitle().equals(noteRetrieved.getTitle())) {
                     matchedRetrievedNotesWithActualNotes.add(noteSaved);
                 }
             }
-        }
-
-        indexMap.clear();
-        for (Note note : matchedRetrievedNotesWithActualNotes) {
-            indexMap.put(note, savedNotes.indexOf(note));
         }
 
         ObservableList<Note> filteredNotes = FXCollections.
                 observableArrayList(matchedRetrievedNotesWithActualNotes);
         notesList.setItems(filteredNotes);
 
-        if (currentNote != null && !filteredNotes.contains(currentNote)) {
-            selectedNoteIndex = savedNotes.indexOf(currentNote);
-        }
         if (!filteredNotes.isEmpty() && currentNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
     }
-
 }
-

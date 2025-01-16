@@ -1,6 +1,7 @@
 package client.utils;
 
 
+import client.utils.note.NoteServerUtils;
 import commons.EmbeddedFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.client.ClientBuilder;

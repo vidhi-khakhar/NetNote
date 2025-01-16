@@ -14,7 +14,7 @@ public record DeleteNoteAction(Note deletedNote,
      */
     @Override
     public void undo() {
-        mainCtrl.handleReAddNote(deletedNote, noteIndex);
+        mainCtrl.commitAddNote(deletedNote, noteIndex);
     }
 
     /**
