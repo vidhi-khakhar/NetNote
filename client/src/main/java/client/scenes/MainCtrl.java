@@ -784,6 +784,7 @@ public class MainCtrl {
                     embeddedFile.getName(), result.get() + "." + type);
             noteEditor.setText(editorResult);
             embeddedFile.setName(result.get()+ "." + type);
+            updateDisplay();
         }
     }
 
