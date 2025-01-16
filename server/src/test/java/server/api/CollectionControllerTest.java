@@ -32,7 +32,7 @@ public class CollectionControllerTest {
     }
 
     @Test
-    public void createCollectionValid() {
+    public void createCollection() {
         Collection collection = new Collection("Collection", "Alias", "Server");
         var response = sut.createCollection(collection);
         assertEquals(201, response.getStatusCode().value());
@@ -80,5 +80,11 @@ public class CollectionControllerTest {
         assertEquals(null, response.getBody());
     }
 
-
+    @Test
+    public void updateCollectionAlias() {
+        Collection collection = new Collection("Collection", "Alias", null);
+        var response = sut.updateCollectionAlias("Collection1", collection);
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals("Alias", collectionDb.findById("Collection1").get().getAlias());
+    }
 }
