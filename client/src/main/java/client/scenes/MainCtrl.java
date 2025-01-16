@@ -39,8 +39,6 @@ public class MainCtrl {
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private Map<String, StringProperty> props;
     private boolean areMarkdownProblemsShown = false;
-    private String currentQuery = ""; // Store the current search query
-
 
     private Scene editCollectionsMenu;
     private Scene mainView;
@@ -175,7 +173,7 @@ public class MainCtrl {
 
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
-            handleMarkdownProblems();
+            handleMarkdownRendering();
         });
 
         searchBar.textProperty().addListener((_, _, newValue) ->
@@ -184,7 +182,7 @@ public class MainCtrl {
 
         problemsCheckbox.selectedProperty().addListener((_, _, isSelected) -> {
             areMarkdownProblemsShown = isSelected;
-            handleMarkdownProblems();
+            handleMarkdownRendering();
         });
 
         initializeShortcuts();
@@ -423,7 +421,7 @@ public class MainCtrl {
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
 
-            handleMarkdownProblems();
+            handleMarkdownRendering();
         } else {
             noteTitleInput.textProperty().removeListener(noteTitleInputListener);
             noteTitleInput.clear();
@@ -445,7 +443,7 @@ public class MainCtrl {
      * @param keyword the keyword to highlight in the text
      * @return the text with highlighted keyword occurrences
      */
-    private String highlightKeywordInText(String text, String keyword) {
+    public String highlightKeywordInText(String text, String keyword) {
         if (keyword == null || keyword.isEmpty()) return text;
         // (?i) makes the search case-insensitive
         return text.replaceAll("(?i)(" +
@@ -520,7 +518,7 @@ public class MainCtrl {
     /**
      * Displays the problems with Markdown rendering in the webview.
      */
-    public void handleMarkdownProblems() {
+    public void handleMarkdownRendering() {
         String renderedContent = markdownUtils.markdownToHtml(content);
         boolean isChecked = problemsCheckbox.isSelected();
 
@@ -664,7 +662,6 @@ public class MainCtrl {
 
         if (query.isBlank()) {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
-            currentQuery = null; // Clear search query
             return;
         }
 
@@ -675,9 +672,6 @@ public class MainCtrl {
         if (!filteredNotes.isEmpty() && currentNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
-
-        // Set the current search query for rendering
-        currentQuery = query;
 
         if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(noNotesMatchYourQueryLabel);
