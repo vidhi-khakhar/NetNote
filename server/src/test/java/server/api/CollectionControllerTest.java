@@ -1,6 +1,8 @@
 package server.api;
 
 import commons.Collection;
+import commons.CollectionContainsNotes;
+import commons.Note;
 import org.junit.jupiter.api.*;
 import server.utils.ServerUtils;
 
@@ -70,6 +72,13 @@ public class CollectionControllerTest {
         assertEquals(2, response.size());
         assertTrue(response.contains(collection1));
         assertTrue(response.contains(collection2));
+    }
+
+    @Test
+    public void getCollectionByUniqueName() {
+        var response = sut.getCollectionByUniqueName("Collection1");
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(collection1, response.getBody());
     }
 
     @Test
