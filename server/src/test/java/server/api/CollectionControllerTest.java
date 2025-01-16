@@ -33,11 +33,19 @@ public class CollectionControllerTest {
 
     @Test
     public void createCollectionValid() {
-        Collection collection = new Collection("Collection3", "Alias3", "Server3");
+        Collection collection = new Collection("Collection", "Alias", "Server");
         var response = sut.createCollection(collection);
         assertEquals(201, response.getStatusCode().value());
         assertTrue(collectionDb.existsById(collection.getCollectionUniqueName()));
-        assertEquals(collection, collectionDb.findById("Collection3").get());
+        assertEquals(collection, collectionDb.findById("Collection").get());
+    }
+
+    @Test
+    public void createCollectionInvalidAlias() {
+        Collection collection = new Collection("Collection4", "Alias4", "Server4");
+        var response = sut.createCollection(collection);
+        assertEquals(400, response.getStatusCode().value());
+        assertTrue(collectionDb.findAll().stream().noneMatch(c -> c.getCollectionUniqueName().equals("Collection3")));
     }
 
 }
