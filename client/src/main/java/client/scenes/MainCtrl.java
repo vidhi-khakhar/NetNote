@@ -183,7 +183,7 @@ public class MainCtrl {
 
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
-            handleMarkdownProblems();
+            handleMarkdownRendering();
         });
 
         searchBar.textProperty().addListener((_, _, newValue) ->
@@ -192,7 +192,7 @@ public class MainCtrl {
 
         problemsCheckbox.selectedProperty().addListener((_, _, isSelected) -> {
             areMarkdownProblemsShown = isSelected;
-            handleMarkdownProblems();
+            handleMarkdownRendering();
         });
 
         initializeShortcuts();
@@ -427,6 +427,7 @@ public class MainCtrl {
             noteTitleInput.setText(note.getTitle());
             noteEditor.setText(note.getText());
             filesHBox.getChildren().clear();
+            content = note.getText();
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
@@ -456,6 +457,8 @@ public class MainCtrl {
                     filesHBox.getChildren().add(fileContainer);
                 }
 
+
+            handleMarkdownRendering();
         } else {
             noteTitleInput.textProperty().removeListener(noteTitleInputListener);
             noteTitleInput.clear();
@@ -469,6 +472,20 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Highlights all occurrences of the keyword in 'text' by wrapping them in a &lt;span&gt;
+     * element with a yellow background color. The search is case-insensitive.
+     *
+     * @param text the text to search and highlight the keyword in
+     * @param keyword the keyword to highlight in the text
+     * @return the text with highlighted keyword occurrences
+     */
+    public String highlightKeywordInText(String text, String keyword) {
+        if (keyword == null || keyword.isEmpty()) return text;
+        // (?i) makes the search case-insensitive
+        return text.replaceAll("(?i)(" +
+                keyword + ")", "<span style=\"background-color: yellow;\">$1</span>");
+    }
 
     /**
      * Adds a listener to the text editor to listen to changes made in the text,
@@ -538,9 +555,10 @@ public class MainCtrl {
     /**
      * Displays the problems with Markdown rendering in the webview.
      */
-    public void handleMarkdownProblems() {
+    public void handleMarkdownRendering() {
         String renderedContent = markdownUtils.markdownToHtml(content);
         boolean isChecked = problemsCheckbox.isSelected();
+
         if (isChecked) {
             noteEditor.setEditable(false);
             renderMarkdownProblems();
@@ -549,6 +567,11 @@ public class MainCtrl {
             if (content.isEmpty()) {
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             } else {
+                // Check if a search query is active
+                String query = getCurrentQuery();
+                if (query != null && !query.isEmpty()) {
+                    renderedContent = highlightKeywordInText(renderedContent, query);
+                }
                 renderedNoteView.getEngine().loadContent(renderedContent);
             }
         }
@@ -680,13 +703,13 @@ public class MainCtrl {
         }
 
         List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
-
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
 
         if (!filteredNotes.isEmpty() && currentNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
+
         if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(noNotesMatchYourQueryLabel);
         }
