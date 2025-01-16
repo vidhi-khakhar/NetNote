@@ -426,6 +426,7 @@ public class MainCtrl {
         if (note != null) {
             noteTitleInput.setText(note.getTitle());
             noteEditor.setText(note.getText());
+            filesHBox.getChildren().clear();
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
@@ -729,6 +730,7 @@ public class MainCtrl {
                 noteEditor.appendText(noteServerUtils.getServerAddress() + "api/files/"
                         + notesList.getSelectionModel().getSelectedItem().getTitle() + "/content/" +
                         embeddedFile.getName() + ")");
+                updateDisplay();
             }
             else
                 System.out.println("No file detected");
