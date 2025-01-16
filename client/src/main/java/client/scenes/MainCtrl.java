@@ -417,13 +417,8 @@ public class MainCtrl {
             noteTitleInput.setText(note.getTitle());
             noteEditor.setText(note.getText());
 
-            // Highlight the search keyword (if any) in the WebView
-            String highlightedContent = highlightKeywordInText(note.getText(), getCurrentQuery());
-            renderedNoteView.getEngine().loadContent(highlightedContent);
-
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
-
             if (note.getText().isEmpty() && !areMarkdownProblemsShown) {
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
@@ -441,7 +436,7 @@ public class MainCtrl {
     }
 
     /**
-     * Highlights all occurrences of the keyword in 'text' by wrapping them in a <span>
+     * Highlights all occurrences of the keyword in 'text' by wrapping them in a &lt;span&gt;
      * element with a yellow background color. The search is case-insensitive.
      *
      * @param text the text to search and highlight the keyword in
@@ -451,12 +446,10 @@ public class MainCtrl {
     private String highlightKeywordInText(String text, String keyword) {
         if (keyword == null || keyword.isEmpty()) return text;
         // (?i) makes the search case-insensitive
-        String highlightedText = text.replaceAll("(?i)(" +
-                        keyword + ")", "<span style=\"background-color: yellow;\">$1</span>");
-
-        return highlightedText;
+        return text.replaceAll("(?i)(" +
+                keyword + ")", "<span style=\"background-color: yellow;\">$1</span>");
     }
-    
+
     /**
      * Adds a listener to the text editor to listen to changes made in the text,
      * so that they are automatically propagated in the rendered view.
@@ -465,6 +458,7 @@ public class MainCtrl {
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
 
         if (selectedNote != null) {
+            //calling the noteServerUtils
             HashMap<String, String> patch = new HashMap<>();
             patch.put("title", selectedNote.getTitle());
             patch.put("text", content);
@@ -658,7 +652,7 @@ public class MainCtrl {
      * @param query the text entered by the user in the search bar
      */
     public void handleSearch(String query) {
-        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
+        Note currentNote = notesList.getSelectionModel().getSelectedItem();
 
         if (query.isBlank()) {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
@@ -669,21 +663,20 @@ public class MainCtrl {
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
 
-        if (!filteredNotes.isEmpty() && selectedNote == null) {
+        if (!filteredNotes.isEmpty() && currentNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
 
-        if (selectedNote != null) {
-            String highlightedContent = highlightKeywordInText(selectedNote.getText(), query);
+        // Highlight the search keyword in the selected note's text
+        if (currentNote != null) {
+            String highlightedContent = highlightKeywordInText(currentNote.getText(), query);
             renderedNoteView.getEngine().loadContent(highlightedContent);
         }
 
         if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(noNotesMatchYourQueryLabel);
-            renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
         }
     }
-
 
     /**
      * A local test version of adding an embedded file
