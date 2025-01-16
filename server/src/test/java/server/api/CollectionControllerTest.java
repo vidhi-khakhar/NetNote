@@ -42,10 +42,10 @@ public class CollectionControllerTest {
 
     @Test
     public void createCollectionInvalidAlias() {
-        Collection collection = new Collection("Collection4", "Al", "Server4");
+        Collection collection = new Collection("Collection", "Al", "Server");
         var response = sut.createCollection(collection);
         assertEquals(400, response.getStatusCode().value());
-        assertTrue(collectionDb.findAll().stream().noneMatch(c -> c.getCollectionUniqueName().equals("Collection3")));
+        assertTrue(collectionDb.findAll().stream().noneMatch(c -> c.getCollectionUniqueName().equals("Collection")));
     }
 
     @Test
@@ -64,4 +64,14 @@ public class CollectionControllerTest {
         assertEquals(400, response.getStatusCode().value());
         assertTrue(collectionDb.findAll().stream().noneMatch(c -> c.getCollectionUniqueName().equals("Collection")));
     }
+
+    @Test
+    public void getAllCollections() {
+        var response = sut.getAllCollections();
+        assertEquals(2, collectionDb.findAll().size());
+        assertTrue(response.contains(collection1));
+        assertTrue(response.contains(collection2));
+    }
+
+
 }
