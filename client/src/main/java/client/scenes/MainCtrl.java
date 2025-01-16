@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.components.Notification;
+import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
 import client.utils.note.NoteUtils;
 import client.utils.LangUtils;
@@ -37,6 +38,7 @@ public class MainCtrl {
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private Map<String, StringProperty> props;
+    private boolean areMarkdownProblemsShown = false;
 
     private Scene editCollectionsMenu;
     private Scene mainView;
@@ -44,7 +46,7 @@ public class MainCtrl {
     private Label noNotesMatchYourQueryLabel;
 
     @Inject
-    private MarkdownCtrl markdownCtrl;
+    private MarkdownUtils markdownUtils;
 
     @Inject
     private UndoHandler undoHandler;
@@ -121,10 +123,6 @@ public class MainCtrl {
     @FXML
     private Label renderedNoteLabel;
 
-    private final ChangeListener<String> webViewContentPropertyListener =
-            (_, _, newValue) ->
-                    renderedNoteView.getEngine().loadContent(newValue);
-
     /**
      * Initializes the controller.
      *
@@ -175,22 +173,20 @@ public class MainCtrl {
 
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
-            if (content.isEmpty()) {
-                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
-                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
-            } else {
-                props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-                renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(content));
-            }
+            handleMarkdownProblems();
         });
 
         searchBar.textProperty().addListener((_, _, newValue) ->
                 handleSearch(newValue)
         );
 
+        problemsCheckbox.selectedProperty().addListener((_, _, isSelected) -> {
+            areMarkdownProblemsShown = isSelected;
+            handleMarkdownProblems();
+        });
+
         initializeShortcuts();
         initializeTextProperties();
-
         updateDisplay();
     }
 
@@ -301,7 +297,6 @@ public class MainCtrl {
                 commitAddNote(newNote, savedNotes.size());
 
                 // Default message for empty note text
-                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
 
                 undoHandler.pushAction(new CreateNoteAction(
@@ -424,8 +419,7 @@ public class MainCtrl {
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
-            if (note.getText().isEmpty()) {
-                props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
+            if (note.getText().isEmpty() && !areMarkdownProblemsShown) {
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
         } else {
@@ -437,7 +431,6 @@ public class MainCtrl {
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleLabelUntitled"));
 
-            props.get("renderedNoteViewEmpty").addListener(webViewContentPropertyListener);
             renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
         }
     }
@@ -511,24 +504,38 @@ public class MainCtrl {
     /**
      * Displays the problems with Markdown rendering in the webview.
      */
-    public void showProblems() {
-        String renderedContent = markdownCtrl.markdownToHtml(content);
-        if (problemsCheckbox.isSelected()) {
+    public void handleMarkdownProblems() {
+        String renderedContent = markdownUtils.markdownToHtml(content);
+        boolean isChecked = problemsCheckbox.isSelected();
+        if (isChecked) {
             noteEditor.setEditable(false);
-            List<String> problems = markdownCtrl.getProblems(content);
-            StringBuilder result = new StringBuilder();
-            for (int i = 0; i < problems.size(); i++) {
-                result.append(problems.get(i));
-                if (i < problems.size() - 1)
-                    result.append("\n");
-            }
-            props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-            renderedNoteView.getEngine().loadContent(result.toString());
+            renderMarkdownProblems();
         } else {
             noteEditor.setEditable(true);
-            props.get("renderedNoteViewEmpty").removeListener(webViewContentPropertyListener);
-            renderedNoteView.getEngine().loadContent(renderedContent);
+            if (content.isEmpty()) {
+                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
+            } else {
+                renderedNoteView.getEngine().loadContent(renderedContent);
+            }
         }
+    }
+
+    /**
+     * Changes the contents of the WebView to show the Markdown problems
+     */
+    public void renderMarkdownProblems() {
+        List<String> problems = markdownUtils.getProblems(content);
+        StringBuilder result = new StringBuilder();
+        if (problems.isEmpty()) {
+            result.append(props.get("markdownNoProblems").get());
+        } else {
+            result.append("<ul>");
+            for (String problem : problems) {
+                result.append("<li>").append(problem).append("</li>");
+            }
+            result.append("</ul>");
+        }
+        renderedNoteView.getEngine().loadContent(result.toString());
     }
 
     /**
@@ -591,7 +598,7 @@ public class MainCtrl {
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(updatedTitle);
-            renderedNoteView.getEngine().loadContent(markdownCtrl.markdownToHtml(noteContent));
+            renderedNoteView.getEngine().loadContent(markdownUtils.markdownToHtml(noteContent));
         }
     }
 
@@ -725,6 +732,7 @@ public class MainCtrl {
         }
         configLoader.setLocale(l);
         langUtils.setLocale(l);
+        if (areMarkdownProblemsShown) renderMarkdownProblems();
     }
 
     /**
