@@ -127,7 +127,7 @@
                         </font>
                      </Label>
                      <HBox fx:id="filesHBox" prefHeight="30.0" prefWidth="155.0" />
-                     <Button mnemonicParsing="false" onAction="#handleAddFile" prefHeight="26.0" prefWidth="30.0" style="-fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="+">
+                     <Button fx:id="addFile" mnemonicParsing="false" onAction="#handleAddFile" prefHeight="26.0" prefWidth="30.0" style="-fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="+">
                         <HBox.margin>
                            <Insets />
                         </HBox.margin>
