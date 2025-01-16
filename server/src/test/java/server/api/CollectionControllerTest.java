@@ -4,8 +4,7 @@ import commons.Collection;
 import org.junit.jupiter.api.*;
 import server.utils.ServerUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CollectionControllerTest {
 
@@ -95,4 +94,12 @@ public class CollectionControllerTest {
         assertEquals(404, response.getStatusCode().value());
         assertTrue(collectionDb.findById("Collection").isEmpty());
     }
+
+    @Test
+    public void deleteCollection() {
+        var response = sut.deleteCollection("Collection1");
+        assertEquals(200, response.getStatusCode().value());
+        assertFalse(collectionDb.existsById("Collection1"));
+    }
+
 }
