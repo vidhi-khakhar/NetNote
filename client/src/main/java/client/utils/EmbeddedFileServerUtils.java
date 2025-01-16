@@ -19,31 +19,6 @@ import java.util.Map;
  * A client utility class for communicating with the server for embedded files.
  */
 public class EmbeddedFileServerUtils {
-    private String serverAddress;
-
-    /**
-     * Default constructor for EmbeddedFileServerUtils used by Guice
-     * Sets the default server address to the address of the current device.
-     */
-    public EmbeddedFileServerUtils() {
-        this.serverAddress = NoteServerUtils.getLocalAddress();
-    }
-
-    /**
-     * Getter for the server address
-     * @return Getter for the server address
-     */
-    public String getServerAddress() {
-        return this.serverAddress;
-    }
-
-    /**
-     * Setter for the server address
-     * @param serverAddress The new server address
-     */
-    public void setServerAddress(String serverAddress) {
-        this.serverAddress = serverAddress;
-    }
 
     /**
      * Method to check if an address corresponds to an available server.
@@ -79,7 +54,7 @@ public class EmbeddedFileServerUtils {
         List<EmbeddedFile> files = new ArrayList<>();
         try {
             Response response = ClientBuilder.newClient()
-                    .target(serverAddress + "api/files/" + noteName)
+                    .target(serverAddress + "api/files/notes/" + noteName)
                     .request(MediaType.APPLICATION_JSON)
                     .get();
 
@@ -110,7 +85,7 @@ public class EmbeddedFileServerUtils {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress + "api/files/" + noteName)
                     .request(MediaType.APPLICATION_JSON)
-                    .post(Entity.entity(file, MediaType.APPLICATION_JSON));
+                    .put(Entity.entity(file, MediaType.APPLICATION_JSON));
 
             if (response.getStatus() == 201) {
                 System.out.println("Embedded file stored successfully.");
@@ -129,22 +104,19 @@ public class EmbeddedFileServerUtils {
      * Sends a PATCH request to update the title of an existing embedded file on the server.
      * @param serverAddress - The server address because some files
      *                      may be stored on different servers.
+     * @param noteName  - The name of the note
      * @param oldTitle    - The current title of the embedded file to be updated.
      * @param newTitle    - The new title to be assigned to the embedded file.
      */
-    public void renameEmbeddedFile(String serverAddress, String oldTitle, String newTitle) {
+    public void renameEmbeddedFile(String serverAddress,String noteName,
+                                   String oldTitle, String newTitle) {
         try {
-            Map<String, String> updateData = new HashMap<>();
-            updateData.put("title", newTitle); // Key "title" matches the server's expected field
-
-            String jsonData = new ObjectMapper().writeValueAsString(updateData);
-
             Response response = ClientBuilder.newClient()
                     .target(serverAddress)
-                    .path("api/files/" + oldTitle)
+                    .path("api/files/" + noteName + "/content/" + oldTitle)
                     .request(MediaType.APPLICATION_JSON)
                     .header("X-HTTP-Method-Override", "PATCH")
-                    .post(Entity.entity(jsonData, MediaType.APPLICATION_JSON));
+                    .post(Entity.entity(newTitle, MediaType.APPLICATION_JSON));
 
             // Handle the response
             if (response.getStatus() == 200) {
