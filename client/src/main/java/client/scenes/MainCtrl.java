@@ -681,6 +681,7 @@ public class MainCtrl {
 
         if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(noNotesMatchYourQueryLabel);
+            renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
         }
     }
 
