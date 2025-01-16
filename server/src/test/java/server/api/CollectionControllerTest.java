@@ -87,4 +87,12 @@ public class CollectionControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertEquals("Alias", collectionDb.findById("Collection1").get().getAlias());
     }
+
+    @Test
+    public void updateCollectionAliasInvalid() {
+        Collection collection = new Collection("Collection", "Alias", null);
+        var response = sut.updateCollectionAlias("Collection", collection);
+        assertEquals(404, response.getStatusCode().value());
+        assertTrue(collectionDb.findById("Collection").isEmpty());
+    }
 }
