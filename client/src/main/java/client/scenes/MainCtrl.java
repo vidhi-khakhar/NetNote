@@ -450,14 +450,13 @@ public class MainCtrl {
      */
     private String highlightKeywordInText(String text, String keyword) {
         if (keyword == null || keyword.isEmpty()) return text;
+        // (?i) makes the search case-insensitive
         String highlightedText = text.replaceAll("(?i)(" +
                         keyword + ")", "<span style=\"background-color: yellow;\">$1</span>");
 
         return highlightedText;
     }
-
-
-
+    
     /**
      * Adds a listener to the text editor to listen to changes made in the text,
      * so that they are automatically propagated in the rendered view.
