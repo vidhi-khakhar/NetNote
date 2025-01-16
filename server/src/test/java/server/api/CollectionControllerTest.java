@@ -68,9 +68,16 @@ public class CollectionControllerTest {
     @Test
     public void getAllCollections() {
         var response = sut.getAllCollections();
-        assertEquals(2, collectionDb.findAll().size());
+        assertEquals(2, response.size());
         assertTrue(response.contains(collection1));
         assertTrue(response.contains(collection2));
+    }
+
+    @Test
+    public void getCollectionByUniqueNameInvalid() {
+        var response = sut.getCollectionByUniqueName("invalid");
+        assertEquals(404, response.getStatusCode().value());
+        assertEquals(null, response.getBody());
     }
 
 
