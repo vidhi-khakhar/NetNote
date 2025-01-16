@@ -40,8 +40,9 @@ public class MainCtrl {
     private Map<String, StringProperty> props;
     private boolean areMarkdownProblemsShown = false;
 
-    private Scene editCollectionsMenu;
     private Scene mainView;
+    private Scene editCollectionsMenu;
+    private Scene networkMenu;
     private Stage stage;
     private Label noNotesMatchYourQueryLabel;
 
@@ -132,12 +133,18 @@ public class MainCtrl {
      * @param stage               Reference to the primary stage.
      * @param mainView            Holds a reference to the MainView scene.
      * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
+     * @param networkMenu         Holds a reference to the NetworkMenu scene.
      */
-    public void initialize(Stage stage, Scene mainView, Scene editCollectionsMenu) {
+    public void initialize(Stage stage,
+                           Scene mainView,
+                           Scene editCollectionsMenu,
+                           Scene networkMenu) {
 
         this.stage = stage;
+
         this.mainView = mainView;
         this.editCollectionsMenu = editCollectionsMenu;
+        this.networkMenu = networkMenu;
 
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
@@ -245,7 +252,7 @@ public class MainCtrl {
         editCollectionsDropdownOption.textProperty().bind(
                 props.get("collectionsDropdownEditCollections"));
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
-        networkButton.textProperty().bind(props.get("networkButton"));
+        networkButton.textProperty().bind(props.get("network"));
 
         setLocale(configLoader.getLocale());
     }
@@ -735,6 +742,16 @@ public class MainCtrl {
         Stage secondaryStage = new Stage();
         secondaryStage.titleProperty().bind(props.get("collectionsDropdownEditCollections"));
         secondaryStage.setScene(editCollectionsMenu);
+        secondaryStage.show();
+    }
+
+    /**
+     * Opens the "Network" scene to manage the data on different servers.
+     */
+    public void showNetworkMenu() {
+        Stage secondaryStage = new Stage();
+        secondaryStage.titleProperty().bind(props.get("network"));
+        secondaryStage.setScene(networkMenu);
         secondaryStage.show();
     }
 

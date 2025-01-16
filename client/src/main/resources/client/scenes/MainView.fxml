@@ -180,7 +180,7 @@
             </HBox>
          </HBox>
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
-               <Button fx:id="networkButton" mnemonicParsing="false" style="-fx-background-color: #e8b419; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="%label.networkButton">
+               <Button fx:id="networkButton" mnemonicParsing="false" onAction="#showNetworkMenu" style="-fx-background-color: #e8b419; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="%label.network">
                   <font>
                      <Font name="System Bold" size="11.0" />
                   </font>

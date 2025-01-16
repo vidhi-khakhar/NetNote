@@ -63,8 +63,11 @@ public class Main extends Application {
         var mainView = FXML.load(MainCtrl.class, "client", "scenes", "MainView.fxml");
         var editCollectionsMenu =
                 FXML.load(EditCollectionsCtrl.class, "client", "scenes", "EditCollections.fxml");
+        var networkMenu = FXML.load(MainCtrl.class, "client", "scenes", "NetworkMenu.fxml");
+
         var mainViewScene = new Scene(mainView.getValue());
         var editCollectionsMenuScene = new Scene(editCollectionsMenu.getValue());
+        var networkMenuScene = new Scene(networkMenu.getValue());
 
         // Apply the CSS file
         String cssPath = getClass()
@@ -77,7 +80,11 @@ public class Main extends Application {
         primaryStage.show();
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, mainViewScene, editCollectionsMenuScene);
+        mainCtrl.initialize(
+                primaryStage,
+                mainViewScene,
+                editCollectionsMenuScene,
+                networkMenuScene);
         mainCtrl.updateDisplay();
     }
 }
