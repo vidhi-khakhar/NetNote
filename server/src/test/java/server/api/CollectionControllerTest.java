@@ -102,4 +102,11 @@ public class CollectionControllerTest {
         assertFalse(collectionDb.existsById("Collection1"));
     }
 
+    @Test
+    public void deleteCollectionInvalid() {
+        var response = sut.deleteCollection("InvalidCollection");
+        assertEquals(404, response.getStatusCode().value());
+        assertEquals(2, collectionDb.findAll().size());
+    }
+
 }
