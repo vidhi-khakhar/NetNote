@@ -123,6 +123,9 @@ public class MainCtrl {
     @FXML
     private Label renderedNoteLabel;
 
+    @FXML
+    private Button networkButton;
+
     /**
      * Initializes the controller.
      *
@@ -242,6 +245,7 @@ public class MainCtrl {
         editCollectionsDropdownOption.textProperty().bind(
                 props.get("collectionsDropdownEditCollections"));
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
+        networkButton.textProperty().bind(props.get("networkButton"));
 
         setLocale(configLoader.getLocale());
     }
@@ -467,38 +471,6 @@ public class MainCtrl {
         List<Note> serverNotes = noteServerUtils.getAllNotes();
         noteUtils.sync(savedNotes, serverNotes);
         notesList.refresh();
-    }
-
-    /**
-     * Shows a dialog where the user can change the address of the server.
-     * The user is notified whether the change was successful or unsuccessful.
-     */
-    public void handleConfigureIP() {
-        String localAddressText = "\n" +
-                props.get("addressConfigLocalAddress").get() +
-                ": " +
-                NoteServerUtils.getLocalAddress();
-        Optional<String> result = uiUtils.askUserForInput(
-                props.get("addressConfigDialogName").get(),
-                props.get("addressConfigCurrentAddress").get() +
-                        ": " +
-                        noteServerUtils.getServerAddress() +
-                        localAddressText,
-                null
-        );
-        if (result.isPresent()) {
-            String newAddress = result.get();
-            if (noteServerUtils.isServerAvailable(newAddress)) {
-                noteServerUtils.setServerAddress(newAddress);
-                uiUtils.showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
-                        props.get("addressConfigSuccessAlertText").get(),
-                        Alert.AlertType.INFORMATION);
-            } else {
-                uiUtils.showPopUp(props.get("addressConfigAddressErrorTitle").get(),
-                        props.get("addressConfigAddressErrorText").get(),
-                        Alert.AlertType.ERROR);
-            }
-        }
     }
 
     /**
