@@ -39,6 +39,8 @@ public class MainCtrl {
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private Map<String, StringProperty> props;
     private boolean areMarkdownProblemsShown = false;
+    private String currentQuery = ""; // Store the current search query
+
 
     private Scene editCollectionsMenu;
     private Scene mainView;
@@ -416,12 +418,12 @@ public class MainCtrl {
         if (note != null) {
             noteTitleInput.setText(note.getTitle());
             noteEditor.setText(note.getText());
+            content = note.getText();
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
-            if (note.getText().isEmpty() && !areMarkdownProblemsShown) {
-                renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
-            }
+
+            handleMarkdownProblems();
         } else {
             noteTitleInput.textProperty().removeListener(noteTitleInputListener);
             noteTitleInput.clear();
@@ -521,6 +523,7 @@ public class MainCtrl {
     public void handleMarkdownProblems() {
         String renderedContent = markdownUtils.markdownToHtml(content);
         boolean isChecked = problemsCheckbox.isSelected();
+
         if (isChecked) {
             noteEditor.setEditable(false);
             renderMarkdownProblems();
@@ -529,6 +532,11 @@ public class MainCtrl {
             if (content.isEmpty()) {
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             } else {
+                // Check if a search query is active
+                String query = getCurrentQuery();
+                if (query != null && !query.isEmpty()) {
+                    renderedContent = highlightKeywordInText(renderedContent, query);
+                }
                 renderedNoteView.getEngine().loadContent(renderedContent);
             }
         }
@@ -656,6 +664,7 @@ public class MainCtrl {
 
         if (query.isBlank()) {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
+            currentQuery = null; // Clear search query
             return;
         }
 
@@ -667,11 +676,8 @@ public class MainCtrl {
             notesList.getSelectionModel().clearSelection();
         }
 
-        // Highlight the search keyword in the selected note's text
-        if (currentNote != null) {
-            String highlightedContent = highlightKeywordInText(currentNote.getText(), query);
-            renderedNoteView.getEngine().loadContent(highlightedContent);
-        }
+        // Set the current search query for rendering
+        currentQuery = query;
 
         if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(noNotesMatchYourQueryLabel);
