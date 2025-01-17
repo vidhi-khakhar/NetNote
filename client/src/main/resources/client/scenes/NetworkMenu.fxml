@@ -16,7 +16,7 @@
          <padding>
             <Insets bottom="4.0" top="4.0" />
          </padding>
-         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Network">
+         <Text fx:id="menuTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="%label.network">
             <font>
                <Font name="System Bold" size="24.0" />
             </font>
@@ -26,9 +26,9 @@
          <padding>
             <Insets bottom="4.0" top="4.0" />
          </padding>
-         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Local address" />
+         <Text fx:id="localAddressLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%label.localAddress" />
          <Text fx:id="localAddressText" strokeType="OUTSIDE" strokeWidth="0.0" text="http://192.168.0.123:8080/" />
-         <Button fx:id="copyButton" mnemonicParsing="false" onAction="#copyLocalAddressToClipboard" style="-fx-border-color: BLACK; -fx-border-radius: 2;" text="Copy" />
+         <Button fx:id="copyButton" mnemonicParsing="false" onAction="#copyLocalAddressToClipboard" style="-fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.copy" />
       </HBox>
       <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
          <VBox alignment="TOP_CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
@@ -36,11 +36,11 @@
                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
             </padding>
             <VBox>
-               <RadioButton fx:id="radioNotes" mnemonicParsing="false" onAction="#handleShowNotes" selected="true" text="Notes" />
-               <RadioButton fx:id="radioCollections" mnemonicParsing="false" onAction="#handleShowCollections" text="Collections" />
-               <RadioButton fx:id="radioFiles" mnemonicParsing="false" onAction="#handleShowFiles" text="Files" />
+               <RadioButton fx:id="radioNotes" mnemonicParsing="false" onAction="#handleShowNotes" selected="true" text="%label.notes" />
+               <RadioButton fx:id="radioCollections" mnemonicParsing="false" onAction="#handleShowCollections" text="%label.collections" />
+               <RadioButton fx:id="radioFiles" mnemonicParsing="false" onAction="#handleShowFiles" text="%label.files" />
             </VBox>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Servers you have access to">
+            <Text fx:id="serverListLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%label.serverList">
                <font>
                   <Font size="16.0" />
                </font>
@@ -51,7 +51,7 @@
             <padding>
                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
             </padding>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Results">
+            <Text fx:id="resultListLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%label.results">
                <font>
                   <Font size="16.0" />
                </font>

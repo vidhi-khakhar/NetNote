@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.utils.EmbeddedFileServerUtils;
+import client.utils.LangUtils;
 import client.utils.collection.CollectionServerUtils;
 import client.utils.network.NetworkMenuSelectionType;
 import client.utils.note.NoteServerUtils;
@@ -46,6 +47,9 @@ public class NetworkCtrl {
     @Inject
     private EmbeddedFileServerUtils fileServerUtils;
 
+    @Inject
+    private LangUtils langUtils;
+
     @FXML
     private RadioButton radioNotes;
 
@@ -67,6 +71,18 @@ public class NetworkCtrl {
     @FXML
     private ListView<String> resultList;
 
+    @FXML
+    private Text menuTitle;
+
+    @FXML
+    private Text localAddressLabel;
+
+    @FXML
+    private Text serverListLabel;
+
+    @FXML
+    private Text resultListLabel;
+
     /**
      * Initializes the {@link NetworkCtrl} controller by
      * binding the appropriate text properties and adding the
@@ -74,7 +90,7 @@ public class NetworkCtrl {
      */
     public void initialize() {
         String localAddress = NoteServerUtils.getLocalAddress();
-        currentAddress = localAddress;
+        currentAddress = null;
 
         ToggleGroup radioGroup = new ToggleGroup();
         radioNotes.setToggleGroup(radioGroup);
@@ -99,6 +115,19 @@ public class NetworkCtrl {
             currentAddress = selected;
             updateResults(currentAddress, currentType);
         });
+
+        initializeTextProperties();
+    }
+
+    private void initializeTextProperties() {
+        menuTitle.textProperty().bind(langUtils.getProps().get("network"));
+        copyButton.textProperty().bind(langUtils.getProps().get("copy"));
+        localAddressLabel.textProperty().bind(langUtils.getProps().get("localAddress"));
+        radioNotes.textProperty().bind(langUtils.getProps().get("notes"));
+        radioCollections.textProperty().bind(langUtils.getProps().get("collections"));
+        radioFiles.textProperty().bind(langUtils.getProps().get("files"));
+        serverListLabel.textProperty().bind(langUtils.getProps().get("serverList"));
+        resultListLabel.textProperty().bind(langUtils.getProps().get("results"));
     }
 
     /**
@@ -112,7 +141,7 @@ public class NetworkCtrl {
         ClipboardContent content = new ClipboardContent();
         content.putString(NoteServerUtils.getLocalAddress());
         clipboard.setContent(content);
-        copyButton.setText("Copied!");
+        copyButton.textProperty().bind(langUtils.getProps().get("copied"));
         Thread.ofPlatform().start(() -> {
             try {
                 Thread.sleep(2000);
@@ -120,7 +149,9 @@ public class NetworkCtrl {
                 System.out.println("Thread was interrupted");
             }
             // All UI changes must be performed by the main application thread
-            Platform.runLater(() -> copyButton.setText("Copy"));
+            Platform.runLater(() -> copyButton
+                    .textProperty()
+                    .bind(langUtils.getProps().get("copy")));
         });
     }
 
@@ -133,6 +164,12 @@ public class NetworkCtrl {
      *                      embedded files).
      */
     public void updateResults(String serverAddress, NetworkMenuSelectionType type) {
+        if (currentAddress == null) {
+            Text placeholderText = new Text();
+            placeholderText.textProperty().bind(langUtils.getProps().get("networkMenuNoServer"));
+            resultList.setPlaceholder(placeholderText);
+            return;
+        }
         List<String> newResults;
         if (type == NetworkMenuSelectionType.COLLECTIONS) {
             List<Collection> collections = collectionServerUtils.getAllCollections(serverAddress);
@@ -152,6 +189,11 @@ public class NetworkCtrl {
         }
         results.clear();
         results.addAll(newResults);
+        if (results.isEmpty()) {
+            Text placeholderText = new Text();
+            placeholderText.textProperty().bind(langUtils.getProps().get("networkMenuNoResults"));
+            resultList.setPlaceholder(placeholderText);
+        }
     }
 
     /**
