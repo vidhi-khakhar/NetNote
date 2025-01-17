@@ -102,14 +102,13 @@ public class NetworkCtrl {
         serverList.setItems(servers);
         resultList.setItems(results);
 
-        servers.addAll(configLoader.getCollections()
-                .stream()
-                .map(Collection::getServer)
-                .distinct()
-                .toList());
-
-        if (!servers.contains(localAddress))
-            servers.add(localAddress);
+        // Refresh list of available servers every 5 seconds
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run(){
+                Platform.runLater(() -> refreshServerList());
+            }
+        },0,5000);
 
         serverList.getSelectionModel().selectedItemProperty().addListener((_, _, selected) -> {
             currentAddress = selected;
@@ -128,6 +127,22 @@ public class NetworkCtrl {
         radioFiles.textProperty().bind(langUtils.getProps().get("files"));
         serverListLabel.textProperty().bind(langUtils.getProps().get("serverList"));
         resultListLabel.textProperty().bind(langUtils.getProps().get("results"));
+    }
+
+    /**
+     * Add all the servers with collections that the current client has access to
+     * into the list of servers.
+     */
+    public void refreshServerList() {
+        servers.clear();
+        servers.addAll(configLoader.getCollections()
+                .stream()
+                .map(Collection::getServer)
+                .distinct()
+                .toList());
+        // Ensure there is at least one address listed
+        if (!servers.contains(NoteServerUtils.getLocalAddress()))
+            servers.add(NoteServerUtils.getLocalAddress());
     }
 
     /**
