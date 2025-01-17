@@ -20,20 +20,24 @@ public class EmbeddedFileControllerTest {
     private EmbeddedFileRepository mockRepository;
     private ServerUtils mockServerUtils;
     private Note n1;
+    private EmbeddedFile file1;
+    private EmbeddedFile file2;
 
     @BeforeEach
     public void setUp() {
         mockRepository = mock(EmbeddedFileRepository.class);
         mockServerUtils = mock(ServerUtils.class);
         sut = new EmbeddedFileController(mockServerUtils, mockRepository);
+
         n1 = new Note("Note1", "Note 1 content");
+        file1 = new EmbeddedFile("File1.txt", "text/plain", new byte[]{1, 2, 3}, n1);
+        file2 = new EmbeddedFile("File2.txt", "text/plain", new byte[]{4, 5, 6}, null);
+
+        n1.addEmbeddedFile(file1);
     }
 
     @Test
     public void getAllFiles() {
-        EmbeddedFile file1 = new EmbeddedFile("File1", "text/plain", new byte[]{1, 2, 3}, null);
-        EmbeddedFile file2 = new EmbeddedFile("File2", "text/plain", new byte[]{4, 5, 6}, null);
-
         when(mockRepository.findAll()).thenReturn(List.of(file1, file2));
 
         List<EmbeddedFile> result = sut.getAllFiles();
@@ -43,36 +47,31 @@ public class EmbeddedFileControllerTest {
 
     @Test
     public void getFilesFromNoteWithFiles() {
-        Note note = new Note("Note1", "Content");
-        EmbeddedFile file = new EmbeddedFile("File1", "text/plain", new byte[]{1, 2, 3}, note);
-        note.addEmbeddedFile(file);
-
-        when(mockServerUtils.getNoteByTitle("Note1")).thenReturn(Optional.of(note));
+        when(mockServerUtils.getNoteByTitle("Note1")).thenReturn(Optional.of(n1));
 
         List<EmbeddedFile> result = sut.getFilesFromNote("Note1");
-        assertEquals(List.of(file), result);
+        assertEquals(List.of(file1), result);
     }
 
     @Test
     public void getFilesFromNoteWithNoFiles() {
-        Note note = new Note("Note1", "Content");
+        Note emptyNote = new Note("EmptyNote", "No content");
 
-        when(mockServerUtils.getNoteByTitle("Note1")).thenReturn(Optional.of(note));
+        when(mockServerUtils.getNoteByTitle("EmptyNote")).thenReturn(Optional.of(emptyNote));
 
-        List<EmbeddedFile> result = sut.getFilesFromNote("Note1");
+        List<EmbeddedFile> result = sut.getFilesFromNote("EmptyNote");
         assertNull(result);
     }
 
     @Test
     public void storeFileSuccess() throws IOException {
-        Note note = new Note("Note1", "Content");
         MultipartFile mockFile = mock(MultipartFile.class);
 
-        when(mockFile.getOriginalFilename()).thenReturn("File1");
+        when(mockFile.getOriginalFilename()).thenReturn("File3");
         when(mockFile.getContentType()).thenReturn("text/plain");
-        when(mockFile.getBytes()).thenReturn(new byte[]{1, 2, 3});
-        when(mockServerUtils.getNoteByTitle("Note1")).thenReturn(Optional.of(note));
-        when(mockServerUtils.checkIfFileExists("File1", "Note1")).thenReturn(Optional.empty());
+        when(mockFile.getBytes()).thenReturn(new byte[]{7, 8, 9});
+        when(mockServerUtils.getNoteByTitle("Note1")).thenReturn(Optional.of(n1));
+        when(mockServerUtils.checkIfFileExists("File3", "Note1")).thenReturn(Optional.empty());
 
         ResponseEntity<String> response = sut.storeFile("Note1", mockFile);
         assertEquals(201, response.getStatusCodeValue());
@@ -84,8 +83,7 @@ public class EmbeddedFileControllerTest {
         MultipartFile mockFile = mock(MultipartFile.class);
 
         when(mockFile.getOriginalFilename()).thenReturn("File1");
-        when(mockServerUtils.checkIfFileExists("File1", "Note1"))
-                .thenReturn(Optional.of(new EmbeddedFile()));
+        when(mockServerUtils.checkIfFileExists("File1", "Note1")).thenReturn(Optional.of(file1));
 
         ResponseEntity<String> response = sut.storeFile("Note1", mockFile);
         assertEquals(409, response.getStatusCodeValue());
@@ -95,22 +93,21 @@ public class EmbeddedFileControllerTest {
     public void storeFileNoteNotFound() throws IOException {
         MultipartFile mockFile = mock(MultipartFile.class);
 
-        when(mockFile.getOriginalFilename()).thenReturn("File1");
-        when(mockServerUtils.getNoteByTitle("Note1")).thenReturn(Optional.empty());
+        when(mockFile.getOriginalFilename()).thenReturn("File3");
+        when(mockServerUtils.getNoteByTitle("NonExistentNote")).thenReturn(Optional.empty());
 
-        ResponseEntity<String> response = sut.storeFile("Note1", mockFile);
+        ResponseEntity<String> response = sut.storeFile("NonExistentNote", mockFile);
         assertEquals(404, response.getStatusCodeValue());
     }
 
     @Test
     public void updateFileTitleSuccess() {
-        EmbeddedFile file = new EmbeddedFile("File1.txt", "text/plain", new byte[]{}, n1);
-        when(mockServerUtils.checkIfFileExists("File1.txt", "Note1")).thenReturn(Optional.of(file));
+        when(mockServerUtils.checkIfFileExists("File1.txt", "Note1")).thenReturn(Optional.of(file1));
 
         ResponseEntity<String> response = sut.updateFileTitle("Note1", "File1.txt", "NewTitle");
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("NewTitle.plain", file.getName()); // Match the current controller behavior
-        verify(mockRepository, times(1)).save(file);
+        assertEquals("NewTitle.plain", file1.getName());
+        verify(mockRepository, times(1)).save(file1);
     }
 
     @Test
@@ -121,11 +118,9 @@ public class EmbeddedFileControllerTest {
         assertEquals(404, response.getStatusCodeValue());
     }
 
-
     @Test
     public void getFileSuccess() {
-        EmbeddedFile file = new EmbeddedFile("File1.txt", "text/plain", new byte[]{1, 2, 3}, null);
-        when(mockServerUtils.checkIfFileExists("File1.txt", "Note1")).thenReturn(Optional.of(file));
+        when(mockServerUtils.checkIfFileExists("File1.txt", "Note1")).thenReturn(Optional.of(file1));
 
         ResponseEntity<byte[]> response = sut.getFile("Note1", "File1.txt");
         assertEquals(200, response.getStatusCodeValue());
@@ -143,12 +138,11 @@ public class EmbeddedFileControllerTest {
 
     @Test
     public void deleteFileSuccess() {
-        EmbeddedFile file = new EmbeddedFile("File1.txt", "text/plain", new byte[]{}, n1);
-        when(mockServerUtils.checkIfFileExists("File1.txt", "Note1")).thenReturn(Optional.of(file));
+        when(mockServerUtils.checkIfFileExists("File1.txt", "Note1")).thenReturn(Optional.of(file1));
 
         ResponseEntity<String> response = sut.deleteFile("Note1", "File1.txt");
         assertEquals(200, response.getStatusCodeValue());
-        verify(mockRepository, times(1)).delete(file);
+        verify(mockRepository, times(1)).delete(file1);
     }
 
     @Test
@@ -159,3 +153,5 @@ public class EmbeddedFileControllerTest {
         assertEquals(404, response.getStatusCodeValue());
     }
 }
+
+
