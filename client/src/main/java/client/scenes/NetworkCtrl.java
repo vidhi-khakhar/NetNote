@@ -1,7 +1,7 @@
 package client.scenes;
 
 import client.config.ConfigLoader;
-import client.utils.EmbeddedFileServerUtils;
+import client.utils.file.EmbeddedFileServerUtils;
 import client.utils.LangUtils;
 import client.utils.collection.CollectionServerUtils;
 import client.utils.network.NetworkMenuSelectionType;
