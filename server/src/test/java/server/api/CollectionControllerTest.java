@@ -142,4 +142,11 @@ public class CollectionControllerTest {
         assertTrue(response.getBody().stream().anyMatch(note -> note.getTitle().equals("Title2")));
     }
 
+    @Test
+    public void getAllNotesInCollectionInvalid() {
+        var response = sut.getAllNotesInCollection("ThisCollectionDoesNotExist");
+        assertEquals(404, response.getStatusCode().value());
+        assertNull(response.getBody());
+    }
+
 }
