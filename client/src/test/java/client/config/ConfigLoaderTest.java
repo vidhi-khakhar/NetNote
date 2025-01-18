@@ -104,7 +104,7 @@ public class ConfigLoaderTest {
         ConfigLoader newLoader = new ConfigLoader(filePath);
         assertEquals(Main.DEFAULT_LOCALE, newLoader.getLocale());
         assertEquals(newLoader.getCollections().size(),1);
-        assertEquals(newLoader.getCollections().getFirst().getAlias(),"Main (Default)");
+        assertEquals(newLoader.getCollections().getFirst().getAlias(),"Main");
     }
 
     @AfterAll

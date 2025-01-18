@@ -58,10 +58,11 @@ public class ConfigLoader {
         } finally {
             if (data == null) {
                 String defaultMainCollectionUniqueName =
-                        "#" + Integer.toString(System.identityHashCode(System.currentTimeMillis()));
+                        "HASHCODE:" + Integer.
+                                toString(System.identityHashCode(System.currentTimeMillis()));
                 Collection defaultMainCollection = new Collection(
                         defaultMainCollectionUniqueName,
-                        "Main (Default)",
+                        "Main",
                         "http://localhost:8080/");
                 List<Collection> collections = new ArrayList<>();
                 collections.add(defaultMainCollection);
@@ -69,12 +70,6 @@ public class ConfigLoader {
                         Main.DEFAULT_LOCALE,
                         collections,
                         defaultMainCollectionUniqueName);
-
-                //collectionServerUtils should store the first Main collection on  the server
-                //for a new user. However, I cannot Inject it here properly, please help.
-
-                //collectionServerUtils.
-                //       createCollection(defaultMainCollection,defaultMainCollection.getServer());
             }
         }
     }
@@ -123,6 +118,7 @@ public class ConfigLoader {
      */
     public void setDefaultCollectionUniqueName(String defaultCollectionUniqueName) {
         data.setDefaultCollectionUniqueName(defaultCollectionUniqueName);
+        save();
     }
 
     /**

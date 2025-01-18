@@ -134,6 +134,19 @@ public class MainCtrl {
      */
     public void initialize(Stage stage, Scene mainView, Scene editCollectionsMenu) {
 
+        if(configLoader.getCollections().size() == 1 &&
+                configLoader.getCollections().getFirst().getAlias().equals("Main")) {
+
+            Collection defaultMainCollection = new Collection(
+                    configLoader.getDefaultCollectionUniqueName(),
+                    configLoader.getCollections().getFirst().getAlias(),
+                    configLoader.getCollections().getFirst().getServer());
+
+            collectionServerUtils.createCollection(defaultMainCollection,
+                    defaultMainCollection.getServer());
+        }
+
+
         this.stage = stage;
         this.mainView = mainView;
         this.editCollectionsMenu = editCollectionsMenu;
@@ -247,7 +260,6 @@ public class MainCtrl {
 
         setLocale(configLoader.getLocale());
     }
-
     /**
      * Getter for the list of saved notes.
      *
