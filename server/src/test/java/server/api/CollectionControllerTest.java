@@ -188,6 +188,26 @@ public class CollectionControllerTest {
         assertEquals(404, response.getStatusCode().value());
     }
 
+    @Test
+    public void moveNoteToAnotherCollection() {
+        var response = sut.moveNoteToAnotherCollection("Collection1", "Title1", "Collection2");
+        assertEquals(200, response.getStatusCode().value());
+        assertTrue(containsNotesDb.findAll().stream()
+                .anyMatch(x -> x.getCollectionId().equals("Collection2") &&
+                        x.getNoteId().equals(n1.getNoteId())));
+        assertFalse(containsNotesDb.findAll().stream()
+                .anyMatch(x -> x.getCollectionId().equals("Collection1") &&
+                        x.getNoteId().equals(n1.getNoteId())));
+    }
+
+    @Test
+    public void moveNoteToAnotherCollectionInvalid() {
+        var response = sut.moveNoteToAnotherCollection("InvalidCollection", "Title1", "Collection2");
+        assertEquals(404, response.getStatusCode().value());
+        assertTrue(containsNotesDb.findAll().stream()
+                .anyMatch(x -> x.getCollectionId().equals("Collection1") &&
+                        x.getNoteId().equals(n1.getNoteId())));
+    }
 
 
 }
