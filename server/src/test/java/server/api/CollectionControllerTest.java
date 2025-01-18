@@ -39,6 +39,10 @@ public class CollectionControllerTest {
         noteDb.save(n2);
         noteDb.save(n3);
 
+        n1.setNoteId(0L);
+        n2.setNoteId(1L);
+        n3.setNoteId(2L);
+
         containsNotesDb.save(new CollectionContainsNotes("Collection1", 0L));
         containsNotesDb.save(new CollectionContainsNotes("Collection1", 1L));
         containsNotesDb.save(new CollectionContainsNotes("Collection2", 2L));
@@ -166,5 +170,7 @@ public class CollectionControllerTest {
                 .noneMatch(x -> serverUtils.getNoteByTitle("Title3").isPresent() &&
                         x.getCollectionId().equals("ThisCollectionDoesNotExist")));
     }
+
+
 
 }
