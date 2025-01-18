@@ -76,8 +76,9 @@ public class EmbeddedFileServerUtils {
      *                      ay be stored on different servers.
      * @param noteName - used to match embedded files with the correct note based on key: noteName
      * @param file - the embedded file.
+     * @return sm
      */
-    public void storeEmbeddedFile(String serverAddress, String noteName, EmbeddedFile file) {
+    public boolean storeEmbeddedFile(String serverAddress, String noteName, EmbeddedFile file) {
         try {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress + "api/files/" + noteName)
@@ -86,13 +87,16 @@ public class EmbeddedFileServerUtils {
 
             if (response.getStatus() == 201) {
                 System.out.println("Embedded file stored successfully.");
+                return true;
             } else {
                 System.out.println("Failed to store embedded file." +
                         "Status: " + response.getStatus());
+                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
 
