@@ -44,6 +44,17 @@ public class ConfigTest {
     }
 
     @Test
+    void getDefaultCollectionUniqueName() {
+        assertEquals("my-notes", c1.getDefaultCollectionUniqueName());
+    }
+
+    @Test
+    void setDefaultCollectionUniqueName() {
+        c1.setDefaultCollectionUniqueName("my-notes2");
+        assertEquals("my-notes2", c1.getDefaultCollectionUniqueName());
+    }
+
+    @Test
     void equalsSelfTest() {
         assertEquals(c1, c1);
     }

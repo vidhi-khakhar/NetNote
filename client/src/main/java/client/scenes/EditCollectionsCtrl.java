@@ -115,7 +115,8 @@ public class EditCollectionsCtrl {
                 } else {
                     // Display alias and append "(Default)" if it's the default collection
                     String displayName = collection.getAlias();
-                    if (configLoader.getDefaultCollectionUniqueName().equals(collection.getCollectionUniqueName())) {
+                    if (configLoader.getDefaultCollectionUniqueName().
+                            equals(collection.getCollectionUniqueName())) {
                         displayName += " (Default)";
                     }
                     setText(displayName);
@@ -399,6 +400,10 @@ public class EditCollectionsCtrl {
                 Alert.AlertType.ERROR);
     }
 
+    /**
+     * handleMakeDefault is the onAction method for the "Make Default" Button.
+     * It makes the current collection default and refreshes the view.
+     */
     public void handleMakeDefault() {
         int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
         Collection currentCollection = collections.get(currentIndex);
