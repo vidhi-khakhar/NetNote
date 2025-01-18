@@ -3,6 +3,7 @@ package server.api;
 import commons.Collection;
 import commons.CollectionContainsNotes;
 import commons.Note;
+import org.h2.tools.Server;
 import org.junit.jupiter.api.*;
 import server.utils.ServerUtils;
 
@@ -15,6 +16,8 @@ public class CollectionControllerTest {
     private TestNoteRepository noteDb;
     private CollectionController sut;
     private Collection collection1, collection2;
+    private ServerUtils serverUtils;
+    private Note n1, n2, n3;
 
     @BeforeEach
     public void setUp() {
@@ -25,10 +28,9 @@ public class CollectionControllerTest {
         collection1 = new Collection("Collection1", "Alias1", "Server1");
         collection2 = new Collection("Collection2", "Alias2", "Server2");
 
-        Note n1 = new Note("Title1", "Text1");
-        Note n2 = new Note("Title2", "Text2");
-        Note n3 = new Note("Title3", "Text3");
-        Note n4 = new Note("Title4", "Text4");
+        n1 = new Note("Title1", "Text1");
+        n2 = new Note("Title2", "Text2");
+        n3 = new Note("Title3", "Text3");
 
         collectionDb.save(collection1);
         collectionDb.save(collection2);
@@ -36,14 +38,12 @@ public class CollectionControllerTest {
         noteDb.save(n1);
         noteDb.save(n2);
         noteDb.save(n3);
-        noteDb.save(n4);
 
         containsNotesDb.save(new CollectionContainsNotes("Collection1", 0L));
         containsNotesDb.save(new CollectionContainsNotes("Collection1", 1L));
         containsNotesDb.save(new CollectionContainsNotes("Collection2", 2L));
-        containsNotesDb.save(new CollectionContainsNotes("Collection2", 3L));
 
-        ServerUtils serverUtils = new ServerUtils(noteDb, null);
+        serverUtils = new ServerUtils(noteDb, null);
         sut = new CollectionController(collectionDb, containsNotesDb, serverUtils, noteDb);
     }
 
@@ -148,5 +148,15 @@ public class CollectionControllerTest {
         assertEquals(404, response.getStatusCode().value());
         assertNull(response.getBody());
     }
+
+    @Test
+    public void addNoteToCollection() {
+        var response = sut.addNoteToCollection("Collection1", "Title3");
+        assertEquals(200, response.getStatusCode().value());
+        assertTrue(containsNotesDb.findAll().stream()
+                .anyMatch(x -> x.getCollectionId().equals("Collection1") &&
+                        serverUtils.getNoteByTitle("Title3").isPresent()));
+    }
+
 
 }
