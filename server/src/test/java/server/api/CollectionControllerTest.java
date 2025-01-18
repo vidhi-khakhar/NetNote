@@ -25,8 +25,23 @@ public class CollectionControllerTest {
         collection1 = new Collection("Collection1", "Alias1", "Server1");
         collection2 = new Collection("Collection2", "Alias2", "Server2");
 
+        Note n1 = new Note("Title1", "Text1");
+        Note n2 = new Note("Title2", "Text2");
+        Note n3 = new Note("Title3", "Text3");
+        Note n4 = new Note("Title4", "Text4");
+
         collectionDb.save(collection1);
         collectionDb.save(collection2);
+
+        noteDb.save(n1);
+        noteDb.save(n2);
+        noteDb.save(n3);
+        noteDb.save(n4);
+
+        containsNotesDb.save(new CollectionContainsNotes("Collection1", 0L));
+        containsNotesDb.save(new CollectionContainsNotes("Collection1", 1L));
+        containsNotesDb.save(new CollectionContainsNotes("Collection2", 2L));
+        containsNotesDb.save(new CollectionContainsNotes("Collection2", 3L));
 
         ServerUtils serverUtils = new ServerUtils(noteDb, null);
         sut = new CollectionController(collectionDb, containsNotesDb, serverUtils, noteDb);
@@ -116,6 +131,15 @@ public class CollectionControllerTest {
         var response = sut.deleteCollection("InvalidCollection");
         assertEquals(404, response.getStatusCode().value());
         assertEquals(2, collectionDb.findAll().size());
+    }
+
+    @Test
+    public void getAllNotesInCollection() {
+        var response = sut.getAllNotesInCollection("Collection1");
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(2, response.getBody().size());
+        assertTrue(response.getBody().stream().anyMatch(note -> note.getTitle().equals("Title1")));
+        assertTrue(response.getBody().stream().anyMatch(note -> note.getTitle().equals("Title2")));
     }
 
 }
