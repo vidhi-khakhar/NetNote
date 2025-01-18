@@ -16,9 +16,9 @@ public class ConfigTest {
     void setUp() {
         col1 = new Collection("my-notes", "My Notes", "http://192.168.1.123");
         col2 = new Collection("my-notes-2", "Uni Notes", "http://192.168.1.124");
-        c1 = new Config(Locale.ENGLISH, List.of(col1, col2));
-        c2 = new Config(Locale.ENGLISH, List.of(col1, col2));
-        c3 = new Config(Locale.forLanguageTag("ro_RO"), List.of(col2));
+        c1 = new Config(Locale.ENGLISH, List.of(col1, col2),"my-notes");
+        c2 = new Config(Locale.ENGLISH, List.of(col1, col2),"my-notes");
+        c3 = new Config(Locale.forLanguageTag("ro_RO"), List.of(col2),"my-notes-2");
     }
 
     @Test

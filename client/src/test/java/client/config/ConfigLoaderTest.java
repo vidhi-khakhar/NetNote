@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 import commons.Collection;
 
 import java.io.*;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,7 +21,7 @@ public class ConfigLoaderTest {
     Collection col3;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws UnknownHostException {
         col1 = new Collection("notes-1", "CSEP notes", "http://192.168.1.123/");
         col2 = new Collection("notes-2", "Uni notes", "http://192.168.1.123/");
         col3 = new Collection("notes-3", "Travelling notes", "http://192.168.1.124");
@@ -60,7 +61,7 @@ public class ConfigLoaderTest {
      * file again.
      */
     @Test
-    void setLocaleTest() {
+    void setLocaleTest() throws UnknownHostException {
         loader.setLocale(Locale.ENGLISH);
         ConfigLoader newLoader = new ConfigLoader(filePath);
         assertEquals(Locale.ENGLISH, newLoader.getLocale());
@@ -72,21 +73,21 @@ public class ConfigLoaderTest {
     }
 
     @Test
-    void addCollectionTest() {
+    void addCollectionTest() throws UnknownHostException {
         loader.addCollection(col3);
         ConfigLoader newLoader = new ConfigLoader(filePath);
         assertEquals(List.of(col1, col2, col3), newLoader.getCollections());
     }
 
     @Test
-    void removeCollectionTest() {
+    void removeCollectionTest() throws UnknownHostException {
         loader.removeCollection("notes-1");
         ConfigLoader newLoader = new ConfigLoader(filePath);
         assertEquals(List.of(col2), newLoader.getCollections());
     }
 
     @Test
-    void defaultValuesTest() {
+    void defaultValuesTest() throws UnknownHostException {
         new File(filePath).delete();
         ConfigLoader newLoader = new ConfigLoader(filePath);
         assertEquals(Main.DEFAULT_LOCALE, newLoader.getLocale());
