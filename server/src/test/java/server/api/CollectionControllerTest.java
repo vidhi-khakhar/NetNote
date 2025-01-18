@@ -158,5 +158,13 @@ public class CollectionControllerTest {
                         serverUtils.getNoteByTitle("Title3").isPresent()));
     }
 
+    @Test
+    public void addNoteToCollectionInvalid() {
+        var response = sut.addNoteToCollection("ThisCollectionDoesNotExist", "Title3");
+        assertEquals(404, response.getStatusCode().value());
+        assertTrue(containsNotesDb.findAll().stream()
+                .noneMatch(x -> serverUtils.getNoteByTitle("Title3").isPresent() &&
+                        x.getCollectionId().equals("ThisCollectionDoesNotExist")));
+    }
 
 }
