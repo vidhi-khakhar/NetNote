@@ -7,21 +7,21 @@ import java.util.*;
 
 public class MockNoteServerUtils extends NoteServerUtils {
 
-    private final List<Note> notes = new ArrayList<>();
+    public static Map<String, List<Note>> notes = new HashMap<>();
 
     @Override
     public List<Note> getAllNotes() {
-        return notes;
+        return notes.get(getServerAddress());
     }
 
     @Override
     public void storeNote(Note note) {
-        notes.add(note);
+        notes.get(getServerAddress()).add(note);
     }
 
     @Override
     public void updateNote(String title, Map<String, String> noteData) {
-        Optional<Note> noteOptional = notes.stream().filter(n -> n.getTitle().equals(title)).findFirst();
+        Optional<Note> noteOptional = notes.get(getServerAddress()).stream().filter(n -> n.getTitle().equals(title)).findFirst();
         if (noteOptional.isEmpty()) return;
         Note note = noteOptional.get();
 
@@ -37,9 +37,9 @@ public class MockNoteServerUtils extends NoteServerUtils {
 
     @Override
     public void deleteNote(String title) {
-        Optional<Note> noteOptional = notes.stream().filter(n -> n.getTitle().equals(title)).findFirst();
+        Optional<Note> noteOptional = notes.get(getServerAddress()).stream().filter(n -> n.getTitle().equals(title)).findFirst();
         if (noteOptional.isEmpty()) return;
         Note note = noteOptional.get();
-        notes.remove(note);
+        notes.get(getServerAddress()).remove(note);
     }
 }
