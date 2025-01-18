@@ -911,6 +911,11 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Helper method that adds a box for a file
+     * @param embeddedFile File that the HBox is based on
+     */
+
     public void addFileElement(EmbeddedFile embeddedFile) {
         HBox fileContainer = new HBox(5);
         fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
