@@ -56,7 +56,7 @@ public class ConfigLoader {
         } catch (IOException e) {
             System.err.println("Could not open the user config file.");
         } finally {
-            if (data == null || data.getDefaultCollectionUniqueName() == null) {
+            if (data == null) {
                 String defaultMainCollectionUniqueName =
                         "#" + Integer.toString(System.identityHashCode(System.currentTimeMillis()));
                 Collection defaultMainCollection = new Collection(

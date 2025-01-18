@@ -40,7 +40,8 @@ public class ConfigLoaderTest {
                           "alias" : "Uni notes",
                           "server" : "http://192.168.1.123/"
                         }
-                      ]
+                      ],
+                      "defaultCollectionUniqueName" : "notes-1"
                     }
                     """);
             w.flush();
@@ -73,6 +74,17 @@ public class ConfigLoaderTest {
     }
 
     @Test
+    void setDefaultCollectionUniqueNameTest() throws UnknownHostException {
+        loader.setDefaultCollectionUniqueName("notes-2");
+        assertEquals("notes-2",loader.getDefaultCollectionUniqueName());
+    }
+
+    @Test
+    void getDefaultCollectionUniqueName() {
+        assertEquals("notes-1",loader.getDefaultCollectionUniqueName());
+    }
+
+    @Test
     void addCollectionTest() throws UnknownHostException {
         loader.addCollection(col3);
         ConfigLoader newLoader = new ConfigLoader(filePath);
@@ -91,7 +103,8 @@ public class ConfigLoaderTest {
         new File(filePath).delete();
         ConfigLoader newLoader = new ConfigLoader(filePath);
         assertEquals(Main.DEFAULT_LOCALE, newLoader.getLocale());
-        assertEquals(List.of(), newLoader.getCollections());
+        assertEquals(newLoader.getCollections().size(),1);
+        assertEquals(newLoader.getCollections().getFirst().getAlias(),"Main (Default)");
     }
 
     @AfterAll
