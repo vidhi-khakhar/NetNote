@@ -171,6 +171,23 @@ public class CollectionControllerTest {
                         x.getCollectionId().equals("ThisCollectionDoesNotExist")));
     }
 
+    @Test
+    public void removeNoteFromCollection() {
+        n1.setNoteId(0L);
+        containsNotesDb.save(new CollectionContainsNotes("Collection1", n1.getNoteId()));
+        var response = sut.removeNoteFromCollection("Collection1", "Title1");
+        assertEquals(200, response.getStatusCode().value());
+        assertFalse(containsNotesDb.findAll().stream()
+                .anyMatch(x -> x.getCollectionId().equals("Collection1") &&
+                        x.getNoteId().equals(n1.getNoteId())));
+    }
+
+    @Test
+    public void removeNoteFromCollectionInvalid() {
+        var response = sut.removeNoteFromCollection("InvalidCollection", "Title1");
+        assertEquals(404, response.getStatusCode().value());
+    }
+
 
 
 }
