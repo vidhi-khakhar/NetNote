@@ -16,6 +16,9 @@ public class MockNoteServerUtils extends NoteServerUtils {
 
     @Override
     public void storeNote(Note note) {
+        if (!notes.containsKey(getServerAddress())) {
+            notes.put(getServerAddress(), new ArrayList<>());
+        }
         notes.get(getServerAddress()).add(note);
     }
 

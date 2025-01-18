@@ -105,10 +105,10 @@ public class NetworkCtrl {
         // Refresh list of available servers every 5 seconds
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
-            public void run(){
+            public void run() {
                 Platform.runLater(() -> refreshServerList());
             }
-        },0,5000);
+        }, 0, 5000);
 
         serverList.getSelectionModel().selectedItemProperty().addListener((_, _, selected) -> {
             currentAddress = selected;
@@ -185,6 +185,35 @@ public class NetworkCtrl {
             resultList.setPlaceholder(placeholderText);
             return;
         }
+        results.clear();
+        results.addAll(getNewResults(serverAddress,
+                type,
+                noteServerUtils,
+                collectionServerUtils,
+                fileServerUtils));
+        if (results.isEmpty()) {
+            Text placeholderText = new Text();
+            placeholderText.textProperty().bind(langUtils.getProps().get("networkMenuNoResults"));
+            resultList.setPlaceholder(placeholderText);
+        }
+    }
+
+    /**
+     * Returns a list of results based on the chosen category of data
+     * (notes, collections or embedded files).
+     *
+     * @param serverAddress         The address of the server from which to fetch the data
+     * @param type                  The chosen category of data
+     * @param noteServerUtils       The class from which to fetch the notes
+     * @param collectionServerUtils The class from which to fetch the collections
+     * @param fileServerUtils       The class from which to fetch the embedded files
+     * @return A list of results based on the chosen category of data.
+     */
+    public List<String> getNewResults(String serverAddress,
+                                      NetworkMenuSelectionType type,
+                                      NoteServerUtils noteServerUtils,
+                                      CollectionServerUtils collectionServerUtils,
+                                      EmbeddedFileServerUtils fileServerUtils) {
         List<String> newResults;
         if (type == NetworkMenuSelectionType.COLLECTIONS) {
             List<Collection> collections = collectionServerUtils.getAllCollections(serverAddress);
@@ -202,13 +231,7 @@ public class NetworkCtrl {
                 newResults = files.stream().map(EmbeddedFile::getName).toList();
             }
         }
-        results.clear();
-        results.addAll(newResults);
-        if (results.isEmpty()) {
-            Text placeholderText = new Text();
-            placeholderText.textProperty().bind(langUtils.getProps().get("networkMenuNoResults"));
-            resultList.setPlaceholder(placeholderText);
-        }
+        return newResults;
     }
 
     /**

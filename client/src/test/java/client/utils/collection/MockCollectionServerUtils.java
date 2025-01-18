@@ -17,7 +17,7 @@ public class MockCollectionServerUtils extends CollectionServerUtils {
 
     @Override
     public List<Collection> getAllCollections(String serverAddress) {
-        return collections.entrySet().stream().flatMap(e -> e.getValue().stream()).toList();
+        return collections.get(serverAddress);
     }
 
     @Override
