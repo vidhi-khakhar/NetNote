@@ -6,11 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import server.database.EmbeddedFileRepository;
 import server.utils.ServerUtils;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,28 +63,22 @@ public class EmbeddedFileController {
      * @param file The file that is being saved
      * @return HTTP response with a string message based if the action went
      * through properly.
-     * @throws IOException Thrown if the content of the file doesn't exist
      */
 
     @PutMapping("/{noteName}")
     public ResponseEntity<String> storeFile(@PathVariable String noteName,
-                                            @RequestBody MultipartFile file) throws IOException {
-        EmbeddedFile embeddedFile = new EmbeddedFile();
-        embeddedFile.setName(file.getOriginalFilename());
-        embeddedFile.setType(file.getContentType());
-        embeddedFile.setData(file.getBytes());
-
+                                            @RequestBody EmbeddedFile file){
         Optional<EmbeddedFile> fileAlreadyExists =
-                serverUtils.checkIfFileExists(embeddedFile.getName(), noteName);
+                serverUtils.checkIfFileExists(file.getName(), noteName);
         if(fileAlreadyExists.isPresent())
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("A file with the same name already exists");
 
         Optional<Note> note = serverUtils.getNoteByTitle(noteName);
         if(note.isPresent()) {
-            embeddedFile.setNote(note.get());
-            note.get().addEmbeddedFile(embeddedFile);
-            embeddedFileRepository.save(embeddedFile);
+            file.setNote(note.get());
+            note.get().addEmbeddedFile(file);
+            embeddedFileRepository.save(file);
             return ResponseEntity.status(HttpStatus.CREATED).body("File successfully stored");
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Note not found");
@@ -154,7 +146,7 @@ public class EmbeddedFileController {
             Note note = embeddedFile.getNote();
             note.removeEmbeddedFile(embeddedFile);
             embeddedFileRepository.delete(embeddedFile);
-            return ResponseEntity.ok("Successfully deleted file");
+            return ResponseEntity.status(HttpStatus.OK).body("Successfully deleted file");
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
     }
