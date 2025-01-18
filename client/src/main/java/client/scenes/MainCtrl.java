@@ -44,6 +44,8 @@ public class MainCtrl {
     private Scene mainView;
     private Stage stage;
     private Label noNotesMatchYourQueryLabel;
+    private Collection currentCollection;
+    private Collection currentDefaultCollection;
 
     @Inject
     private MarkdownUtils markdownUtils;
@@ -380,6 +382,19 @@ public class MainCtrl {
     public void commitAddNote(Note note, int index) {
         savedNotes.add(index, note);
         noteServerUtils.storeNote(note);
+
+        collectionServerUtils.addNoteToCollection(
+                currentDefaultCollection.getCollectionUniqueName(),
+                note.getTitle(),
+                currentDefaultCollection.getServer());
+
+        if(currentCollection != currentDefaultCollection) {
+            collectionServerUtils.addNoteToCollection(
+                    currentCollection.getCollectionUniqueName(),
+                    note.getTitle(),
+                    currentCollection.getServer());
+        }
+
         notesList.setItems(savedNotes);
         notesList.getSelectionModel().select(index);
         noteTitleInput.setText(note.getTitle());
@@ -795,10 +810,21 @@ public class MainCtrl {
         List<Collection> collections = configLoader.getCollections();
         // Create and add MenuItems for each collection
         for (Collection collection : collections) {
-            MenuItem itemCollection = new MenuItem(collection.getAlias());
+
+            final String displayName = configLoader.getDefaultCollectionUniqueName()
+                    .equals(collection.getCollectionUniqueName())
+                    ? collection.getAlias() + " (Default)"
+                    : collection.getAlias();
+
+            MenuItem itemCollection = new MenuItem(displayName);
             itemCollection.setOnAction(_ -> {
+                currentCollection = collection;
+                if(currentCollection.getCollectionUniqueName()
+                        .equals(configLoader.getDefaultCollectionUniqueName())) {
+                    currentDefaultCollection = collection;
+                }
                 collectionDropdown.textProperty().unbind();
-                collectionDropdown.setText(collection.getAlias());
+                collectionDropdown.setText(displayName);
                 // Example: process or display the notes
                 processNotes(collectionServerUtils
                         .getAllNotesInCollection(
