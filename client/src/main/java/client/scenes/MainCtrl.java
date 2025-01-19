@@ -3,6 +3,7 @@ package client.scenes;
 import client.config.ConfigLoader;
 import client.components.Notification;
 import client.utils.EmbeddedFileServerUtils;
+import client.utils.collection.CollectionUtils;
 import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
 import client.utils.note.NoteUtils;
@@ -416,8 +417,33 @@ public class MainCtrl {
         }
     }
 
-    public void handleMoveNote () {
+    public void handleMoveNote() {
+        if (notesList.getSelectionModel().getSelectedItem() == null) {
+            uiUtils.showPopUp("No Note Selected", "Please select a note to move.", Alert.AlertType.WARNING);
+            return;
+        }
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
+        String currentCollectionUniqueName = collectionDropdown.getText();
 
+        List<String> otherCollections = collectionServerUtils.getAllCollections(noteServerUtils.getServerAddress())
+                .stream()
+                .map(Collection::getCollectionUniqueName)
+                .filter(name -> !name.equals(currentCollectionUniqueName))
+                .toList();
+
+        if(otherCollections.isEmpty()) {
+            uiUtils.showPopUp("No other collections", "There are no other collections to move this note to", Alert.AlertType.INFORMATION);
+        }
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(otherCollections.get(0), otherCollections);
+        dialog.setTitle("Move Note");
+        dialog.setHeaderText("Move Note: " + selectedNote.getTitle());
+        dialog.setContentText("Choose the target collection:");
+        Optional<String> result = dialog.showAndWait();
+        String targetCollectionUniqueName = result.get();
+
+        collectionServerUtils.moveNoteToAnotherCollection(currentCollectionUniqueName, selectedNote.getTitle(), targetCollectionUniqueName, noteServerUtils.getServerAddress());
+        notesList.refresh();
     }
 
     /**
