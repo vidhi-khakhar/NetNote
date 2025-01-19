@@ -28,7 +28,7 @@ class EmbeddedFileServerUtilsTest {
         noteServerUtils = new NoteServerUtils();
 
         // Initialize the server address
-        serverAddress = embeddedFileServerUtils.getServerAddress();  // Fetch the server address
+        serverAddress = noteServerUtils.getServerAddress();  // Fetch the server address
 
         // Allow the tests only if the server is available
         assumeTrue(embeddedFileServerUtils.isServerAvailable(serverAddress), "Server is not available," +

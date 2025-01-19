@@ -65,11 +65,11 @@ public class EmbeddedFileControllerTest {
 
     @Test
     public void storeFileSuccess() throws IOException {
-        MultipartFile mockFile = mock(MultipartFile.class);
+        EmbeddedFile mockFile = mock(EmbeddedFile.class);
 
-        when(mockFile.getOriginalFilename()).thenReturn("File3");
-        when(mockFile.getContentType()).thenReturn("text/plain");
-        when(mockFile.getBytes()).thenReturn(new byte[]{7, 8, 9});
+        when(mockFile.getName()).thenReturn("File3");
+        when(mockFile.getType()).thenReturn("text/plain");
+        when(mockFile.getData()).thenReturn(new byte[]{7, 8, 9});
         when(mockServerUtils.getNoteByTitle("Note1")).thenReturn(Optional.of(n1));
         when(mockServerUtils.checkIfFileExists("File3", "Note1")).thenReturn(Optional.empty());
 
@@ -80,9 +80,9 @@ public class EmbeddedFileControllerTest {
 
     @Test
     public void storeFileAlreadyExists() throws IOException {
-        MultipartFile mockFile = mock(MultipartFile.class);
+        EmbeddedFile mockFile = mock(EmbeddedFile.class);
 
-        when(mockFile.getOriginalFilename()).thenReturn("File1");
+        when(mockFile.getName()).thenReturn("File1");
         when(mockServerUtils.checkIfFileExists("File1", "Note1")).thenReturn(Optional.of(file1));
 
         ResponseEntity<String> response = sut.storeFile("Note1", mockFile);
@@ -91,9 +91,9 @@ public class EmbeddedFileControllerTest {
 
     @Test
     public void storeFileNoteNotFound() throws IOException {
-        MultipartFile mockFile = mock(MultipartFile.class);
+        EmbeddedFile mockFile = mock(EmbeddedFile.class);
 
-        when(mockFile.getOriginalFilename()).thenReturn("File3");
+        when(mockFile.getName()).thenReturn("File3");
         when(mockServerUtils.getNoteByTitle("NonExistentNote")).thenReturn(Optional.empty());
 
         ResponseEntity<String> response = sut.storeFile("NonExistentNote", mockFile);
