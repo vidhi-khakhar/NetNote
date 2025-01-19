@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.components.Notification;
+import client.utils.EmbeddedFileServerUtils;
 import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
 import client.utils.note.NoteUtils;
@@ -13,6 +14,7 @@ import client.utils.note.NoteServerUtils;
 import client.utils.collection.CollectionServerUtils;
 import com.google.inject.Inject;
 import commons.Collection;
+import commons.EmbeddedFile;
 import commons.Note;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -27,10 +29,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.*;
 
 public class MainCtrl {
@@ -72,6 +79,9 @@ public class MainCtrl {
 
     @Inject
     private MarkdownShortcutUtils markdownShortcutUtils;
+
+    @Inject
+    private EmbeddedFileServerUtils embeddedFileServerUtils;
 
     @FXML
     private TextField searchBar;
@@ -183,7 +193,7 @@ public class MainCtrl {
 
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
-            handleMarkdownProblems();
+            handleMarkdownRendering();
         });
 
         searchBar.textProperty().addListener((_, _, newValue) ->
@@ -192,7 +202,7 @@ public class MainCtrl {
 
         problemsCheckbox.selectedProperty().addListener((_, _, isSelected) -> {
             areMarkdownProblemsShown = isSelected;
-            handleMarkdownProblems();
+            handleMarkdownRendering();
         });
 
         initializeShortcuts();
@@ -427,12 +437,23 @@ public class MainCtrl {
         if (note != null) {
             noteTitleInput.setText(note.getTitle());
             noteEditor.setText(note.getText());
+            filesHBox.getChildren().clear();
+            content = note.getText();
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(note.getTitle());
             if (note.getText().isEmpty() && !areMarkdownProblemsShown) {
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
+            List<EmbeddedFile> files = embeddedFileServerUtils.getFilesFromNote(
+                    noteServerUtils.getServerAddress(), note.getTitle());
+            if(files != null)
+                for(int i = 0; i < files.size(); i++) {
+                    addFileElement(files.get(i));
+                }
+
+
+            handleMarkdownRendering();
         } else {
             noteTitleInput.textProperty().removeListener(noteTitleInputListener);
             noteTitleInput.clear();
@@ -446,6 +467,20 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Highlights all occurrences of the keyword in 'text' by wrapping them in a &lt;span&gt;
+     * element with a yellow background color. The search is case-insensitive.
+     *
+     * @param text the text to search and highlight the keyword in
+     * @param keyword the keyword to highlight in the text
+     * @return the text with highlighted keyword occurrences
+     */
+    public String highlightKeywordInText(String text, String keyword) {
+        if (keyword == null || keyword.isEmpty()) return text;
+        // (?i) makes the search case-insensitive
+        return text.replaceAll("(?i)(" +
+                keyword + ")", "<span style=\"background-color: yellow;\">$1</span>");
+    }
 
     /**
      * Adds a listener to the text editor to listen to changes made in the text,
@@ -483,9 +518,10 @@ public class MainCtrl {
     /**
      * Displays the problems with Markdown rendering in the webview.
      */
-    public void handleMarkdownProblems() {
+    public void handleMarkdownRendering() {
         String renderedContent = markdownUtils.markdownToHtml(content);
         boolean isChecked = problemsCheckbox.isSelected();
+
         if (isChecked) {
             noteEditor.setEditable(false);
             renderMarkdownProblems();
@@ -494,6 +530,11 @@ public class MainCtrl {
             if (content.isEmpty()) {
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             } else {
+                // Check if a search query is active
+                String query = getCurrentQuery();
+                if (query != null && !query.isEmpty()) {
+                    renderedContent = highlightKeywordInText(renderedContent, query);
+                }
                 renderedNoteView.getEngine().loadContent(renderedContent);
             }
         }
@@ -625,13 +666,13 @@ public class MainCtrl {
         }
 
         List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
-
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
 
         if (!filteredNotes.isEmpty() && currentNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
+
         if (filteredNotes.isEmpty()) {
             notesList.setPlaceholder(noNotesMatchYourQueryLabel);
         }
@@ -640,51 +681,104 @@ public class MainCtrl {
     /**
      * A local test version of adding an embedded file
      */
-    public void handleAddFile() {
+    public void handleAddFile() throws IOException {
         if (notesList.getSelectionModel().getSelectedIndex() == -1) {
             uiUtils.showPopUp(props.get("FileAddWarningTitle").get(),
                     props.get("FileAddWarningText").get(),
                     Alert.AlertType.WARNING);
         } else {
+            try {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Open File");
+                File file = fileChooser.showOpenDialog(stage);
+                if (file != null) {
+                    EmbeddedFile embeddedFile = new EmbeddedFile(file.getName(),
+                            Files.probeContentType(file.toPath()),
+                            Files.readAllBytes(file.toPath()),
+                            notesList.getSelectionModel().getSelectedItem());
+                    if(!embeddedFileServerUtils.storeEmbeddedFile
+                            (noteServerUtils.getServerAddress(),
+                            notesList.getSelectionModel().getSelectedItem().getTitle(),
+                            embeddedFile)){
+                        uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
+                                props.get("fileStoreFailAlertText").get(),
+                                Alert.AlertType.ERROR);
+                        return;
+                    }
 
-            HBox fileContainer = new HBox(5);
-            fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
-                    " -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
+                    addFileElement(embeddedFile);
+                    String toAdd = "";
+                    if (embeddedFile.getType().contains("image"))
+                        toAdd = "!";
+                    toAdd = toAdd + "[" + embeddedFile.getName() + "]("
+                            + noteServerUtils.getServerAddress() + "api/files/"
+                            + notesList.getSelectionModel().getSelectedItem().getTitle()
+                            + "/content/" +
+                            embeddedFile.getName() + ")";
+                    toAdd = StringUtils.replace(toAdd, " ", "%20");
+                    noteEditor.appendText(toAdd);
+                    updateDisplay();
+                } else
+                    System.out.println("No file detected");
 
-            Label fileNameLabel = new Label("testFile.jpg");
-
-            Button renameButton = new Button("✎");
-            renameButton.setOnAction(_ -> handleRenameFile(fileNameLabel));
-
-            Button deleteButton = new Button("ⓧ");
-            deleteButton.setOnAction(_ -> handleDeleteFile(fileContainer));
-
-            fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
-
-            filesHBox.getChildren().add(fileContainer);
-
+            }
+            catch (OutOfMemoryError e){
+                uiUtils.showPopUp(props.get("fileTooLargeAlertTitle").get(),
+                        props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
+            }
         }
 
     }
 
+
     /**
      * Renaming a file Pop-up
      */
-    private void handleRenameFile(Label fileNameLabel) {
+    private void handleRenameFile(Label fileNameLabel, EmbeddedFile embeddedFile) {
         TextInputDialog dialog = new TextInputDialog(fileNameLabel.getText());
         dialog.titleProperty().bind(props.get("RenameFileConfirmationTitle"));
         dialog.headerTextProperty().bind(props.get("renameFileAlertText"));
+        String type = embeddedFile.getType();
+        type = type.substring(type.indexOf("/") + 1);
         // label.RenameFileConfirmationTitle=Rename File
         // label.renameFileAlertText= Enter a new name for the file:
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(fileNameLabel::setText);
+        if(result.isPresent()) {
+            String newTitle = result.get() + "." + type;
+            fileNameLabel.setText(newTitle);
+            embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
+                    notesList.getSelectionModel().getSelectedItem().getTitle(),
+                    embeddedFile.getName(), result.get());
+            newTitle = StringUtils.replace(newTitle, " ", "%20");
+            String editorResult = StringUtils.replace(noteEditor.getText(),
+                    StringUtils.replace(embeddedFile.getName(),
+                            " ", "%20"), newTitle);
+            noteEditor.setText(editorResult);
+            embeddedFile.setName(newTitle);
+            updateDisplay();
+        }
     }
+
 
     /**
      * Delete an embedded file (currently only removes from HBox)
      */
-    private void handleDeleteFile(HBox fileContainer) {
+    private void handleDeleteFile(HBox fileContainer, EmbeddedFile embeddedFile) {
+        embeddedFileServerUtils.deleteEmbeddedFile(noteServerUtils.getServerAddress(),
+                notesList.getSelectionModel().getSelectedItem().getTitle(),
+                embeddedFile.getName());
+        String fileName = StringUtils.replace(embeddedFile.getName(), " ", "%20");
+        String toDelete = "";
+        if(embeddedFile.getType().contains("image"))
+            toDelete = "!";
+        toDelete = toDelete + "[" + fileName + "](" + noteServerUtils.getServerAddress()
+                + "api/files/" + notesList.getSelectionModel().getSelectedItem().getTitle()
+                + "/content/" + fileName + ")";
+        toDelete = StringUtils.replace(toDelete, " ", "%20");
+        String result = StringUtils.remove(noteEditor.getText(), toDelete);
+        noteEditor.setText(result);
         filesHBox.getChildren().remove(fileContainer);
+        updateDisplay();
     }
 
 
@@ -804,5 +898,28 @@ public class MainCtrl {
         if (!filteredNotes.isEmpty() && currentNote == null) {
             notesList.getSelectionModel().clearSelection();
         }
+    }
+
+    /**
+     * Helper method that adds a box for a file
+     * @param embeddedFile File that the HBox is based on
+     */
+
+    public void addFileElement(EmbeddedFile embeddedFile) {
+        HBox fileContainer = new HBox(5);
+        fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
+                " -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
+
+        Label fileNameLabel = new Label(embeddedFile.getName());
+
+        Button renameButton = new Button("✎");
+        renameButton.setOnAction(e -> handleRenameFile(fileNameLabel, embeddedFile));
+
+        Button deleteButton = new Button("ⓧ");
+        deleteButton.setOnAction(e -> handleDeleteFile(fileContainer,embeddedFile));
+
+        fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
+
+        filesHBox.getChildren().add(fileContainer);
     }
 }

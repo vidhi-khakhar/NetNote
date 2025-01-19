@@ -60,6 +60,7 @@ class MainCtrlTest {
         assertEquals("Title", sut.getSavedNotes().get(0).getTitle());
         assertEquals("Text", sut.getSavedNotes().get(0).getText());
     }
+
     @Test
     void handleAddNoteTest(){
         //test still to be implemented
@@ -73,6 +74,42 @@ class MainCtrlTest {
     void updateDisplayTest(){
         //method not implemented yet
     }
+
+    @Test
+    public void testHighlightKeywordInText() {
+        String text = "This is a test content with the word Test in it.";
+        String keyword = "test";
+        String expected = "This is a <span style=\"background-color: yellow;\">test</span> content with the word <span style=\"background-color: yellow;\">Test</span> in it.";
+
+        String result = sut.highlightKeywordInText(text, keyword);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testEmptyKeyword() {
+        String text = "This is some text.";
+        String keyword = "";
+        String expected = "This is some text."; // No change expected
+
+        String result = sut.highlightKeywordInText(text, keyword);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testHighlightKeywordInTextWithMultipleOccurrences() {
+        // Test case where the keyword occurs multiple times
+        String text = "This is a test. Test again, test.";
+        String keyword = "test";
+        String expected = "This is a <span style=\"background-color: yellow;\">test</span>. <span style=\"background-color: yellow;\">Test</span> again, <span style=\"background-color: yellow;\">test</span>.";
+
+        String result = sut.highlightKeywordInText(text, keyword);
+
+        assertEquals(expected, result);
+    }
+
+
     @Test
     void updateTitleTest(){
         //test still to be implemented
