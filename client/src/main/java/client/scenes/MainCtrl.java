@@ -166,7 +166,11 @@ public class MainCtrl {
 
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
-        notesList.setItems(savedNotes);
+
+        processNotes(collectionServerUtils
+                .getAllNotesInCollection(
+                        currentCollection.getCollectionUniqueName(),
+                        currentCollection.getServer()));
 
         noNotesMatchYourQueryLabel = new Label();
 
