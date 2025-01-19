@@ -2,13 +2,16 @@ package client.config;
 
 import client.Main;
 import client.MyModule;
+import client.utils.collection.CollectionServerUtils;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 import java.io.*;
+import java.net.UnknownHostException;
 import java.util.*;
 
 import commons.Collection;
@@ -18,12 +21,14 @@ public class ConfigLoader {
     private static final Injector INJECTOR = Guice.createInjector(new MyModule());
     private Config data;
     private final String filePath;
+    @Inject
+    private CollectionServerUtils collectionServerUtils;
 
     /**
      * Default constructor used by Guice
      */
     @SuppressWarnings("unused")
-    public ConfigLoader() {
+    public ConfigLoader() throws UnknownHostException {
         this("config.json");
     }
 
@@ -35,7 +40,7 @@ public class ConfigLoader {
      * @param filePath The path to the file in which to store the
      *                 configuration data
      */
-    public ConfigLoader(String filePath) {
+    public ConfigLoader(String filePath) throws UnknownHostException {
         this.filePath = filePath;
         try {
             File configFile = new File(filePath);
@@ -51,9 +56,21 @@ public class ConfigLoader {
         } catch (IOException e) {
             System.err.println("Could not open the user config file.");
         } finally {
-            if (data == null) data = new Config(
-                    Main.DEFAULT_LOCALE,
-                    new ArrayList<>());
+            if (data == null) {
+                String defaultMainCollectionUniqueName =
+                        "HASHCODE:" + Integer.
+                                toString(System.identityHashCode(System.currentTimeMillis()));
+                Collection defaultMainCollection = new Collection(
+                        defaultMainCollectionUniqueName,
+                        "Main",
+                        "http://localhost:8080/");
+                List<Collection> collections = new ArrayList<>();
+                collections.add(defaultMainCollection);
+                data = new Config(
+                        Main.DEFAULT_LOCALE,
+                        collections,
+                        defaultMainCollectionUniqueName);
+            }
         }
     }
 
@@ -84,6 +101,24 @@ public class ConfigLoader {
      */
     public List<Collection> getCollections() {
         return data.getCollections();
+    }
+
+    /**
+     * Getter for the Unique Name of the current default collection
+     *
+     * @return Unique Name of the current default collection
+     */
+    public String getDefaultCollectionUniqueName() {
+        return data.getDefaultCollectionUniqueName();
+    }
+
+    /**
+     * Setter for the Unique Name of the current default collection.
+     * @param defaultCollectionUniqueName new defaultCollectionUniqueName.
+     */
+    public void setDefaultCollectionUniqueName(String defaultCollectionUniqueName) {
+        data.setDefaultCollectionUniqueName(defaultCollectionUniqueName);
+        save();
     }
 
     /**

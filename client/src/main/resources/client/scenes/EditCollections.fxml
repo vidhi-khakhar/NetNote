@@ -68,7 +68,7 @@
             </HBox>
          </HBox>
          <HBox alignment="BOTTOM_RIGHT" minWidth="-Infinity" prefHeight="30.0" spacing="4.0" VBox.vgrow="ALWAYS">
-            <Button fx:id="buttonMakeDefault" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" style="-fx-background-color: #fbee04; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonMakeDefault" HBox.hgrow="NEVER">
+            <Button fx:id="buttonMakeDefault" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#handleMakeDefault" prefHeight="30.0" style="-fx-background-color: #fbee04; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonMakeDefault" HBox.hgrow="NEVER">
                <font>
                   <Font size="14.0" />
                </font>
