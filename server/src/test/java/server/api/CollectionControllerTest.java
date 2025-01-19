@@ -3,7 +3,6 @@ package server.api;
 import commons.Collection;
 import commons.CollectionContainsNotes;
 import commons.Note;
-import org.h2.tools.Server;
 import org.junit.jupiter.api.*;
 import server.utils.ServerUtils;
 
@@ -57,7 +56,9 @@ public class CollectionControllerTest {
         var response = sut.createCollection(collection);
         assertEquals(201, response.getStatusCode().value());
         assertTrue(collectionDb.existsById(collection.getCollectionUniqueName()));
-        assertEquals(collection, collectionDb.findById("Collection").get());
+        var retrievedCollection = collectionDb.findById("Collection");
+        assertTrue(retrievedCollection.isPresent());
+        assertEquals(collection, retrievedCollection.get());
     }
 
     @Test
@@ -112,7 +113,9 @@ public class CollectionControllerTest {
         Collection collection = new Collection("Collection", "Alias", null);
         var response = sut.updateCollectionAlias("Collection1", collection);
         assertEquals(200, response.getStatusCode().value());
-        assertEquals("Alias", collectionDb.findById("Collection1").get().getAlias());
+        var updatedCollection = collectionDb.findById("Collection1");
+        assertTrue(updatedCollection.isPresent());
+        assertEquals("Alias", updatedCollection.get().getAlias());
     }
 
     @Test
