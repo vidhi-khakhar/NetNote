@@ -65,6 +65,15 @@ public class Note {
     }
 
     /**
+     * Setter for NoteId.
+     * Intended for testing purposes only. Use ONLY to mimic database behaviour.
+     * @param noteId new noteId.
+     */
+    public void setNoteId(Long noteId) {
+        this.noteId = noteId;
+    }
+
+    /**
      * Getter for title.
      * @return title
      */
