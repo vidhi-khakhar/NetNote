@@ -159,21 +159,17 @@ public class MainCtrl {
                 currentDefaultCollection = collection;
             }
         }
-
         this.stage = stage;
         this.mainView = mainView;
         this.editCollectionsMenu = editCollectionsMenu;
 
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
-
-        processNotes(collectionServerUtils
-                .getAllNotesInCollection(
+        processNotes(collectionServerUtils.getAllNotesInCollection(
                         currentCollection.getCollectionUniqueName(),
                         currentCollection.getServer()));
 
         noNotesMatchYourQueryLabel = new Label();
-
         // This part was created with the help of generative AI,
         // it makes only the Title of the note appear in ListView
         notesList.setCellFactory(_ -> new ListCell<>() {
