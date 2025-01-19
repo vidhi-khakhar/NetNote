@@ -416,6 +416,10 @@ public class MainCtrl {
         }
     }
 
+    public void handleMoveNote () {
+
+    }
+
     /**
      * Updates the contents of the editor and the rendered view
      * after the user select a different note to load.
