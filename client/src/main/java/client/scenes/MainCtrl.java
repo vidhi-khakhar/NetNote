@@ -143,23 +143,20 @@ public class MainCtrl {
      * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
      */
     public void initialize(Stage stage, Scene mainView, Scene editCollectionsMenu) {
-
         if(configLoader.getCollections().size() == 1 &&
                 configLoader.getCollections().getFirst().getAlias().equals("Main")) {
-
             Collection defaultMainCollection = new Collection(
                     configLoader.getDefaultCollectionUniqueName(),
                     configLoader.getCollections().getFirst().getAlias(),
                     configLoader.getCollections().getFirst().getServer());
-
             collectionServerUtils.createCollection(defaultMainCollection,
                     defaultMainCollection.getServer());
         }
-
         for(Collection collection : configLoader.getCollections()) {
             if(collection.getCollectionUniqueName().
                     equals(configLoader.getDefaultCollectionUniqueName())) {
                 currentCollection = collection;
+                currentDefaultCollection = collection;
             }
         }
 
