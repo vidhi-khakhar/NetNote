@@ -156,6 +156,12 @@ public class MainCtrl {
                     defaultMainCollection.getServer());
         }
 
+        for(Collection collection : configLoader.getCollections()) {
+            if(collection.getCollectionUniqueName().
+                    equals(configLoader.getDefaultCollectionUniqueName())) {
+                currentCollection = collection;
+            }
+        }
 
         this.stage = stage;
         this.mainView = mainView;
@@ -260,7 +266,7 @@ public class MainCtrl {
         problemsCheckbox.textProperty().bind(props.get("markdownCheckboxLabel"));
         searchBar.promptTextProperty().bind(props.get("searchPlaceholder"));
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
-        collectionDropdown.textProperty().bind(props.get("currentCollectionName"));
+        collectionDropdown.setText(currentCollection.getAlias() + " (Default)");
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
         filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
         addedFilesLabel.textProperty().bind(props.get("addedFilesName"));
