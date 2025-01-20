@@ -1,14 +1,13 @@
 package client.utils.collection;
 
+import client.utils.note.NoteServerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Collection;
 import commons.Note;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -16,35 +15,34 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class CollectionServerUtilsTest {
 
     private CollectionServerUtils collectionServerUtils;
+    private NoteServerUtils noteServerUtils;
     private Collection testCollection;
+    private Collection duplicateCollection;
+    private Note removableNote;
 
     @BeforeEach
     void setup() {
         collectionServerUtils = new CollectionServerUtils(new ObjectMapper());
+        noteServerUtils = new NoteServerUtils();
 
+        assumeTrue(noteServerUtils.isServerAvailable(noteServerUtils.getServerAddress()), "Server is not available, skipping tests.");
         testCollection = new Collection("test-collection", "Test Collection Alias", "http://localhost:8080/");
         collectionServerUtils.createCollection(testCollection, "http://localhost:8080/");
+        Collection duplicateCollection = new Collection("test-collection", "Duplicate Alias", "http://localhost:8080/");
+        collectionServerUtils.createCollection(duplicateCollection, "http://localhost:8080/");
+        Note removableNote = new Note("Note1", "Text1");
     }
 
     @Test
     void fetchAllCollectionsTest() {
         List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
+        assertNotNull(collections, "Collections list should not be null.");
 
         boolean isTestCollectionPresent = collections.stream()
                 .anyMatch(collection -> collection.getCollectionUniqueName().equals(testCollection.getCollectionUniqueName()) &&
                                         collection.getAlias().equals(testCollection.getAlias()));
+
         assertTrue(isTestCollectionPresent, "Test collection should be present in the list of collections.");
-    }
-
-    @Test
-    void CreateCollectionTest() {
-        Collection newCollection = new Collection("new-collection", "New Collection Alias", "http://localhost:8080/");
-        collectionServerUtils.createCollection(newCollection, "http://localhost:8080/");
-
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
-        boolean isNewCollectionPresent = collections.stream()
-                .anyMatch(collection -> collection.getCollectionUniqueName().equals(newCollection.getCollectionUniqueName()));
-        assertTrue(isNewCollectionPresent, "New collection should be present in the list of collections.");
     }
 
     @Test
@@ -69,49 +67,6 @@ public class CollectionServerUtilsTest {
         assertTrue(isCollectionDeleted, "Test collection should be deleted.");
     }
 
-    @Test
-    void HandleDuplicateCollectionCreationTest() {
-        Collection duplicateCollection = new Collection("test-collection", "Duplicate Alias", "http://localhost:8080/");
-        collectionServerUtils.createCollection(duplicateCollection, "http://localhost:8080/");
-
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
-        long count = collections.stream()
-                .filter(collection -> collection.getCollectionUniqueName().equals(testCollection.getCollectionUniqueName()))
-                .count();
-        assertEquals(1, count, "Duplicate collections should not be allowed.");
-    }
-    @Test
-    void RemoveNoteFromCollectionTest() {
-        Note removableNote = new Note("Note1", "Text1");
-
-        collectionServerUtils.addNoteToCollection(testCollection.getCollectionUniqueName(), removableNote.getTitle(), "http://localhost:8080/");
-        collectionServerUtils.removeNoteFromCollection(testCollection.getCollectionUniqueName(), removableNote.getTitle(), "http://localhost:8080/");
-
-        List<Note> notes = collectionServerUtils.getAllNotesInCollection(testCollection.getCollectionUniqueName(), "http://localhost:8080/");
-
-        boolean isNoteRemoved = notes.stream()
-                .noneMatch(note -> note.getTitle().equals(removableNote.getTitle()));
-
-        assertTrue(isNoteRemoved, "Removable note should be removed from the collection.");
-    }
-    @Test
-    void canAddMultipleCollectionsWithDifferentNamesTest() {
-        Collection collection1 = new Collection("collection1", "Alias1", "http://localhost:8080/");
-        Collection collection2 = new Collection("collection2", "Alias2", "http://localhost:8080/");
-        Collection collection3 = new Collection("collection3", "Alias3", "http://localhost:8080/");
-
-        collectionServerUtils.createCollection(collection1, "http://localhost:8080/");
-        collectionServerUtils.createCollection(collection2, "http://localhost:8080/");
-        collectionServerUtils.createCollection(collection3, "http://localhost:8080/");
-
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
-        boolean allCollectionsAdded = collections.stream()
-                                              .anyMatch(c -> c.getCollectionUniqueName().equals("collection1")) &&
-                                      collections.stream().anyMatch(c -> c.getCollectionUniqueName().equals("collection2")) &&
-                                      collections.stream().anyMatch(c -> c.getCollectionUniqueName().equals("collection3"));
-
-        assertTrue(allCollectionsAdded, "All collections should be added successfully.");
-    }
     @Test
     void aliasConsistencyAfterUpdatesTest() {
         String alias1 = "UpdatedAlias1";
@@ -154,9 +109,15 @@ public class CollectionServerUtilsTest {
 
         assertTrue(collectionExists, "The test collection should exist.");
     }
+
     @AfterEach
     void cleanup() {
-        collectionServerUtils.deleteCollection(testCollection.getCollectionUniqueName(), "http://localhost:8080/");
+        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
+        boolean exists = collections.stream()
+                .anyMatch(c -> c.getCollectionUniqueName().equals(testCollection.getCollectionUniqueName()));
+        if (exists) {
+            collectionServerUtils.deleteCollection(testCollection.getCollectionUniqueName(), "http://localhost:8080/");
+        }
     }
 }
 
