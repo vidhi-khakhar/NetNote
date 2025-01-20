@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainCtrl {
 
@@ -447,53 +448,67 @@ public class MainCtrl {
         }
     }
 
+    /**
+     *
+     *
+     *
+     */
     public void handleMoveNote() {
         if (notesList.getSelectionModel().getSelectedItem() == null) {
-            uiUtils.showPopUp("No Note Selected", "Please select a note to move.", Alert.AlertType.WARNING);
+            uiUtils.showPopUp(
+                    props.get("noNoteSelectedTitle").get(),
+                    props.get("noNoteSelectedMessage").get(),
+                    Alert.AlertType.WARNING
+            );
             return;
         }
 
         List<Collection> collections = configLoader.getCollections();
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
-        Map<String, String> aliasToUniqueNameMap = new HashMap<>();
-
-        for (Collection collection : collections) {
-            aliasToUniqueNameMap.put(collection.getAlias(), collection.getCollectionUniqueName());
-        }
+        Map<String, String> aliasToUniqueNameMap = collections
+                .stream()
+                .collect(Collectors.toMap(Collection::getAlias, Collection::getCollectionUniqueName));
 
         List<String> otherCollectionsAliases = collections
                 .stream()
                 .map(Collection::getAlias)
-                .filter(x -> !x.equals(currentCollection.getAlias()))
+                .filter(alias -> !alias.equals(currentCollection.getAlias()))
                 .toList();
-        if(otherCollectionsAliases.isEmpty()) {
-            uiUtils.showPopUp("No other collections", "There are no other collections to move this note to", Alert.AlertType.INFORMATION);
-        }
 
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(currentCollection.getAlias(), otherCollectionsAliases);
-        dialog.setTitle("Move Note");
-        dialog.setHeaderText("Move Note: " + selectedNote.getTitle());
-        dialog.setContentText("Choose the target collection:");
-        Optional<String> result = dialog.showAndWait();
-
-        if (result.isEmpty()) {
+        if (otherCollectionsAliases.isEmpty()) {
+            uiUtils.showPopUp(
+                    props.get("noOtherCollectionsTitle").get(),
+                    props.get("noOtherCollectionsMessage").get(),
+                    Alert.AlertType.INFORMATION
+            );
             return;
         }
 
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(otherCollectionsAliases.get(0), otherCollectionsAliases);
+        dialog.setTitle(props.get("moveNoteDialogTitle").get());
+        dialog.setHeaderText(String.format(
+                props.get("moveNoteDialogHeader").get(),
+                selectedNote.getTitle()
+        ));
+        dialog.setContentText(props.get("moveNoteDialogContent").get());
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isEmpty()) {
+            return;
+        }
         String targetCollectionAlias = result.get();
 
-        String targetCollectionUniqueName = aliasToUniqueNameMap.get(targetCollectionAlias);
-
-        collectionServerUtils.moveNoteToAnotherCollection
-                (currentCollection.getCollectionUniqueName(),
+        collectionServerUtils.moveNoteToAnotherCollection(
+                currentCollection.getCollectionUniqueName(),
                 selectedNote.getTitle(),
-                targetCollectionUniqueName,
-                noteServerUtils.getServerAddress());
+                aliasToUniqueNameMap.get(targetCollectionAlias),
+                noteServerUtils.getServerAddress()
+        );
 
-        processNotes(collectionServerUtils
-                .getAllNotesInCollection(
-                        currentCollection.getCollectionUniqueName(),
-                        currentCollection.getServer()));
+        processNotes(collectionServerUtils.getAllNotesInCollection(
+                currentCollection.getCollectionUniqueName(),
+                currentCollection.getServer()
+        ));
     }
 
     /**
