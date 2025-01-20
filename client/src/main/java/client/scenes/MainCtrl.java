@@ -3,7 +3,6 @@ package client.scenes;
 import client.config.ConfigLoader;
 import client.components.Notification;
 import client.utils.EmbeddedFileServerUtils;
-import client.utils.collection.CollectionUtils;
 import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
 import client.utils.note.NoteUtils;
@@ -449,9 +448,7 @@ public class MainCtrl {
     }
 
     /**
-     *
-     *
-     *
+     * Moves a note from currently selected collection to the one chosen by the user.
      */
     public void handleMoveNote() {
         if (notesList.getSelectionModel().getSelectedItem() == null) {
@@ -467,7 +464,8 @@ public class MainCtrl {
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
         Map<String, String> aliasToUniqueNameMap = collections
                 .stream()
-                .collect(Collectors.toMap(Collection::getAlias, Collection::getCollectionUniqueName));
+                .collect(Collectors.toMap
+                        (Collection::getAlias, Collection::getCollectionUniqueName));
 
         List<String> otherCollectionsAliases = collections
                 .stream()
@@ -484,7 +482,8 @@ public class MainCtrl {
             return;
         }
 
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(otherCollectionsAliases.get(0), otherCollectionsAliases);
+        ChoiceDialog<String> dialog =
+                new ChoiceDialog<>(currentCollection.getAlias(), otherCollectionsAliases);
         dialog.setTitle(props.get("moveNoteDialogTitle").get());
         dialog.setHeaderText(String.format(
                 props.get("moveNoteDialogHeader").get(),
