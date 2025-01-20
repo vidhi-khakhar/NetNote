@@ -225,9 +225,13 @@ public class NetworkCtrl {
                 newResults = notes.stream().map(Note::getTitle).toList();
             } else {
                 List<EmbeddedFile> files = new ArrayList<>();
-                notes.forEach(n ->
-                        files.addAll(
-                                fileServerUtils.getFilesFromNote(serverAddress, n.getTitle())));
+                notes.forEach(n -> {
+                    List<EmbeddedFile> currentFiles =
+                            fileServerUtils.getFilesFromNote(serverAddress, n.getTitle());
+                    if (currentFiles != null) {
+                        files.addAll(currentFiles);
+                    }
+                });
                 newResults = files.stream().map(EmbeddedFile::getName).toList();
             }
         }

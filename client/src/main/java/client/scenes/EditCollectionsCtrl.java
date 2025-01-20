@@ -113,7 +113,13 @@ public class EditCollectionsCtrl {
                 if (empty || collection == null) {
                     setText(null);
                 } else {
-                    setText(collection.getAlias());
+                    // Display alias and append "(Default)" if it's the default collection
+                    String displayName = collection.getAlias();
+                    if (configLoader.getDefaultCollectionUniqueName().
+                            equals(collection.getCollectionUniqueName())) {
+                        displayName += " (Default)";
+                    }
+                    setText(displayName);
                 }
             }
         });
@@ -180,9 +186,17 @@ public class EditCollectionsCtrl {
      */
     public void handleRemoveCollection() {
         int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
+        Collection currentCollection = collections.get(currentIndex);
         if (currentIndex == -1) {
             uiUtils.showPopUp(props.get("noCollectionSelectedAlertTitle").get(),
                     props.get("noCollectionSelectedAlertText").get(),
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        if (currentCollection.getCollectionUniqueName().
+                equals(configLoader.getDefaultCollectionUniqueName())) {
+            uiUtils.showPopUp(props.get("CannotRemoveDefaultCollectionTitle").get(),
+                    props.get("CannotRemoveDefaultCollectionText").get(),
                     Alert.AlertType.ERROR);
             return;
         }
@@ -384,5 +398,19 @@ public class EditCollectionsCtrl {
         uiUtils.showPopUp(props.get("actionConflictAlertTitle").get(),
                 props.get("actionConflictAlertText").get(),
                 Alert.AlertType.ERROR);
+    }
+
+    /**
+     * handleMakeDefault is the onAction method for the "Make Default" Button.
+     * It makes the current collection default and refreshes the view.
+     */
+    public void handleMakeDefault() {
+        int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
+        Collection currentCollection = collections.get(currentIndex);
+
+        configLoader.setDefaultCollectionUniqueName(currentCollection.getCollectionUniqueName());
+        configLoader.save();
+        collectionsList.refresh();
+        currentAction = CollectionAction.NO_ACTION;
     }
 }

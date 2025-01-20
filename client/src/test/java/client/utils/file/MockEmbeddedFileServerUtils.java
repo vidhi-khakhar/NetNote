@@ -17,15 +17,16 @@ public class MockEmbeddedFileServerUtils extends EmbeddedFileServerUtils {
     }
 
     @Override
-    public void storeEmbeddedFile(String serverAddress, String noteName, EmbeddedFile file) {
+    public boolean storeEmbeddedFile(String serverAddress, String noteName, EmbeddedFile file) {
         Optional<Note> noteOptional = MockNoteServerUtils.notes.get(serverAddress).stream().filter(n -> n.getTitle().equals(noteName)).findFirst();
-        if (noteOptional.isEmpty()) return;
+        if (noteOptional.isEmpty()) return false;
         Note note = noteOptional.get();
         note.getEmbeddedFiles().add(file);
+        return true;
     }
 
     @Override
-    public void renameEmbeddedFile(String serverAddress, String oldTitle, String newTitle) {
+    public void renameEmbeddedFile(String serverAddress, String noteName, String oldTitle, String newTitle) {
         // TODO
     }
 

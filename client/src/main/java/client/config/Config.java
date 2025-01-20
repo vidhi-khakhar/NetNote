@@ -8,6 +8,7 @@ public class Config {
 
     private Locale locale;
     private List<Collection> collections;
+    private String defaultCollectionUniqueName;
 
     /**
      * Parameterless constructor for Jackson
@@ -18,12 +19,14 @@ public class Config {
     /**
      * Constructor for an object that contains application configuration data
      *
-     * @param locale The application locale
+     * @param locale      The application locale
      * @param collections The collections the client has access to
+     * @param defaultCollectionUniqueName The unique name of the default Collection
      */
-    public Config(Locale locale, List<Collection> collections) {
+    public Config(Locale locale, List<Collection> collections, String defaultCollectionUniqueName) {
         this.locale = locale;
         this.collections = collections;
+        this.defaultCollectionUniqueName = defaultCollectionUniqueName;
     }
 
     /**
@@ -64,7 +67,24 @@ public class Config {
     }
 
     /**
+     * Getter for defaultCollectionUniqueName
+     * @return defaultCollectionUniqueName
+     */
+    public String getDefaultCollectionUniqueName() {
+        return defaultCollectionUniqueName;
+    }
+
+    /**
+     * Setter for defaultCollectionUniqueName
+     * @param defaultCollectionUniqueName new defaultCollectionUniqueName
+     */
+    public void setDefaultCollectionUniqueName(String defaultCollectionUniqueName) {
+        this.defaultCollectionUniqueName = defaultCollectionUniqueName;
+    }
+
+    /**
      * Compares a collection to another object to see if they are equal
+     *
      * @param o The object to compare against
      * @return True if the collections are equal, false otherwise
      */
@@ -78,6 +98,7 @@ public class Config {
 
     /**
      * Generates a hashcode for a Config object
+     *
      * @return The hashcode used by hash tables
      */
     @Override
@@ -87,6 +108,7 @@ public class Config {
 
     /**
      * Generates a string representation of the Config object
+     *
      * @return A string representation of the Config object
      */
     @Override
