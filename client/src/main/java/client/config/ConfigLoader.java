@@ -21,6 +21,7 @@ public class ConfigLoader {
     private static final Injector INJECTOR = Guice.createInjector(new MyModule());
     private Config data;
     private final String filePath;
+
     @Inject
     private CollectionServerUtils collectionServerUtils;
 

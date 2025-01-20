@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class MainCtrl {
@@ -143,7 +144,7 @@ public class MainCtrl {
      * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
      */
     public void initialize(Stage stage, Scene mainView, Scene editCollectionsMenu) {
-        if(configLoader.getCollections().size() == 1 &&
+        if (configLoader.getCollections().size() == 1 &&
                 configLoader.getCollections().getFirst().getAlias().equals("Main")) {
             Collection defaultMainCollection = new Collection(
                     configLoader.getDefaultCollectionUniqueName(),
@@ -152,8 +153,8 @@ public class MainCtrl {
             collectionServerUtils.createCollection(defaultMainCollection,
                     defaultMainCollection.getServer());
         }
-        for(Collection collection : configLoader.getCollections()) {
-            if(collection.getCollectionUniqueName().
+        for (Collection collection : configLoader.getCollections()) {
+            if (collection.getCollectionUniqueName().
                     equals(configLoader.getDefaultCollectionUniqueName())) {
                 currentCollection = collection;
                 currentDefaultCollection = collection;
@@ -166,8 +167,8 @@ public class MainCtrl {
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
         processNotes(collectionServerUtils.getAllNotesInCollection(
-                        currentCollection.getCollectionUniqueName(),
-                        currentCollection.getServer()));
+                currentCollection.getCollectionUniqueName(),
+                currentCollection.getServer()));
 
         noNotesMatchYourQueryLabel = new Label();
         // This part was created with the help of generative AI,
@@ -212,9 +213,9 @@ public class MainCtrl {
             areMarkdownProblemsShown = isSelected;
             handleMarkdownRendering();
         });
-
         initializeShortcuts();
         initializeTextProperties();
+        initializeCss();
         updateDisplay();
     }
 
@@ -273,6 +274,35 @@ public class MainCtrl {
 
         setLocale(configLoader.getLocale());
     }
+
+    /**
+     * Loads a stylesheet ({@code .css}) file from the project root into the webview,
+     * if there are any present. <br>
+     * If there is more than one stylesheet, the first one encountered will be loaded.
+     */
+    public void initializeCss() {
+        File root = new File("client/.."); // Trick to access the root of the project
+        File[] files = root.listFiles();
+        if (files == null) return;
+        List<File> cssFiles = Arrays
+                .stream(files)
+                .filter(f -> f.getName().endsWith(".css"))
+                .toList();
+        if (cssFiles.isEmpty()) {
+            System.out.println("No CSS file found in the project root. Default styles applied");
+            return;
+        }
+        String cssFileName = cssFiles.getFirst().getName();
+        renderedNoteView.getEngine().setUserStyleSheetLocation(
+                Paths.get(cssFileName).toUri().toString()
+        );
+        if (cssFiles.size() > 1) {
+            System.out.println("Multiple CSS files detected; applying" + " " + cssFileName);
+        } else {
+            System.out.println("CSS file found; applying" + " " + cssFileName);
+        }
+    }
+
     /**
      * Getter for the list of saved notes.
      *
@@ -413,7 +443,7 @@ public class MainCtrl {
                 note.getTitle(),
                 currentDefaultCollection.getServer());
 
-        if(currentCollection != currentDefaultCollection) {
+        if (currentCollection != currentDefaultCollection) {
             collectionServerUtils.addNoteToCollection(
                     currentCollection.getCollectionUniqueName(),
                     note.getTitle(),
@@ -466,8 +496,8 @@ public class MainCtrl {
             }
             List<EmbeddedFile> files = embeddedFileServerUtils.getFilesFromNote(
                     noteServerUtils.getServerAddress(), note.getTitle());
-            if(files != null)
-                for(int i = 0; i < files.size(); i++) {
+            if (files != null)
+                for (int i = 0; i < files.size(); i++) {
                     addFileElement(files.get(i));
                 }
 
@@ -490,7 +520,7 @@ public class MainCtrl {
      * Highlights all occurrences of the keyword in 'text' by wrapping them in a &lt;span&gt;
      * element with a yellow background color. The search is case-insensitive.
      *
-     * @param text the text to search and highlight the keyword in
+     * @param text    the text to search and highlight the keyword in
      * @param keyword the keyword to highlight in the text
      * @return the text with highlighted keyword occurrences
      */
@@ -747,10 +777,10 @@ public class MainCtrl {
                             Files.probeContentType(file.toPath()),
                             Files.readAllBytes(file.toPath()),
                             notesList.getSelectionModel().getSelectedItem());
-                    if(!embeddedFileServerUtils.storeEmbeddedFile
+                    if (!embeddedFileServerUtils.storeEmbeddedFile
                             (noteServerUtils.getServerAddress(),
-                            notesList.getSelectionModel().getSelectedItem().getTitle(),
-                            embeddedFile)){
+                                    notesList.getSelectionModel().getSelectedItem().getTitle(),
+                                    embeddedFile)) {
                         uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
                                 props.get("fileStoreFailAlertText").get(),
                                 Alert.AlertType.ERROR);
@@ -772,8 +802,7 @@ public class MainCtrl {
                 } else
                     System.out.println("No file detected");
 
-            }
-            catch (OutOfMemoryError e){
+            } catch (OutOfMemoryError e) {
                 uiUtils.showPopUp(props.get("fileTooLargeAlertTitle").get(),
                         props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
             }
@@ -794,7 +823,7 @@ public class MainCtrl {
         // label.RenameFileConfirmationTitle=Rename File
         // label.renameFileAlertText= Enter a new name for the file:
         Optional<String> result = dialog.showAndWait();
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             String newTitle = result.get() + "." + type;
             fileNameLabel.setText(newTitle);
             embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
@@ -820,7 +849,7 @@ public class MainCtrl {
                 embeddedFile.getName());
         String fileName = StringUtils.replace(embeddedFile.getName(), " ", "%20");
         String toDelete = "";
-        if(embeddedFile.getType().contains("image"))
+        if (embeddedFile.getType().contains("image"))
             toDelete = "!";
         toDelete = toDelete + "[" + fileName + "](" + noteServerUtils.getServerAddress()
                 + "api/files/" + notesList.getSelectionModel().getSelectedItem().getTitle()
@@ -908,7 +937,7 @@ public class MainCtrl {
             MenuItem itemCollection = new MenuItem(displayName);
             itemCollection.setOnAction(_ -> {
                 currentCollection = collection;
-                if(currentCollection.getCollectionUniqueName()
+                if (currentCollection.getCollectionUniqueName()
                         .equals(configLoader.getDefaultCollectionUniqueName())) {
                     currentDefaultCollection = collection;
                 }
@@ -954,6 +983,7 @@ public class MainCtrl {
 
     /**
      * Helper method that adds a box for a file
+     *
      * @param embeddedFile File that the HBox is based on
      */
 
@@ -968,7 +998,7 @@ public class MainCtrl {
         renameButton.setOnAction(e -> handleRenameFile(fileNameLabel, embeddedFile));
 
         Button deleteButton = new Button("ⓧ");
-        deleteButton.setOnAction(e -> handleDeleteFile(fileContainer,embeddedFile));
+        deleteButton.setOnAction(e -> handleDeleteFile(fileContainer, embeddedFile));
 
         fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
 
