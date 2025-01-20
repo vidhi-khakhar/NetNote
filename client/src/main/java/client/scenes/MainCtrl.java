@@ -452,28 +452,48 @@ public class MainCtrl {
             uiUtils.showPopUp("No Note Selected", "Please select a note to move.", Alert.AlertType.WARNING);
             return;
         }
+
+        List<Collection> collections = configLoader.getCollections();
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
-        String currentCollectionUniqueName = collectionDropdown.getText();
+        Map<String, String> aliasToUniqueNameMap = new HashMap<>();
 
-        List<String> otherCollections = collectionServerUtils.getAllCollections(noteServerUtils.getServerAddress())
+        for (Collection collection : collections) {
+            aliasToUniqueNameMap.put(collection.getAlias(), collection.getCollectionUniqueName());
+        }
+
+        List<String> otherCollectionsAliases = collections
                 .stream()
-                .map(Collection::getCollectionUniqueName)
-                .filter(name -> !name.equals(currentCollectionUniqueName))
+                .map(Collection::getAlias)
+                .filter(x -> !x.equals(currentCollection.getAlias()))
                 .toList();
-
-        if(otherCollections.isEmpty()) {
+        if(otherCollectionsAliases.isEmpty()) {
             uiUtils.showPopUp("No other collections", "There are no other collections to move this note to", Alert.AlertType.INFORMATION);
         }
 
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(otherCollections.get(0), otherCollections);
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(currentCollection.getAlias(), otherCollectionsAliases);
         dialog.setTitle("Move Note");
         dialog.setHeaderText("Move Note: " + selectedNote.getTitle());
         dialog.setContentText("Choose the target collection:");
         Optional<String> result = dialog.showAndWait();
-        String targetCollectionUniqueName = result.get();
 
-        collectionServerUtils.moveNoteToAnotherCollection(currentCollectionUniqueName, selectedNote.getTitle(), targetCollectionUniqueName, noteServerUtils.getServerAddress());
-        notesList.refresh();
+        if (result.isEmpty()) {
+            return;
+        }
+
+        String targetCollectionAlias = result.get();
+
+        String targetCollectionUniqueName = aliasToUniqueNameMap.get(targetCollectionAlias);
+
+        collectionServerUtils.moveNoteToAnotherCollection
+                (currentCollection.getCollectionUniqueName(),
+                selectedNote.getTitle(),
+                targetCollectionUniqueName,
+                noteServerUtils.getServerAddress());
+
+        processNotes(collectionServerUtils
+                .getAllNotesInCollection(
+                        currentCollection.getCollectionUniqueName(),
+                        currentCollection.getServer()));
     }
 
     /**
