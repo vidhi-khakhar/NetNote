@@ -291,7 +291,7 @@ public class MainCtrl {
                 .toList();
         if (cssFiles.isEmpty()) {
             Notification.create(stage,
-                    "No CSS file found in the project root. Default styles applied",
+                    props.get("noCssFile").get(),
                     NotificationType.INFO);
             return;
         }
@@ -301,11 +301,11 @@ public class MainCtrl {
         );
         if (cssFiles.size() > 1) {
             Notification.create(stage,
-                    "Multiple CSS files detected; applying" + " " + cssFileName,
+                    props.get("multipleCssFiles").get() + " " + cssFileName,
                     NotificationType.INFO);
         } else {
             Notification.create(stage,
-                    "CSS file found; applying" + " " + cssFileName,
+                    props.get("cssFound").get() + " " + cssFileName,
                     NotificationType.INFO);
         }
     }

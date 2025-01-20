@@ -17,7 +17,7 @@ public class Notification {
     public static final int messageTime = 2000;
     public static final int fadeIn = 500;
     public static final int fadeOut = 500;
-    public static NotificationType type;
+    private static NotificationType type;
 
     /**
      * Creates a pop-up notification that lasts 3 seconds.
