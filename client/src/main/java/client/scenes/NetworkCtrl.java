@@ -217,28 +217,62 @@ public class NetworkCtrl {
                                       NoteServerUtils noteServerUtils,
                                       CollectionServerUtils collectionServerUtils,
                                       EmbeddedFileServerUtils fileServerUtils) {
-        List<String> newResults;
-        if (type == NetworkMenuSelectionType.COLLECTIONS) {
-            List<Collection> collections = collectionServerUtils.getAllCollections(serverAddress);
-            newResults = collections.stream().map(Collection::getCollectionUniqueName).toList();
-        } else {
-            noteServerUtils.setServerAddress(serverAddress);
-            List<Note> notes = noteServerUtils.getAllNotes();
-            if (type == NetworkMenuSelectionType.NOTES) {
-                newResults = notes.stream().map(Note::getTitle).toList();
-            } else {
-                List<EmbeddedFile> files = new ArrayList<>();
-                notes.forEach(n -> {
-                    List<EmbeddedFile> currentFiles =
-                            fileServerUtils.getFilesFromNote(serverAddress, n.getTitle());
-                    if (currentFiles != null) {
-                        files.addAll(currentFiles);
-                    }
-                });
-                newResults = files.stream().map(EmbeddedFile::getName).toList();
+        return switch (type) {
+            case COLLECTIONS -> getNewCollectionResults(serverAddress, collectionServerUtils);
+            case NOTES -> getNewNoteResults(serverAddress, noteServerUtils);
+            case FILES -> getNewFileResults(serverAddress, noteServerUtils, fileServerUtils);
+        };
+    }
+
+    /**
+     * Returns a list of the unique names of all collections stored on a server
+     *
+     * @param serverAddress         The address of the server
+     * @param collectionServerUtils The class from which to fetch the collections
+     * @return A list of the unique names of all collections stored on a server
+     */
+    public List<String> getNewCollectionResults(String serverAddress,
+                                                CollectionServerUtils collectionServerUtils) {
+        List<Collection> collections = collectionServerUtils.getAllCollections(serverAddress);
+        return collections.stream().map(Collection::getCollectionUniqueName).toList();
+    }
+
+    /**
+     * Returns a list of the titles of all notes stored on a server
+     *
+     * @param serverAddress   The address of the server
+     * @param noteServerUtils The class from which to fetch the notes
+     * @return A list of the titles of all notes stored on a server
+     */
+    public List<String> getNewNoteResults(String serverAddress,
+                                          NoteServerUtils noteServerUtils) {
+        noteServerUtils.setServerAddress(serverAddress);
+        List<Note> notes = noteServerUtils.getAllNotes();
+        return notes.stream().map(Note::getTitle).toList();
+    }
+
+    /**
+     * Returns a list of the names of all embedded files stored on a server
+     *
+     * @param serverAddress   The address of the server
+     * @param noteServerUtils The class from which to fetch the notes
+     * @param fileServerUtils The class from which to fetch the files
+     * @return A list of the names of all embedded files stored on a server
+     */
+    public List<String> getNewFileResults(String serverAddress,
+                                          NoteServerUtils noteServerUtils,
+                                          EmbeddedFileServerUtils fileServerUtils) {
+        noteServerUtils.setServerAddress(serverAddress);
+        List<Note> notes = noteServerUtils.getAllNotes();
+        List<EmbeddedFile> files = new ArrayList<>();
+        notes.forEach(n -> {
+            List<EmbeddedFile> currentFiles =
+                    fileServerUtils.getFilesFromNote(serverAddress, n.getTitle());
+            if (currentFiles != null) {
+                files.addAll(currentFiles);
             }
-        }
-        return newResults;
+        });
+        return files.stream().map(EmbeddedFile::getName).toList();
     }
 
     /**
