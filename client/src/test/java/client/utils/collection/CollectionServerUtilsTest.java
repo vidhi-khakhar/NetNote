@@ -25,7 +25,7 @@ public class CollectionServerUtilsTest {
         collectionServerUtils = new CollectionServerUtils(new ObjectMapper());
         noteServerUtils = new NoteServerUtils();
 
-        assumeTrue(noteServerUtils.isServerAvailable(noteServerUtils.getServerAddress()), "Server is not available, skipping tests.");
+        assumeTrue(noteServerUtils.isServerAvailable("http://localhost:8080/"), "Server is not available, skipping tests.");
         testCollection = new Collection("test-collection", "Test Collection Alias", "http://localhost:8080/");
         collectionServerUtils.createCollection(testCollection, "http://localhost:8080/");
         Collection duplicateCollection = new Collection("test-collection", "Duplicate Alias", "http://localhost:8080/");
@@ -46,7 +46,7 @@ public class CollectionServerUtilsTest {
     }
 
     @Test
-    void UpdateCollectionAliasTest() {
+    void updateCollectionAliasTest() {
         String newAlias = "Updated Alias";
         collectionServerUtils.updateCollectionAlias(testCollection.getCollectionUniqueName(), newAlias, "http://localhost:8080/");
 
@@ -58,7 +58,7 @@ public class CollectionServerUtilsTest {
     }
 
     @Test
-    void DeleteCollectionTest() {
+    void deleteCollectionTest() {
         collectionServerUtils.deleteCollection(testCollection.getCollectionUniqueName(), "http://localhost:8080/");
 
         List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
