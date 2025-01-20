@@ -52,6 +52,8 @@ public class MainCtrl {
     private Scene mainView;
     private Stage stage;
     private Label noNotesMatchYourQueryLabel;
+    private Collection currentCollection;
+    private Collection currentDefaultCollection;
 
     @Inject
     private MarkdownUtils markdownUtils;
@@ -142,17 +144,33 @@ public class MainCtrl {
      * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
      */
     public void initialize(Stage stage, Scene mainView, Scene editCollectionsMenu) {
-
+        if(configLoader.getCollections().size() == 1 &&
+                configLoader.getCollections().getFirst().getAlias().equals("Main")) {
+            Collection defaultMainCollection = new Collection(
+                    configLoader.getDefaultCollectionUniqueName(),
+                    configLoader.getCollections().getFirst().getAlias(),
+                    configLoader.getCollections().getFirst().getServer());
+            collectionServerUtils.createCollection(defaultMainCollection,
+                    defaultMainCollection.getServer());
+        }
+        for(Collection collection : configLoader.getCollections()) {
+            if(collection.getCollectionUniqueName().
+                    equals(configLoader.getDefaultCollectionUniqueName())) {
+                currentCollection = collection;
+                currentDefaultCollection = collection;
+            }
+        }
         this.stage = stage;
         this.mainView = mainView;
         this.editCollectionsMenu = editCollectionsMenu;
 
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
-        notesList.setItems(savedNotes);
+        processNotes(collectionServerUtils.getAllNotesInCollection(
+                        currentCollection.getCollectionUniqueName(),
+                        currentCollection.getServer()));
 
         noNotesMatchYourQueryLabel = new Label();
-
         // This part was created with the help of generative AI,
         // it makes only the Title of the note appear in ListView
         notesList.setCellFactory(_ -> new ListCell<>() {
@@ -246,7 +264,7 @@ public class MainCtrl {
         problemsCheckbox.textProperty().bind(props.get("markdownCheckboxLabel"));
         searchBar.promptTextProperty().bind(props.get("searchPlaceholder"));
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
-        collectionDropdown.textProperty().bind(props.get("currentCollectionName"));
+        collectionDropdown.setText(currentCollection.getAlias() + " (Default)");
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
         filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
         addedFilesLabel.textProperty().bind(props.get("addedFilesName"));
@@ -256,7 +274,6 @@ public class MainCtrl {
 
         setLocale(configLoader.getLocale());
     }
-
     /**
      * Getter for the list of saved notes.
      *
@@ -391,6 +408,19 @@ public class MainCtrl {
     public void commitAddNote(Note note, int index) {
         savedNotes.add(index, note);
         noteServerUtils.storeNote(note);
+
+        collectionServerUtils.addNoteToCollection(
+                currentDefaultCollection.getCollectionUniqueName(),
+                note.getTitle(),
+                currentDefaultCollection.getServer());
+
+        if(currentCollection != currentDefaultCollection) {
+            collectionServerUtils.addNoteToCollection(
+                    currentCollection.getCollectionUniqueName(),
+                    note.getTitle(),
+                    currentCollection.getServer());
+        }
+
         notesList.setItems(savedNotes);
         notesList.getSelectionModel().select(index);
         noteTitleInput.setText(note.getTitle());
@@ -899,10 +929,21 @@ public class MainCtrl {
         List<Collection> collections = configLoader.getCollections();
         // Create and add MenuItems for each collection
         for (Collection collection : collections) {
-            MenuItem itemCollection = new MenuItem(collection.getAlias());
+
+            final String displayName = configLoader.getDefaultCollectionUniqueName()
+                    .equals(collection.getCollectionUniqueName())
+                    ? collection.getAlias() + " (Default)"
+                    : collection.getAlias();
+
+            MenuItem itemCollection = new MenuItem(displayName);
             itemCollection.setOnAction(_ -> {
+                currentCollection = collection;
+                if(currentCollection.getCollectionUniqueName()
+                        .equals(configLoader.getDefaultCollectionUniqueName())) {
+                    currentDefaultCollection = collection;
+                }
                 collectionDropdown.textProperty().unbind();
-                collectionDropdown.setText(collection.getAlias());
+                collectionDropdown.setText(displayName);
                 // Example: process or display the notes
                 processNotes(collectionServerUtils
                         .getAllNotesInCollection(
