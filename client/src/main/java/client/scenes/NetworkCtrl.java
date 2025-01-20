@@ -32,7 +32,7 @@ public class NetworkCtrl {
 
     private final ObservableList<String> servers = FXCollections.observableArrayList();
     private final ObservableList<String> results = FXCollections.observableArrayList();
-    private String currentAddress = "";
+    private String currentAddress;
     private NetworkMenuSelectionType currentType = NetworkMenuSelectionType.NOTES;
 
     @Inject
@@ -135,11 +135,14 @@ public class NetworkCtrl {
      */
     public void refreshServerList() {
         servers.clear();
-        servers.addAll(configLoader.getCollections()
-                .stream()
-                .map(Collection::getServer)
-                .distinct()
-                .toList());
+        List<Collection> collections = configLoader.getCollections();
+        if (collections != null) {
+            servers.addAll(configLoader.getCollections()
+                    .stream()
+                    .map(Collection::getServer)
+                    .distinct()
+                    .toList());
+        }
         // Ensure there is at least one address listed
         if (!servers.contains(NoteServerUtils.getLocalAddress()))
             servers.add(NoteServerUtils.getLocalAddress());
@@ -241,7 +244,7 @@ public class NetworkCtrl {
     /**
      * The results will be all the notes in the currently selected server
      */
-    public void handleShowNotes() {
+    public void handleShowNotesForSelectedServer() {
         currentType = NetworkMenuSelectionType.NOTES;
         updateResults(currentAddress, currentType);
     }
@@ -249,7 +252,7 @@ public class NetworkCtrl {
     /**
      * The results will be all the collections in the currently selected server
      */
-    public void handleShowCollections() {
+    public void handleShowCollectionsForSelectedServer() {
         currentType = NetworkMenuSelectionType.COLLECTIONS;
         updateResults(currentAddress, currentType);
     }
@@ -257,7 +260,7 @@ public class NetworkCtrl {
     /**
      * The results will be all the embedded files in the currently selected server
      */
-    public void handleShowFiles() {
+    public void handleShowFilesForSelectedServer() {
         currentType = NetworkMenuSelectionType.FILES;
         updateResults(currentAddress, currentType);
     }

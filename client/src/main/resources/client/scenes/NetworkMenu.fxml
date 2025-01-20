@@ -36,9 +36,9 @@
                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
             </padding>
             <VBox>
-               <RadioButton fx:id="radioNotes" mnemonicParsing="false" onAction="#handleShowNotes" selected="true" text="%label.notes" />
-               <RadioButton fx:id="radioCollections" mnemonicParsing="false" onAction="#handleShowCollections" text="%label.collections" />
-               <RadioButton fx:id="radioFiles" mnemonicParsing="false" onAction="#handleShowFiles" text="%label.files" />
+               <RadioButton fx:id="radioNotes" mnemonicParsing="false" onAction="#handleShowNotesForSelectedServer" selected="true" text="%label.notes" />
+               <RadioButton fx:id="radioCollections" mnemonicParsing="false" onAction="#handleShowCollectionsForSelectedServer" text="%label.collections" />
+               <RadioButton fx:id="radioFiles" mnemonicParsing="false" onAction="#handleShowFilesForSelectedServer" text="%label.files" />
             </VBox>
             <Text fx:id="serverListLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%label.serverList">
                <font>
