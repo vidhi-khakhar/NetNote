@@ -776,11 +776,16 @@ public class MainCtrl {
         Note currentNote = notesList.getSelectionModel().getSelectedItem();
 
         if (query.isBlank()) {
-            notesList.setItems(FXCollections.observableArrayList(savedNotes));
+            processNotes(collectionServerUtils
+                    .getAllNotesInCollection(currentCollection.getCollectionUniqueName(),
+                            currentCollection.getServer()));
             return;
         }
 
-        List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
+        List<Note> searchedNotes = NoteSearchUtils.search(collectionServerUtils
+                        .getAllNotesInCollection(currentCollection.getCollectionUniqueName(),
+                                currentCollection.getServer())
+                , query);
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
 
