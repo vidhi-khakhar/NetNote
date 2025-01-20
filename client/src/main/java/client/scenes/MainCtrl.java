@@ -3,7 +3,7 @@ package client.scenes;
 import client.components.NotificationType;
 import client.config.ConfigLoader;
 import client.components.Notification;
-import client.utils.EmbeddedFileServerUtils;
+import client.utils.file.EmbeddedFileServerUtils;
 import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
 import client.utils.note.NoteUtils;
@@ -51,6 +51,7 @@ public class MainCtrl {
 
     private Scene editCollectionsMenu;
     private Scene mainView;
+    private Scene networkMenu;
     private Stage stage;
     private Label noNotesMatchYourQueryLabel;
     private Collection currentCollection;
@@ -137,14 +138,21 @@ public class MainCtrl {
     @FXML
     private Label renderedNoteLabel;
 
+    @FXML
+    private Button networkButton;
+
     /**
      * Initializes the controller.
      *
      * @param stage               Reference to the primary stage.
      * @param mainView            Holds a reference to the MainView scene.
      * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
+     * @param networkMenu         Holds a reference to the NetworkMenu scene.
      */
-    public void initialize(Stage stage, Scene mainView, Scene editCollectionsMenu) {
+    public void initialize(Stage stage,
+                           Scene mainView,
+                           Scene editCollectionsMenu,
+                           Scene networkMenu) {
         if (configLoader.getCollections().size() == 1 &&
                 configLoader.getCollections().getFirst().getAlias().equals("Main")) {
             Collection defaultMainCollection = new Collection(
@@ -164,13 +172,12 @@ public class MainCtrl {
         this.stage = stage;
         this.mainView = mainView;
         this.editCollectionsMenu = editCollectionsMenu;
-
+        this.networkMenu = networkMenu;
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
         processNotes(collectionServerUtils.getAllNotesInCollection(
                 currentCollection.getCollectionUniqueName(),
                 currentCollection.getServer()));
-
         noNotesMatchYourQueryLabel = new Label();
         // This part was created with the help of generative AI,
         // it makes only the Title of the note appear in ListView
@@ -185,7 +192,6 @@ public class MainCtrl {
                 }
             }
         });
-
         notesList
                 .getSelectionModel()
                 .selectedItemProperty()
@@ -198,18 +204,14 @@ public class MainCtrl {
                     }
                     displaySavedNote(selectedNote);
                 });
-
         noteTitleInput.textProperty().addListener(noteTitleInputListener);
-
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
             handleMarkdownRendering();
         });
-
         searchBar.textProperty().addListener((_, _, newValue) ->
                 handleSearch(newValue)
         );
-
         problemsCheckbox.selectedProperty().addListener((_, _, isSelected) -> {
             areMarkdownProblemsShown = isSelected;
             handleMarkdownRendering();
@@ -272,9 +274,11 @@ public class MainCtrl {
         editCollectionsDropdownOption.textProperty().bind(
                 props.get("collectionsDropdownEditCollections"));
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
+        networkButton.textProperty().bind(props.get("network"));
 
         setLocale(configLoader.getLocale());
     }
+
 
     /**
      * Loads a stylesheet ({@code .css}) file from the project root into the webview,
@@ -569,38 +573,6 @@ public class MainCtrl {
         List<Note> serverNotes = noteServerUtils.getAllNotes();
         noteUtils.sync(savedNotes, serverNotes);
         notesList.refresh();
-    }
-
-    /**
-     * Shows a dialog where the user can change the address of the server.
-     * The user is notified whether the change was successful or unsuccessful.
-     */
-    public void handleConfigureIP() {
-        String localAddressText = "\n" +
-                props.get("addressConfigLocalAddress").get() +
-                ": " +
-                NoteServerUtils.getLocalAddress();
-        Optional<String> result = uiUtils.askUserForInput(
-                props.get("addressConfigDialogName").get(),
-                props.get("addressConfigCurrentAddress").get() +
-                        ": " +
-                        noteServerUtils.getServerAddress() +
-                        localAddressText,
-                null
-        );
-        if (result.isPresent()) {
-            String newAddress = result.get();
-            if (noteServerUtils.isServerAvailable(newAddress)) {
-                noteServerUtils.setServerAddress(newAddress);
-                uiUtils.showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
-                        props.get("addressConfigSuccessAlertText").get(),
-                        Alert.AlertType.INFORMATION);
-            } else {
-                uiUtils.showPopUp(props.get("addressConfigAddressErrorTitle").get(),
-                        props.get("addressConfigAddressErrorText").get(),
-                        Alert.AlertType.ERROR);
-            }
-        }
     }
 
     /**
@@ -923,6 +895,16 @@ public class MainCtrl {
         Stage secondaryStage = new Stage();
         secondaryStage.titleProperty().bind(props.get("collectionsDropdownEditCollections"));
         secondaryStage.setScene(editCollectionsMenu);
+        secondaryStage.show();
+    }
+
+    /**
+     * Opens the "Network" scene to manage the data on different servers.
+     */
+    public void showNetworkMenu() {
+        Stage secondaryStage = new Stage();
+        secondaryStage.titleProperty().bind(props.get("network"));
+        secondaryStage.setScene(networkMenu);
         secondaryStage.show();
     }
 
