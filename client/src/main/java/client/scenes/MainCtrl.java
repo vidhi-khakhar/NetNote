@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.components.NotificationType;
 import client.config.ConfigLoader;
 import client.components.Notification;
 import client.utils.EmbeddedFileServerUtils;
@@ -237,14 +238,14 @@ public class MainCtrl {
                     try {
                         undoHandler.undoAction();
                     } catch (CannotUndoException e) {
-                        Notification.create(stage, e.getMessage());
+                        Notification.create(stage, e.getMessage(), NotificationType.ERROR);
                     }
                 }
                 case "Ctrl+Y" -> {
                     try {
                         undoHandler.redoAction();
                     } catch (CannotRedoException e) {
-                        Notification.create(stage, e.getMessage());
+                        Notification.create(stage, e.getMessage(), NotificationType.ERROR);
                     }
                 }
                 case "Ctrl+N" -> handleAddNote();
@@ -289,7 +290,9 @@ public class MainCtrl {
                 .filter(f -> f.getName().endsWith(".css"))
                 .toList();
         if (cssFiles.isEmpty()) {
-            System.out.println("No CSS file found in the project root. Default styles applied");
+            Notification.create(stage,
+                    "No CSS file found in the project root. Default styles applied",
+                    NotificationType.INFO);
             return;
         }
         String cssFileName = cssFiles.getFirst().getName();
@@ -297,9 +300,13 @@ public class MainCtrl {
                 Paths.get(cssFileName).toUri().toString()
         );
         if (cssFiles.size() > 1) {
-            System.out.println("Multiple CSS files detected; applying" + " " + cssFileName);
+            Notification.create(stage,
+                    "Multiple CSS files detected; applying" + " " + cssFileName,
+                    NotificationType.INFO);
         } else {
-            System.out.println("CSS file found; applying" + " " + cssFileName);
+            Notification.create(stage,
+                    "CSS file found; applying" + " " + cssFileName,
+                    NotificationType.INFO);
         }
     }
 
