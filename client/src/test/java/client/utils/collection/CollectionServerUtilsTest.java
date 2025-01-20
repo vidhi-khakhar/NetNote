@@ -19,23 +19,24 @@ public class CollectionServerUtilsTest {
     private Collection testCollection;
     private Collection duplicateCollection;
     private Note removableNote;
+    public static String SERVER_ADDRESS = "http://localhost:8080/";
 
     @BeforeEach
     void setup() {
         collectionServerUtils = new CollectionServerUtils(new ObjectMapper());
         noteServerUtils = new NoteServerUtils();
 
-        assumeTrue(noteServerUtils.isServerAvailable("http://localhost:8080/"), "Server is not available, skipping tests.");
-        testCollection = new Collection("test-collection", "Test Collection Alias", "http://localhost:8080/");
-        collectionServerUtils.createCollection(testCollection, "http://localhost:8080/");
-        Collection duplicateCollection = new Collection("test-collection", "Duplicate Alias", "http://localhost:8080/");
-        collectionServerUtils.createCollection(duplicateCollection, "http://localhost:8080/");
+        assumeTrue(noteServerUtils.isServerAvailable(SERVER_ADDRESS), "Server is not available, skipping tests.");
+        testCollection = new Collection("test-collection", "Test Collection Alias", SERVER_ADDRESS);
+        collectionServerUtils.createCollection(testCollection, SERVER_ADDRESS);
+        Collection duplicateCollection = new Collection("test-collection", "Duplicate Alias", SERVER_ADDRESS);
+        collectionServerUtils.createCollection(duplicateCollection, SERVER_ADDRESS);
         Note removableNote = new Note("Note1", "Text1");
     }
 
     @Test
     void fetchAllCollectionsTest() {
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
         assertNotNull(collections, "Collections list should not be null.");
 
         boolean isTestCollectionPresent = collections.stream()
@@ -48,9 +49,9 @@ public class CollectionServerUtilsTest {
     @Test
     void updateCollectionAliasTest() {
         String newAlias = "Updated Alias";
-        collectionServerUtils.updateCollectionAlias(testCollection.getCollectionUniqueName(), newAlias, "http://localhost:8080/");
+        collectionServerUtils.updateCollectionAlias(testCollection.getCollectionUniqueName(), newAlias, SERVER_ADDRESS);
 
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
         boolean isAliasUpdated = collections.stream()
                 .anyMatch(collection -> collection.getCollectionUniqueName().equals(testCollection.getCollectionUniqueName()) &&
                                         collection.getAlias().equals(newAlias));
@@ -59,9 +60,9 @@ public class CollectionServerUtilsTest {
 
     @Test
     void deleteCollectionTest() {
-        collectionServerUtils.deleteCollection(testCollection.getCollectionUniqueName(), "http://localhost:8080/");
+        collectionServerUtils.deleteCollection(testCollection.getCollectionUniqueName(), SERVER_ADDRESS);
 
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
         boolean isCollectionDeleted = collections.stream()
                 .noneMatch(collection -> collection.getCollectionUniqueName().equals(testCollection.getCollectionUniqueName()));
         assertTrue(isCollectionDeleted, "Test collection should be deleted.");
@@ -73,11 +74,11 @@ public class CollectionServerUtilsTest {
         String alias2 = "UpdatedAlias2";
         String alias3 = "UpdatedAlias3";
 
-        collectionServerUtils.updateCollectionAlias(testCollection.getCollectionUniqueName(), alias1, "http://localhost:8080/");
-        collectionServerUtils.updateCollectionAlias(testCollection.getCollectionUniqueName(), alias2, "http://localhost:8080/");
-        collectionServerUtils.updateCollectionAlias(testCollection.getCollectionUniqueName(), alias3, "http://localhost:8080/");
+        collectionServerUtils.updateCollectionAlias(testCollection.getCollectionUniqueName(), alias1, SERVER_ADDRESS);
+        collectionServerUtils.updateCollectionAlias(testCollection.getCollectionUniqueName(), alias2, SERVER_ADDRESS);
+        collectionServerUtils.updateCollectionAlias(testCollection.getCollectionUniqueName(), alias3, SERVER_ADDRESS);
 
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
         boolean finalAliasCorrect = collections.stream()
                 .anyMatch(c -> c.getCollectionUniqueName().equals(testCollection.getCollectionUniqueName()) &&
                                c.getAlias().equals(alias3));
@@ -86,16 +87,16 @@ public class CollectionServerUtilsTest {
     }
     @Test
     void deleteAllCollectionsTest() {
-        Collection collection1 = new Collection("deleted1", "deletedAlias1", "http://localhost:8080/");
-        Collection collection2 = new Collection("deleted2", "deletedAlias2", "http://localhost:8080/");
+        Collection collection1 = new Collection("deleted1", "deletedAlias1", SERVER_ADDRESS);
+        Collection collection2 = new Collection("deleted2", "deletedAlias2", SERVER_ADDRESS);
 
-        collectionServerUtils.createCollection(collection1, "http://localhost:8080/");
-        collectionServerUtils.createCollection(collection2, "http://localhost:8080/");
+        collectionServerUtils.createCollection(collection1, SERVER_ADDRESS);
+        collectionServerUtils.createCollection(collection2, SERVER_ADDRESS);
 
-        collectionServerUtils.deleteCollection(collection1.getCollectionUniqueName(), "http://localhost:8080/");
-        collectionServerUtils.deleteCollection(collection2.getCollectionUniqueName(), "http://localhost:8080/");
+        collectionServerUtils.deleteCollection(collection1.getCollectionUniqueName(), SERVER_ADDRESS);
+        collectionServerUtils.deleteCollection(collection2.getCollectionUniqueName(), SERVER_ADDRESS);
 
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
         boolean allDeleted = collections.stream()
                 .noneMatch(c -> c.getCollectionUniqueName().equals("deleted1") || c.getCollectionUniqueName().equals("deleted2"));
 
@@ -103,7 +104,7 @@ public class CollectionServerUtilsTest {
     }
     @Test
     void checkIfCollectionExistsTest() {
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
         boolean collectionExists = collections.stream()
                 .anyMatch(collection -> collection.getCollectionUniqueName().equals(testCollection.getCollectionUniqueName()));
 
@@ -112,11 +113,11 @@ public class CollectionServerUtilsTest {
 
     @AfterEach
     void cleanup() {
-        List<Collection> collections = collectionServerUtils.getAllCollections("http://localhost:8080/");
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
         boolean exists = collections.stream()
                 .anyMatch(c -> c.getCollectionUniqueName().equals(testCollection.getCollectionUniqueName()));
         if (exists) {
-            collectionServerUtils.deleteCollection(testCollection.getCollectionUniqueName(), "http://localhost:8080/");
+            collectionServerUtils.deleteCollection(testCollection.getCollectionUniqueName(), SERVER_ADDRESS);
         }
     }
 }
