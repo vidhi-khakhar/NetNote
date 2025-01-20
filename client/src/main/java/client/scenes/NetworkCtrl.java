@@ -83,6 +83,9 @@ public class NetworkCtrl {
     @FXML
     private Text resultListLabel;
 
+    @FXML
+    private Button refreshServerListButton;
+
     /**
      * Initializes the {@link NetworkCtrl} controller by
      * binding the appropriate text properties and adding the
@@ -102,13 +105,7 @@ public class NetworkCtrl {
         serverList.setItems(servers);
         resultList.setItems(results);
 
-        // Refresh list of available servers every 5 seconds
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() -> refreshServerList());
-            }
-        }, 0, 5000);
+        refreshServerList();
 
         serverList.getSelectionModel().selectedItemProperty().addListener((_, _, selected) -> {
             currentAddress = selected;
@@ -127,6 +124,7 @@ public class NetworkCtrl {
         radioFiles.textProperty().bind(langUtils.getProps().get("files"));
         serverListLabel.textProperty().bind(langUtils.getProps().get("serverList"));
         resultListLabel.textProperty().bind(langUtils.getProps().get("results"));
+        refreshServerListButton.textProperty().bind(langUtils.getProps().get("refresh"));
     }
 
     /**
