@@ -46,6 +46,7 @@ public class MainCtrl {
     private String content = "";
     private ObservableList<Note> savedNotes = FXCollections.observableArrayList();
     private Map<String, StringProperty> props;
+    private int currentLanguageIndex;
     private boolean areMarkdownProblemsShown = false;
 
     private Scene editCollectionsMenu;
@@ -142,6 +143,9 @@ public class MainCtrl {
 
     @FXML
     private Text selectedLanguageLabel;
+
+    @FXML
+    private MenuButton languageDropdown;
 
     /**
      * Initializes the controller.
@@ -256,6 +260,8 @@ public class MainCtrl {
                 case "Ctrl+B" -> applyMarkdownShortcut("**", "**");
                 case "Ctrl+I" -> applyMarkdownShortcut("*", "*");
                 case "Ctrl+U" -> applyMarkdownShortcut("<u>", "</u>");
+                case "Ctrl+Alt+L" -> cycleLanguage(false);
+                case "Ctrl+Alt+Shift+L" -> cycleLanguage(true);
             }
         });
     }
@@ -828,6 +834,12 @@ public class MainCtrl {
         } else {
             selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
         }
+        currentLanguageIndex = switch (l.toLanguageTag()) {
+            case "nl-NL" -> 1;
+            case "ro-RO" -> 2;
+            case "pl-PL" -> 3;
+            default -> 0;
+        };
         selectedLanguageLabel.textProperty().bind(props.get(langUtils.getLabelFromLocale(l)));
 
         configLoader.setLocale(l);
@@ -854,6 +866,21 @@ public class MainCtrl {
      */
     public void setRO() {
         setLocale(Locale.forLanguageTag("ro-RO"));
+    }
+
+    /**
+     * Selects the next language in the language list. <br>
+     * If the current language is at the end of the list, it will loop back.
+     *
+     * @param reversed False if the selected language moves from top to bottom in the list
+     *                 when cycling, true if it moves from bottom to top
+     */
+    public void cycleLanguage(boolean reversed) {
+        int totalLanguages = languageDropdown.getItems().size();
+        int newIndex = currentLanguageIndex + (reversed ? -1 : 1);
+        if (newIndex >= totalLanguages) newIndex = 0;
+        if (newIndex == -1) newIndex = totalLanguages - 1;
+        languageDropdown.getItems().get(newIndex).fire();
     }
 
     /**

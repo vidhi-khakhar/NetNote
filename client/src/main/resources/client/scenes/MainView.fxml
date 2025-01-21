@@ -147,7 +147,7 @@
                      <MenuItem fx:id="editCollectionsDropdownOption" mnemonicParsing="false" onAction="#showEditCollectionsMenu" text="%label.collectionsDropdownEditCollections" />
                   </items>
                </MenuButton>
-               <MenuButton alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="NEVER">
+               <MenuButton fx:id="languageDropdown" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="27.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" HBox.hgrow="NEVER">
                   <items>
                      <MenuItem mnemonicParsing="false" onAction="#setEN">
                         <graphic>
