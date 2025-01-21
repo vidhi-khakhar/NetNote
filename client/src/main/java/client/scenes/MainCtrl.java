@@ -869,6 +869,13 @@ public class MainCtrl {
     }
 
     /**
+     * Sets the application locale to Polish.
+     */
+    public void setPL() {
+        setLocale(Locale.forLanguageTag("pl-PL"));
+    }
+
+    /**
      * Selects the next language in the language list. <br>
      * If the current language is at the end of the list, it will loop back.
      *
