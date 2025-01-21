@@ -1010,7 +1010,8 @@ public class MainCtrl {
             toAdd = "!";
         String fileName = URLEncoder.encode(embeddedFile.getName(),
                 StandardCharsets.UTF_8).replaceAll("\\+", "%20");
-        String noteName = URLEncoder.encode(notesList.getSelectionModel().getSelectedItem().getTitle(),
+        String noteName = URLEncoder.encode(notesList.getSelectionModel().
+                        getSelectedItem().getTitle(),
                 StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         toAdd = toAdd + "[" + embeddedFile.getName() + "]("
                 + noteServerUtils.getServerAddress() + "api/files/" + noteName
