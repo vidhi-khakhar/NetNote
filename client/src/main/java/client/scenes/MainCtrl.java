@@ -465,8 +465,10 @@ public class MainCtrl {
 
         List<Collection> collections = configLoader.getCollections();
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
-        Map<String, String> aliasToUniqueNameMap = getAliasToUniqueNameMap(configLoader.getCollections());
-        List<String> otherCollectionsAliases = getOtherCollectionsAliases(configLoader.getCollections(), currentCollection.getAlias());
+        Map<String, String> aliasToUniqueNameMap =
+                getAliasToUniqueNameMap(configLoader.getCollections());
+        List<String> otherCollectionsAliases = getOtherCollectionsAliases
+                (configLoader.getCollections(), currentCollection.getAlias());
 
         if (otherCollectionsAliases.isEmpty()) {
             uiUtils.showPopUp(
@@ -512,7 +514,8 @@ public class MainCtrl {
      * @param currentAlias The alias of currently displayed collection.
      * @return A list of Aliases of other collections.
      */
-    public List<String> getOtherCollectionsAliases(List<Collection> collections, String currentAlias) {
+    public List<String> getOtherCollectionsAliases
+    (List<Collection> collections, String currentAlias) {
         return collections.stream()
                 .map(Collection::getAlias)
                 .filter(alias -> !alias.equals(currentAlias))
@@ -525,9 +528,11 @@ public class MainCtrl {
      * @param collections The list of collections to process.
      * @return A map where the key is the collection alias, and the value is the unique name.
      */
-    public Map<String, String> getAliasToUniqueNameMap(List<Collection> collections) {
+    public Map<String, String> getAliasToUniqueNameMap
+    (List<Collection> collections) {
         return collections.stream()
-                .collect(Collectors.toMap(Collection::getAlias, Collection::getCollectionUniqueName));
+                .collect(Collectors.toMap
+                        (Collection::getAlias, Collection::getCollectionUniqueName));
     }
 
 
