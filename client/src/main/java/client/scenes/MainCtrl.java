@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.components.NotificationType;
 import client.config.ConfigLoader;
 import client.components.Notification;
 import client.utils.file.EmbeddedFileServerUtils;
@@ -38,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class MainCtrl {
@@ -216,6 +218,7 @@ public class MainCtrl {
         });
         initializeShortcuts();
         initializeTextProperties();
+        initializeCss();
         updateDisplay();
     }
 
@@ -237,14 +240,14 @@ public class MainCtrl {
                     try {
                         undoHandler.undoAction();
                     } catch (CannotUndoException e) {
-                        Notification.create(stage, e.getMessage());
+                        Notification.create(stage, e.getMessage(), NotificationType.ERROR);
                     }
                 }
                 case "Ctrl+Y" -> {
                     try {
                         undoHandler.redoAction();
                     } catch (CannotRedoException e) {
-                        Notification.create(stage, e.getMessage());
+                        Notification.create(stage, e.getMessage(), NotificationType.ERROR);
                     }
                 }
                 case "Ctrl+N" -> handleAddNote();
@@ -274,6 +277,60 @@ public class MainCtrl {
         networkButton.textProperty().bind(props.get("network"));
 
         setLocale(configLoader.getLocale());
+    }
+
+
+    /**
+     * Loads a stylesheet ({@code .css}) file from the project root into the webview,
+     * if there are any present. <br>
+     * If there is more than one stylesheet, the first one encountered will be loaded.
+     */
+    public void initializeCss() {
+        File root = new File("client/.."); // Trick to access the root of the project
+        File[] files = root.listFiles();
+        if (files == null) return;
+        List<File> cssFiles = filterCssFiles(files);
+        String cssLabel = getCssLabel(cssFiles);
+        if (cssFiles.isEmpty()) {
+            Notification.create(stage,
+                    props.get(cssLabel).get(),
+                    NotificationType.INFO);
+            return;
+        }
+        String cssFileName = cssFiles.getFirst().getName();
+        renderedNoteView.getEngine().setUserStyleSheetLocation(
+                Paths.get(cssFileName).toUri().toString()
+        );
+        Notification.create(stage,
+                props.get(cssLabel).get() + " " + cssFileName,
+                NotificationType.INFO);
+    }
+
+    /**
+     * Returns a list of all files ending in {@code .css} from an array of files
+     * @param files The array of files to filter
+     * @return A list of all CSS stylesheets in the array
+     */
+    public List<File> filterCssFiles(File[] files) {
+        if (files == null) return new ArrayList<>();
+        return Arrays
+                .stream(files)
+                .filter(f -> f.getName().endsWith(".css"))
+                .toList();
+    }
+
+    /**
+     * Returns the appropriate bundle label name given a list of CSS files
+     * @param cssFiles The list of CSS files for which the length is tested
+     * @return The appropriate bundle label name
+     */
+    public String getCssLabel(List<File> cssFiles) {
+        if (cssFiles.size() > 1) {
+            return "multipleCssFiles";
+        } else if (cssFiles.size() == 1) {
+            return "cssFound";
+        }
+        return "noCssFile";
     }
 
     /**
@@ -888,7 +945,7 @@ public class MainCtrl {
             MenuItem itemCollection = new MenuItem(displayName);
             itemCollection.setOnAction(_ -> {
                 currentCollection = collection;
-                if(currentCollection.getCollectionUniqueName()
+                if (currentCollection.getCollectionUniqueName()
                         .equals(configLoader.getDefaultCollectionUniqueName())) {
                     currentDefaultCollection = collection;
                 }
