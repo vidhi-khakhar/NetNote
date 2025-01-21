@@ -485,16 +485,15 @@ public class MainCtrl {
             return;
         }
 
-        ChoiceDialog<String> dialog =
-                new ChoiceDialog<>(currentCollection.getAlias(), otherCollectionsAliases);
-        dialog.setTitle(props.get("moveNoteDialogTitle").get());
-        dialog.setHeaderText(String.format(
-                props.get("moveNoteDialogHeader").get(),
-                selectedNote.getTitle()
-        ));
-        dialog.setContentText(props.get("moveNoteDialogContent").get());
+        Optional<String> result = uiUtils.showChoiceDialog(
+                props.get("moveNoteDialogTitle").get(),
+                String.format(props.get("moveNoteDialogHeader").get(), selectedNote.getTitle()),
+                props.get("moveNoteDialogContent").get(),
+                otherCollectionsAliases,
+                currentCollection.getAlias()
+        );
 
-        Optional<String> result = dialog.showAndWait();
+
         if (result.isEmpty()) {
             return;
         }
