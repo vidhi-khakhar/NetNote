@@ -3,20 +3,28 @@ package client.scenes;
 import commons.Note;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+
+import java.io.*;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MainCtrlTest {
 
     private MainCtrl sut;
+    private File f1, f2, f3, f4;
 
     /**
      * Setting up the Controller for the tests.
      */
     @BeforeEach
     void setup() {
+        f1 = new File("test.txt");
+        f2 = new File("test.css");
+        f3 = new File("test2.css");
+        f4 = new File("test.pdf");
+
         sut = new MainCtrl();
         sut.setSavedNotes(FXCollections.observableArrayList());
     }
@@ -113,5 +121,29 @@ class MainCtrlTest {
     @Test
     void updateTitleTest(){
         //test still to be implemented
+    }
+
+    @Test
+    public void filterCssFilesTest() {
+        File[] files = { f1, f2, f3, f4 };
+        assertEquals(List.of(f2, f3), sut.filterCssFiles(files));
+    }
+
+    @Test
+    public void getCssLabelNoFilesTest() {
+        List<File> cssFiles = List.of();
+        assertEquals("noCssFile", sut.getCssLabel(cssFiles));
+    }
+
+    @Test
+    public void getCssLabelOneFileTest() {
+        List<File> cssFiles = List.of(f2);
+        assertEquals("cssFound", sut.getCssLabel(cssFiles));
+    }
+
+    @Test
+    public void getCssLabelMultipleFilesTest() {
+        List<File> cssFiles = List.of(f2, f3);
+        assertEquals("multipleCssFiles", sut.getCssLabel(cssFiles));
     }
 }
