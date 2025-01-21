@@ -902,6 +902,10 @@ public class MainCtrl {
         configLoader.setLocale(l);
         langUtils.setLocale(l);
         if (areMarkdownProblemsShown) renderMarkdownProblems();
+
+        Notification.create(stage,
+                props.get("languageSwitch").get(),
+                NotificationType.INFO);
     }
 
     /**
