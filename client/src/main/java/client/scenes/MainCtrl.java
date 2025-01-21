@@ -289,13 +289,11 @@ public class MainCtrl {
         File root = new File("client/.."); // Trick to access the root of the project
         File[] files = root.listFiles();
         if (files == null) return;
-        List<File> cssFiles = Arrays
-                .stream(files)
-                .filter(f -> f.getName().endsWith(".css"))
-                .toList();
+        List<File> cssFiles = filterCssFiles(files);
+        String cssLabel = getCssLabel(cssFiles);
         if (cssFiles.isEmpty()) {
             Notification.create(stage,
-                    props.get("noCssFile").get(),
+                    props.get(cssLabel).get(),
                     NotificationType.INFO);
             return;
         }
@@ -303,15 +301,36 @@ public class MainCtrl {
         renderedNoteView.getEngine().setUserStyleSheetLocation(
                 Paths.get(cssFileName).toUri().toString()
         );
+        Notification.create(stage,
+                props.get(cssLabel).get() + " " + cssFileName,
+                NotificationType.INFO);
+    }
+
+    /**
+     * Returns a list of all files ending in {@code .css} from an array of files
+     * @param files The array of files to filter
+     * @return A list of all CSS stylesheets in the array
+     */
+    public List<File> filterCssFiles(File[] files) {
+        if (files == null) return new ArrayList<>();
+        return Arrays
+                .stream(files)
+                .filter(f -> f.getName().endsWith(".css"))
+                .toList();
+    }
+
+    /**
+     * Returns the appropriate bundle label name given a list of CSS files
+     * @param cssFiles The list of CSS files for which the length is tested
+     * @return The appropriate bundle label name
+     */
+    public String getCssLabel(List<File> cssFiles) {
         if (cssFiles.size() > 1) {
-            Notification.create(stage,
-                    props.get("multipleCssFiles").get() + " " + cssFileName,
-                    NotificationType.INFO);
-        } else {
-            Notification.create(stage,
-                    props.get("cssFound").get() + " " + cssFileName,
-                    NotificationType.INFO);
+            return "multipleCssFiles";
+        } else if (cssFiles.size() == 1) {
+            return "cssFound";
         }
+        return "noCssFile";
     }
 
     /**
