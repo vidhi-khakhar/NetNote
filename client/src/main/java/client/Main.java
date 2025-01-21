@@ -64,10 +64,12 @@ public class Main extends Application {
         var editCollectionsMenu =
                 FXML.load(EditCollectionsCtrl.class, "client", "scenes", "EditCollections.fxml");
         var networkMenu = FXML.load(MainCtrl.class, "client", "scenes", "NetworkMenu.fxml");
+        var shortcutsOverview = FXML.load(EditCollectionsCtrl.class, "client", "scenes", "ShortcutWindow.fxml");
 
         var mainViewScene = new Scene(mainView.getValue());
         var editCollectionsMenuScene = new Scene(editCollectionsMenu.getValue());
         var networkMenuScene = new Scene(networkMenu.getValue());
+        var shortcutsOverviewScene = new Scene(shortcutsOverview.getValue());
 
         // Apply the CSS file
         String cssPath = getClass()
@@ -84,7 +86,8 @@ public class Main extends Application {
                 primaryStage,
                 mainViewScene,
                 editCollectionsMenuScene,
-                networkMenuScene);
+                networkMenuScene,
+                shortcutsOverviewScene);
         mainCtrl.updateDisplay();
     }
 }
