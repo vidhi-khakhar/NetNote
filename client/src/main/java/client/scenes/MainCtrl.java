@@ -998,6 +998,13 @@ public class MainCtrl {
      * @param notesInCollection The list of notes in the currently selected collection.
      */
     public void processNotes(List<Note> notesInCollection) {
+
+        if (notesInCollection.isEmpty()) {
+            notesList.setItems(FXCollections.observableArrayList());
+            notesList.setPlaceholder(new Label(props.get("noNotesInCollection").get()));
+            return;
+        }
+
         Note currentNote = notesList.getSelectionModel().getSelectedItem();
 
         List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
