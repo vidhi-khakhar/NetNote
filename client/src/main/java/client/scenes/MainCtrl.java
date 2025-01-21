@@ -998,6 +998,12 @@ public class MainCtrl {
         filesHBox.getChildren().add(fileContainer);
     }
 
+    /**
+     *
+     * @param embeddedFile file inserted from the user
+     * @return path to the file on the server
+     */
+
     public String constructLink(EmbeddedFile embeddedFile) {
         String toAdd = "";
         if (embeddedFile.getType().contains("image"))
