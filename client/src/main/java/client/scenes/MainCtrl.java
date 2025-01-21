@@ -2,7 +2,7 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.components.Notification;
-import client.utils.EmbeddedFileServerUtils;
+import client.utils.file.EmbeddedFileServerUtils;
 import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
 import client.utils.note.NoteUtils;
@@ -50,6 +50,7 @@ public class MainCtrl {
 
     private Scene editCollectionsMenu;
     private Scene mainView;
+    private Scene networkMenu;
     private Stage stage;
     private Label noNotesMatchYourQueryLabel;
     private Collection currentCollection;
@@ -136,15 +137,22 @@ public class MainCtrl {
     @FXML
     private Label renderedNoteLabel;
 
+    @FXML
+    private Button networkButton;
+
     /**
      * Initializes the controller.
      *
      * @param stage               Reference to the primary stage.
      * @param mainView            Holds a reference to the MainView scene.
      * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
+     * @param networkMenu         Holds a reference to the NetworkMenu scene.
      */
-    public void initialize(Stage stage, Scene mainView, Scene editCollectionsMenu) {
-        if(configLoader.getCollections().size() == 1 &&
+    public void initialize(Stage stage,
+                           Scene mainView,
+                           Scene editCollectionsMenu,
+                           Scene networkMenu) {
+        if (configLoader.getCollections().size() == 1 &&
                 configLoader.getCollections().getFirst().getAlias().equals("Main")) {
             Collection defaultMainCollection = new Collection(
                     configLoader.getDefaultCollectionUniqueName(),
@@ -153,8 +161,8 @@ public class MainCtrl {
             collectionServerUtils.createCollection(defaultMainCollection,
                     defaultMainCollection.getServer());
         }
-        for(Collection collection : configLoader.getCollections()) {
-            if(collection.getCollectionUniqueName().
+        for (Collection collection : configLoader.getCollections()) {
+            if (collection.getCollectionUniqueName().
                     equals(configLoader.getDefaultCollectionUniqueName())) {
                 currentCollection = collection;
                 currentDefaultCollection = collection;
@@ -163,13 +171,12 @@ public class MainCtrl {
         this.stage = stage;
         this.mainView = mainView;
         this.editCollectionsMenu = editCollectionsMenu;
-
+        this.networkMenu = networkMenu;
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
         processNotes(collectionServerUtils.getAllNotesInCollection(
-                        currentCollection.getCollectionUniqueName(),
-                        currentCollection.getServer()));
-
+                currentCollection.getCollectionUniqueName(),
+                currentCollection.getServer()));
         noNotesMatchYourQueryLabel = new Label();
         // This part was created with the help of generative AI,
         // it makes only the Title of the note appear in ListView
@@ -184,7 +191,6 @@ public class MainCtrl {
                 }
             }
         });
-
         notesList
                 .getSelectionModel()
                 .selectedItemProperty()
@@ -197,23 +203,18 @@ public class MainCtrl {
                     }
                     displaySavedNote(selectedNote);
                 });
-
         noteTitleInput.textProperty().addListener(noteTitleInputListener);
-
         noteEditor.textProperty().addListener((_, _, newValue) -> {
             content = newValue;
             handleMarkdownRendering();
         });
-
         searchBar.textProperty().addListener((_, _, newValue) ->
                 handleSearch(newValue)
         );
-
         problemsCheckbox.selectedProperty().addListener((_, _, isSelected) -> {
             areMarkdownProblemsShown = isSelected;
             handleMarkdownRendering();
         });
-
         initializeShortcuts();
         initializeTextProperties();
         updateDisplay();
@@ -271,9 +272,11 @@ public class MainCtrl {
         editCollectionsDropdownOption.textProperty().bind(
                 props.get("collectionsDropdownEditCollections"));
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
+        networkButton.textProperty().bind(props.get("network"));
 
         setLocale(configLoader.getLocale());
     }
+
     /**
      * Getter for the list of saved notes.
      *
@@ -414,7 +417,7 @@ public class MainCtrl {
                 note.getTitle(),
                 currentDefaultCollection.getServer());
 
-        if(currentCollection != currentDefaultCollection) {
+        if (currentCollection != currentDefaultCollection) {
             collectionServerUtils.addNoteToCollection(
                     currentCollection.getCollectionUniqueName(),
                     note.getTitle(),
@@ -530,8 +533,8 @@ public class MainCtrl {
             }
             List<EmbeddedFile> files = embeddedFileServerUtils.getFilesFromNote(
                     noteServerUtils.getServerAddress(), note.getTitle());
-            if(files != null)
-                for(int i = 0; i < files.size(); i++) {
+            if (files != null)
+                for (int i = 0; i < files.size(); i++) {
                     addFileElement(files.get(i));
                 }
 
@@ -554,7 +557,7 @@ public class MainCtrl {
      * Highlights all occurrences of the keyword in 'text' by wrapping them in a &lt;span&gt;
      * element with a yellow background color. The search is case-insensitive.
      *
-     * @param text the text to search and highlight the keyword in
+     * @param text    the text to search and highlight the keyword in
      * @param keyword the keyword to highlight in the text
      * @return the text with highlighted keyword occurrences
      */
@@ -596,38 +599,6 @@ public class MainCtrl {
         List<Note> serverNotes = noteServerUtils.getAllNotes();
         noteUtils.sync(savedNotes, serverNotes);
         notesList.refresh();
-    }
-
-    /**
-     * Shows a dialog where the user can change the address of the server.
-     * The user is notified whether the change was successful or unsuccessful.
-     */
-    public void handleConfigureIP() {
-        String localAddressText = "\n" +
-                props.get("addressConfigLocalAddress").get() +
-                ": " +
-                NoteServerUtils.getLocalAddress();
-        Optional<String> result = uiUtils.askUserForInput(
-                props.get("addressConfigDialogName").get(),
-                props.get("addressConfigCurrentAddress").get() +
-                        ": " +
-                        noteServerUtils.getServerAddress() +
-                        localAddressText,
-                null
-        );
-        if (result.isPresent()) {
-            String newAddress = result.get();
-            if (noteServerUtils.isServerAvailable(newAddress)) {
-                noteServerUtils.setServerAddress(newAddress);
-                uiUtils.showPopUp(props.get("addressConfigSuccessAlertTitle").get(),
-                        props.get("addressConfigSuccessAlertText").get(),
-                        Alert.AlertType.INFORMATION);
-            } else {
-                uiUtils.showPopUp(props.get("addressConfigAddressErrorTitle").get(),
-                        props.get("addressConfigAddressErrorText").get(),
-                        Alert.AlertType.ERROR);
-            }
-        }
     }
 
     /**
@@ -816,10 +787,10 @@ public class MainCtrl {
                             Files.probeContentType(file.toPath()),
                             Files.readAllBytes(file.toPath()),
                             notesList.getSelectionModel().getSelectedItem());
-                    if(!embeddedFileServerUtils.storeEmbeddedFile
+                    if (!embeddedFileServerUtils.storeEmbeddedFile
                             (noteServerUtils.getServerAddress(),
-                            notesList.getSelectionModel().getSelectedItem().getTitle(),
-                            embeddedFile)){
+                                    notesList.getSelectionModel().getSelectedItem().getTitle(),
+                                    embeddedFile)) {
                         uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
                                 props.get("fileStoreFailAlertText").get(),
                                 Alert.AlertType.ERROR);
@@ -841,8 +812,7 @@ public class MainCtrl {
                 } else
                     System.out.println("No file detected");
 
-            }
-            catch (OutOfMemoryError e){
+            } catch (OutOfMemoryError e) {
                 uiUtils.showPopUp(props.get("fileTooLargeAlertTitle").get(),
                         props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
             }
@@ -863,7 +833,7 @@ public class MainCtrl {
         // label.RenameFileConfirmationTitle=Rename File
         // label.renameFileAlertText= Enter a new name for the file:
         Optional<String> result = dialog.showAndWait();
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             String newTitle = result.get() + "." + type;
             fileNameLabel.setText(newTitle);
             embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
@@ -889,7 +859,7 @@ public class MainCtrl {
                 embeddedFile.getName());
         String fileName = StringUtils.replace(embeddedFile.getName(), " ", "%20");
         String toDelete = "";
-        if(embeddedFile.getType().contains("image"))
+        if (embeddedFile.getType().contains("image"))
             toDelete = "!";
         toDelete = toDelete + "[" + fileName + "](" + noteServerUtils.getServerAddress()
                 + "api/files/" + notesList.getSelectionModel().getSelectedItem().getTitle()
@@ -960,6 +930,16 @@ public class MainCtrl {
     }
 
     /**
+     * Opens the "Network" scene to manage the data on different servers.
+     */
+    public void showNetworkMenu() {
+        Stage secondaryStage = new Stage();
+        secondaryStage.titleProperty().bind(props.get("network"));
+        secondaryStage.setScene(networkMenu);
+        secondaryStage.show();
+    }
+
+    /**
      * Reloads all the elements inside the collections dropdown menu.
      */
     public void populateCollectionsDropdown() {
@@ -1023,6 +1003,7 @@ public class MainCtrl {
 
     /**
      * Helper method that adds a box for a file
+     *
      * @param embeddedFile File that the HBox is based on
      */
 
@@ -1037,7 +1018,7 @@ public class MainCtrl {
         renameButton.setOnAction(e -> handleRenameFile(fileNameLabel, embeddedFile));
 
         Button deleteButton = new Button("ⓧ");
-        deleteButton.setOnAction(e -> handleDeleteFile(fileContainer,embeddedFile));
+        deleteButton.setOnAction(e -> handleDeleteFile(fileContainer, embeddedFile));
 
         fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
 

@@ -1,4 +1,4 @@
-package client.utils;
+package client.utils.file;
 
 
 import commons.EmbeddedFile;

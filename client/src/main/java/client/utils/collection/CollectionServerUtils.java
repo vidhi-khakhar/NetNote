@@ -8,12 +8,10 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
-import org.jvnet.hk2.annotations.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
 public class CollectionServerUtils {
 
     private final ObjectMapper mapper;
