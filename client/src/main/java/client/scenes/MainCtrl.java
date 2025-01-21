@@ -28,6 +28,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -138,6 +139,9 @@ public class MainCtrl {
 
     @FXML
     private Button networkButton;
+
+    @FXML
+    private Text selectedLanguageLabel;
 
     /**
      * Initializes the controller.
@@ -824,6 +828,8 @@ public class MainCtrl {
         } else {
             selectedLanguageImage.setImage(new Image(imageURL.toExternalForm()));
         }
+        selectedLanguageLabel.textProperty().bind(props.get(langUtils.getLabelFromLocale(l)));
+
         configLoader.setLocale(l);
         langUtils.setLocale(l);
         if (areMarkdownProblemsShown) renderMarkdownProblems();
