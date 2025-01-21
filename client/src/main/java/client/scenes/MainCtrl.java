@@ -37,6 +37,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -441,6 +443,7 @@ public class MainCtrl {
     public void commitDeleteNote(int noteIndex) {
         noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle());
         savedNotes.remove(noteIndex);
+        filesHBox.getChildren().clear();
         if (!savedNotes.isEmpty()) {
             int newIndex = Math.min(noteIndex, savedNotes.size() - 1);
             notesList.getSelectionModel().select(newIndex);
@@ -729,15 +732,7 @@ public class MainCtrl {
                     }
 
                     addFileElement(embeddedFile);
-                    String toAdd = "";
-                    if (embeddedFile.getType().contains("image"))
-                        toAdd = "!";
-                    toAdd = toAdd + "[" + embeddedFile.getName() + "]("
-                            + noteServerUtils.getServerAddress() + "api/files/"
-                            + notesList.getSelectionModel().getSelectedItem().getTitle()
-                            + "/content/" +
-                            embeddedFile.getName() + ")";
-                    toAdd = StringUtils.replace(toAdd, " ", "%20");
+                    String toAdd = constructLink(embeddedFile);
                     noteEditor.appendText(toAdd);
                     updateDisplay();
                 } else
@@ -748,9 +743,7 @@ public class MainCtrl {
                         props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
             }
         }
-
     }
-
 
     /**
      * Renaming a file Pop-up
@@ -770,12 +763,11 @@ public class MainCtrl {
             embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
                     notesList.getSelectionModel().getSelectedItem().getTitle(),
                     embeddedFile.getName(), result.get());
-            newTitle = StringUtils.replace(newTitle, " ", "%20");
-            String editorResult = StringUtils.replace(noteEditor.getText(),
-                    StringUtils.replace(embeddedFile.getName(),
-                            " ", "%20"), newTitle);
-            noteEditor.setText(editorResult);
+            String oldLink = constructLink(embeddedFile);
             embeddedFile.setName(newTitle);
+            String newLink = constructLink(embeddedFile);
+            String editorResult = StringUtils.replace(noteEditor.getText(), oldLink, newLink);
+            noteEditor.setText(editorResult);
             updateDisplay();
         }
     }
@@ -788,14 +780,7 @@ public class MainCtrl {
         embeddedFileServerUtils.deleteEmbeddedFile(noteServerUtils.getServerAddress(),
                 notesList.getSelectionModel().getSelectedItem().getTitle(),
                 embeddedFile.getName());
-        String fileName = StringUtils.replace(embeddedFile.getName(), " ", "%20");
-        String toDelete = "";
-        if (embeddedFile.getType().contains("image"))
-            toDelete = "!";
-        toDelete = toDelete + "[" + fileName + "](" + noteServerUtils.getServerAddress()
-                + "api/files/" + notesList.getSelectionModel().getSelectedItem().getTitle()
-                + "/content/" + fileName + ")";
-        toDelete = StringUtils.replace(toDelete, " ", "%20");
+        String toDelete = constructLink(embeddedFile);
         String result = StringUtils.remove(noteEditor.getText(), toDelete);
         noteEditor.setText(result);
         filesHBox.getChildren().remove(fileContainer);
@@ -954,5 +939,19 @@ public class MainCtrl {
         fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
 
         filesHBox.getChildren().add(fileContainer);
+    }
+
+    public String constructLink(EmbeddedFile embeddedFile) {
+        String toAdd = "";
+        if (embeddedFile.getType().contains("image"))
+            toAdd = "!";
+        String fileName = URLEncoder.encode(embeddedFile.getName(),
+                StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+        String noteName = URLEncoder.encode(notesList.getSelectionModel().getSelectedItem().getTitle(),
+                StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+        toAdd = toAdd + "[" + embeddedFile.getName() + "]("
+                + noteServerUtils.getServerAddress() + "api/files/" + noteName
+                + "/content/" + fileName + ")";
+        return toAdd;
     }
 }
