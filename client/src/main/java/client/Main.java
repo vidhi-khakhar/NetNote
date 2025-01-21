@@ -64,7 +64,8 @@ public class Main extends Application {
         var editCollectionsMenu =
                 FXML.load(EditCollectionsCtrl.class, "client", "scenes", "EditCollections.fxml");
         var networkMenu = FXML.load(MainCtrl.class, "client", "scenes", "NetworkMenu.fxml");
-        var shortcutsOverview = FXML.load(EditCollectionsCtrl.class, "client", "scenes", "ShortcutWindow.fxml");
+        var shortcutsOverview =
+                FXML.load(EditCollectionsCtrl.class, "client", "scenes", "ShortcutWindow.fxml");
 
         var mainViewScene = new Scene(mainView.getValue());
         var editCollectionsMenuScene = new Scene(editCollectionsMenu.getValue());
