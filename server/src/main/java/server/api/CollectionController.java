@@ -13,6 +13,7 @@ import server.database.NoteRepository;
 import server.utils.ServerUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/collections/")
@@ -22,6 +23,7 @@ public class CollectionController {
     private final CollectionContainsNotesRepository collectionContainsNotesRepository;
     private final ServerUtils serverUtils;
     private final NoteRepository noteRepository;
+    private final List<CollectionContainsNotes> data = new ArrayList<>();
 
     /**
      * Constructor for the collection controller.
@@ -175,14 +177,16 @@ public class CollectionController {
                     .body(null);
         }
 
-        List<Note> notes = collectionContainsNotesRepository
-                .findAll()
-                .stream()
-                .filter(entry -> entry.getCollectionId().equals(uniqueName))
-                .map(CollectionContainsNotes::getNoteId)
-                .map(noteId -> noteRepository.findById(noteId).orElse(null))
-                .filter(Objects::nonNull)
-                .toList();
+        // Use the repository to find all relationships for the given collection ID
+        List<CollectionContainsNotes> relationships = collectionContainsNotesRepository
+                .findByCollectionId(uniqueName);
+
+        // Map the relationships to notes using the noteId
+        List<Note> notes = relationships.stream()
+                .map(relationship -> noteRepository.findById(relationship.getId().getNoteId())
+                        .orElse(null))
+                .filter(Objects::nonNull)  // filter out null notes
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(notes);
     }
@@ -205,7 +209,7 @@ public class CollectionController {
                     .body("Collection with the specified unique name does not exist.");
         }
 
-        Optional<Note> noteOptional = serverUtils.getNoteByTitle(noteTitle);
+        Optional<Note> noteOptional = noteRepository.findByTitle(noteTitle);
 
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
