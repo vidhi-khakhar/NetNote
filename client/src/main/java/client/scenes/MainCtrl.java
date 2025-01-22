@@ -1087,6 +1087,18 @@ public class MainCtrl {
             });
             collectionDropdown.getItems().add(itemCollection);
         }
+        MenuItem itemAll = new MenuItem("All");
+        itemAll.setOnAction(_ -> {
+            Set setOfNotes = new HashSet<>();
+            for(Collection collection : configLoader.getCollections()) {
+                for(Note note : collectionServerUtils.getAllNotesInCollection(
+                        collection.getCollectionUniqueName(),collection.getServer())) {
+                    setOfNotes.add(note);
+                }
+            }
+            processNotes(setOfNotes.stream().toList());
+        });
+        collectionDropdown.getItems().add(itemAll);
         collectionDropdown.getItems().add(editCollectionsDropdownOption);
     }
 
