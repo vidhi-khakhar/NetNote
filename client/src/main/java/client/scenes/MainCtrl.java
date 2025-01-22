@@ -53,6 +53,7 @@ public class MainCtrl {
     private Scene editCollectionsMenu;
     private Scene mainView;
     private Scene networkMenu;
+    private Scene shortcutsOverview;
     private Stage stage;
     private Label noNotesMatchYourQueryLabel;
     private Collection currentCollection;
@@ -149,11 +150,13 @@ public class MainCtrl {
      * @param mainView            Holds a reference to the MainView scene.
      * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
      * @param networkMenu         Holds a reference to the NetworkMenu scene.
+     * @param shortcutsOverview   Holds a reference to the shortcutsOverview scene.
      */
     public void initialize(Stage stage,
                            Scene mainView,
                            Scene editCollectionsMenu,
-                           Scene networkMenu) {
+                           Scene networkMenu,
+                           Scene shortcutsOverview) {
         if (configLoader.getCollections().size() == 1 &&
                 configLoader.getCollections().getFirst().getAlias().equals("Main")) {
             Collection defaultMainCollection = new Collection(
@@ -173,6 +176,7 @@ public class MainCtrl {
         this.stage = stage;
         this.mainView = mainView;
         this.editCollectionsMenu = editCollectionsMenu;
+        this.shortcutsOverview = shortcutsOverview;
         this.networkMenu = networkMenu;
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
@@ -1110,5 +1114,14 @@ public class MainCtrl {
         fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
 
         filesHBox.getChildren().add(fileContainer);
+    }
+
+    /**
+     * Opens the "Edit Collections" scene to manage the current collections
+     */
+    public void showShortcutsOverview() {
+        Stage secondaryStage = new Stage();
+        secondaryStage.setScene(shortcutsOverview);
+        secondaryStage.show();
     }
 }
