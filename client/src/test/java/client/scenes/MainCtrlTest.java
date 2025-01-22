@@ -1,6 +1,7 @@
 package client.scenes;
 
 import commons.Note;
+import commons.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.junit.jupiter.api.*;
@@ -146,4 +147,36 @@ class MainCtrlTest {
         List<File> cssFiles = List.of(f2, f3);
         assertEquals("multipleCssFiles", sut.getCssLabel(cssFiles));
     }
+
+    @Test
+    public void testGetAliasToUniqueNameMap() {
+        List<Collection> collections = List.of(
+                new Collection("name 1", "Alias1", "server"),
+                new Collection("name 2", "Alias2", "server")
+        );
+
+        Map<String, String> result = sut.getAliasToUniqueNameMap(collections);
+        Map<String, String> expected = Map.of(
+                "Alias1", "name 1",
+                "Alias2", "name 2"
+        );
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testGetOtherCollectionsAliases() {
+        List<Collection> collections = List.of(
+                new Collection("name 1", "Alias1", "server"),
+                new Collection("name 2", "Alias2", "server"),
+                new Collection("name 3", "Alias3", "server")
+        );
+
+        List<String> result = sut.getOtherCollectionsAliases(collections, collections.getFirst().getAlias());
+
+        List<String> expected = List.of("Alias2", "Alias3");
+
+        assertEquals(expected, result);
+    }
+
 }
