@@ -9,6 +9,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -68,6 +69,9 @@
                            <Image url="@/images/icons/add.png" />
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="%label.addDialogTitle" />
+                     </tooltip>
                   </Button>
                   <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
                      <HBox.margin>
@@ -81,6 +85,9 @@
                            <Image url="@/images/icons/delete.png" />
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="%label.deleteNoteConfirmationTitle" />
+                     </tooltip>
                   </Button>
                   <Button fx:id="moveNoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleMoveNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #ffcbcb; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
                   <HBox.margin>
@@ -94,6 +101,9 @@
                            <Image url="@/images/icons/move.png" />
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="%label.moveNoteTooltip" />
+                     </tooltip>
                   </Button>
                   <Button layoutX="35.0" layoutY="10.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
                      <HBox.margin>
@@ -107,6 +117,9 @@
                            <Image url="@/images/icons/refresh.png" />
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="%label.refresh" />
+                     </tooltip>
                   </Button>
                </HBox>
             </VBox>
@@ -156,6 +169,9 @@
                            <Image url="@/images/icons/upload.png" />
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="%label.uploadFileTooltip" />
+                     </tooltip>
                      </Button>
                </HBox>
             </VBox>
@@ -233,6 +249,9 @@
                         <Image url="@/images/icons/info.png" />
                      </ImageView>
                   </graphic>
+                  <tooltip>
+                     <Tooltip text="%label.showShortcutsTooltip" />
+                  </tooltip>
                </Button>
             </HBox>
          </HBox>
