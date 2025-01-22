@@ -13,7 +13,6 @@ import server.database.NoteRepository;
 import server.utils.ServerUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/collections/")
