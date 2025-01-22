@@ -1087,7 +1087,7 @@ public class MainCtrl {
             });
             collectionDropdown.getItems().add(itemCollection);
         }
-        MenuItem itemAll = new MenuItem("All");
+        MenuItem itemAll = new MenuItem(props.get("AllCollectionDropdown").get());
         itemAll.setOnAction(_ -> {
             Set setOfNotes = new HashSet<>();
             for(Collection collection : configLoader.getCollections()) {
