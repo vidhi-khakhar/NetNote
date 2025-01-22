@@ -263,8 +263,8 @@ public class MainCtrl {
                 case "Ctrl+B" -> applyMarkdownShortcut("**", "**");
                 case "Ctrl+I" -> applyMarkdownShortcut("*", "*");
                 case "Ctrl+U" -> applyMarkdownShortcut("<u>", "</u>");
-                case "Ctrl+Alt+L" -> cycleLanguage(false);
-                case "Ctrl+Alt+Shift+L" -> cycleLanguage(true);
+                case "Ctrl+L" -> cycleLanguage(false);
+                case "Ctrl+Shift+L" -> cycleLanguage(true);
             }
         });
     }
@@ -895,7 +895,7 @@ public class MainCtrl {
             case "nl-NL" -> 1;
             case "ro-RO" -> 2;
             case "pl-PL" -> 3;
-            default -> 0;
+            default -> 0; // English (case "en") is covered by the default case
         };
         selectedLanguageLabel.textProperty().bind(props.get(langUtils.getLabelFromLocale(l)));
 

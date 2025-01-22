@@ -67,6 +67,8 @@ public class Notification {
             }).start()
         );
         timelineIN.play();
+
+        main.requestFocus(); // Ensures the main view does not lose focus
     }
 
     /**
