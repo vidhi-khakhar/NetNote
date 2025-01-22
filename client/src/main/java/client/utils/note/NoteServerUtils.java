@@ -18,7 +18,9 @@ package client.utils.note;
 import commons.Note;
 
 import java.net.InetAddress;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -172,6 +174,8 @@ public class NoteServerUtils {
             // Build the Jersey client
             Client client = ClientBuilder.newClient();
 
+            title = URLEncoder.encode(title, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+
             // Perform the POST request with the X-HTTP-Method-Override header
             Response response = client.target(serverAddress)
                     .path("api/notes/" + title)
@@ -199,6 +203,7 @@ public class NoteServerUtils {
      * @param title - The title of the note to be deleted.
      */
     public void deleteNote(String title) {
+        title = URLEncoder.encode(title, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         try {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress + "api/notes/" + title)
