@@ -9,6 +9,8 @@ import jakarta.ws.rs.core.*;
 import org.glassfish.jersey.client.ClientConfig;
 
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +51,7 @@ public class EmbeddedFileServerUtils {
      */
     public List<EmbeddedFile> getFilesFromNote(String serverAddress, String noteName) {
         List<EmbeddedFile> files = new ArrayList<>();
+        noteName = URLEncoder.encode(noteName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         try {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress + "api/files/notes/" + noteName)
@@ -79,6 +82,7 @@ public class EmbeddedFileServerUtils {
      * @return sm
      */
     public boolean storeEmbeddedFile(String serverAddress, String noteName, EmbeddedFile file) {
+        noteName = URLEncoder.encode(noteName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         try {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress + "api/files/" + noteName)
@@ -111,6 +115,7 @@ public class EmbeddedFileServerUtils {
      */
     public void renameEmbeddedFile(String serverAddress,String noteName,
                                    String oldTitle, String newTitle) {
+        oldTitle = URLEncoder.encode(oldTitle, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         try {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress)
@@ -144,6 +149,8 @@ public class EmbeddedFileServerUtils {
      * @param fileName - Name of the file to be deleted.
      */
     public void deleteEmbeddedFile(String serverAddress, String noteName, String fileName) {
+        noteName = URLEncoder.encode(noteName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+        fileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         try {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress + "api/files/" + noteName + "/content/" + fileName)
