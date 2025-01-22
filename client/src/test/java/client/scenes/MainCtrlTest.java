@@ -149,7 +149,7 @@ class MainCtrlTest {
     }
 
     @Test
-    public void testGetAliasToUniqueNameMap() {
+    public void getAliasToUniqueNameMapTest() {
         List<Collection> collections = List.of(
                 new Collection("name 1", "Alias1", "server"),
                 new Collection("name 2", "Alias2", "server")
@@ -165,7 +165,7 @@ class MainCtrlTest {
     }
 
     @Test
-    public void testGetOtherCollectionsAliases() {
+    public void getOtherCollectionsAliasesTest() {
         List<Collection> collections = List.of(
                 new Collection("name 1", "Alias1", "server"),
                 new Collection("name 2", "Alias2", "server"),
