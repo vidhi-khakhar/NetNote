@@ -70,7 +70,7 @@
                         </ImageView>
                      </graphic>
                      <tooltip>
-                        <Tooltip text="%label.addDialogTitle" />
+                        <Tooltip fx:id="tooltipAddNote" text="%label.addDialogTitle" />
                      </tooltip>
                   </Button>
                   <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
@@ -86,7 +86,7 @@
                         </ImageView>
                      </graphic>
                      <tooltip>
-                        <Tooltip text="%label.deleteNoteConfirmationTitle" />
+                        <Tooltip fx:id="tooltipDeleteNote" text="%label.deleteNoteConfirmationTitle" />
                      </tooltip>
                   </Button>
                   <Button fx:id="moveNoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleMoveNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #ffcbcb; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
@@ -102,7 +102,7 @@
                         </ImageView>
                      </graphic>
                      <tooltip>
-                        <Tooltip text="%label.moveNoteTooltip" />
+                        <Tooltip fx:id="tooltipMoveNote" text="%label.moveNoteTooltip" />
                      </tooltip>
                   </Button>
                   <Button layoutX="35.0" layoutY="10.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
@@ -118,7 +118,7 @@
                         </ImageView>
                      </graphic>
                      <tooltip>
-                        <Tooltip text="%label.refresh" />
+                        <Tooltip fx:id="tooltipRefresh" text="%label.refresh" />
                      </tooltip>
                   </Button>
                </HBox>
@@ -170,7 +170,7 @@
                         </ImageView>
                      </graphic>
                      <tooltip>
-                        <Tooltip text="%label.uploadFileTooltip" />
+                        <Tooltip fx:id="tooltipUploadFile" text="%label.uploadFileTooltip" />
                      </tooltip>
                      </Button>
                </HBox>
@@ -250,7 +250,7 @@
                      </ImageView>
                   </graphic>
                   <tooltip>
-                     <Tooltip text="%label.showShortcutsTooltip" />
+                     <Tooltip fx:id="tooltipShowShortcuts" text="%label.showShortcutsTooltip" />
                   </tooltip>
                </Button>
             </HBox>

@@ -153,6 +153,24 @@ public class MainCtrl {
     @FXML
     private MenuButton languageDropdown;
 
+    @FXML
+    private Tooltip tooltipAddNote;
+
+    @FXML
+    private Tooltip tooltipDeleteNote;
+
+    @FXML
+    private Tooltip tooltipMoveNote;
+
+    @FXML
+    private Tooltip tooltipRefresh;
+
+    @FXML
+    private Tooltip tooltipUploadFile;
+
+    @FXML
+    private Tooltip tooltipShowShortcuts;
+
     /**
      * Initializes the controller.
      *
@@ -292,6 +310,12 @@ public class MainCtrl {
                 props.get("collectionsDropdownEditCollections"));
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
         networkButton.textProperty().bind(props.get("network"));
+        tooltipAddNote.textProperty().bind(props.get("addDialogTitle"));
+        tooltipDeleteNote.textProperty().bind(props.get("deleteNoteConfirmationTitle"));
+        tooltipMoveNote.textProperty().bind(props.get("moveNoteTooltip"));
+        tooltipRefresh.textProperty().bind(props.get("refresh"));
+        tooltipUploadFile.textProperty().bind(props.get("uploadFileTooltip"));
+        tooltipShowShortcuts.textProperty().bind(props.get("showShortcutsTooltip"));
 
         setLocale(configLoader.getLocale());
     }
