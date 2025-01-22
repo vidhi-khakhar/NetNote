@@ -229,7 +229,7 @@ public class MainCtrl {
         updateDisplay();
     }
 
-    private void initializeShortcuts() {
+    private void initializeShortcuts(){
         mainView.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             List<String> eventKeys = new ArrayList<>();
             if (event.isControlDown()) eventKeys.add("Ctrl");
@@ -886,7 +886,8 @@ public class MainCtrl {
 
                     addFileElement(embeddedFile);
                     String toAdd = constructLink(embeddedFile);
-                    noteEditor.appendText(toAdd);
+                    int caretPos = noteEditor.getCaretPosition();
+                    noteEditor.insertText(caretPos, toAdd);
                     updateDisplay();
                 } else
                     System.out.println("No file detected");
