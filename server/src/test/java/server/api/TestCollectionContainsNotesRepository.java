@@ -201,4 +201,14 @@ public class TestCollectionContainsNotesRepository implements CollectionContains
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public List<CollectionContainsNotes> findByCollectionId(String collectionId) {
+        return List.of();
+    }
+
+    @Override
+    public List<CollectionContainsNotes> findByNoteId(Long noteId) {
+        return List.of();
+    }
 }
