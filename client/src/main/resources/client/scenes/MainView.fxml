@@ -71,6 +71,14 @@
                         <Font size="14.0" />
                      </font>
                   </Button>
+                  <Button fx:id="moveNoteButton" mnemonicParsing="false" onAction="#handleMoveNote" prefHeight="26.0" prefWidth="50.0" style="-fx-background-color:	#ffcbcb; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="→">
+                  <HBox.margin>
+                     <Insets left="5.0" />
+                  </HBox.margin>
+                  <font>
+                     <Font size="14.0" />
+                  </font>
+                  </Button>
                   <Button layoutX="35.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="⟳">
                      <HBox.margin>
                         <Insets left="5.0" right="10.0" />

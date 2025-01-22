@@ -2,8 +2,10 @@ package client.utils;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.TextInputDialog;
 
+import java.util.List;
 import java.util.Optional;
 
 public class UiUtils {
@@ -41,6 +43,25 @@ public class UiUtils {
         dialog.setTitle(title);
         dialog.setContentText(content);
         dialog.setHeaderText(header);
+        return dialog.showAndWait();
+    }
+
+    /**
+     * Shows a choice dialog for the user to select an option from a dropdown list.
+     *
+     * @param title      The title of the dialog window
+     * @param header     The header text of the dialog.
+     * @param content    The text displayed in the dialog.
+     * @param choices    The list of choices the user can select from.
+     * @param defaultChoice The default choice to be preselected.
+     * @return The user's selected choice wrapped in an {@link Optional}.
+     */
+    public Optional<String> showChoiceDialog
+    (String title, String header, String content, List<String> choices, String defaultChoice) {
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(defaultChoice, choices);
+        dialog.setTitle(title);
+        dialog.setHeaderText(header);
+        dialog.setContentText(content);
         return dialog.showAndWait();
     }
 }
