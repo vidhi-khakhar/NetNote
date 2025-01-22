@@ -101,7 +101,8 @@ public class CollectionServerUtils {
 
             String jsonData = mapper.writeValueAsString(updatedCollection);
 
-            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
 
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/" + uniqueName)
@@ -129,7 +130,8 @@ public class CollectionServerUtils {
      */
     public void deleteCollection(String uniqueName, String serverAddress) {
         try {
-            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/" + uniqueName)
                     .request(MediaType.APPLICATION_JSON)
@@ -157,7 +159,8 @@ public class CollectionServerUtils {
      */
     public List<Note> getAllNotesInCollection(String uniqueName, String serverAddress) {
         try {
-            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/" + uniqueName + "/notes/")
                     .request(MediaType.APPLICATION_JSON)
@@ -188,8 +191,10 @@ public class CollectionServerUtils {
      */
     public void addNoteToCollection(String uniqueName, String noteTitle, String serverAddress) {
         try {
-            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
-            noteTitle = URLEncoder.encode(noteTitle, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+            noteTitle = URLEncoder.encode(noteTitle, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/" + uniqueName + "/notes/" + noteTitle)
                     .request(MediaType.APPLICATION_JSON)
@@ -220,9 +225,12 @@ public class CollectionServerUtils {
     public void moveNoteToAnotherCollection
     (String uniqueName, String noteTitle, String targetUniqueName, String serverAddress) {
         try {
-            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
-            noteTitle = URLEncoder.encode(noteTitle, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
-            targetUniqueName = URLEncoder.encode(targetUniqueName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+            noteTitle = URLEncoder.encode(noteTitle, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+            targetUniqueName = URLEncoder.encode(targetUniqueName, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
             var response = ClientBuilder.newClient()
                     .target(serverAddress + "api/collections/"
                             + uniqueName + "/notes/"
@@ -255,7 +263,8 @@ public class CollectionServerUtils {
     public void removeNoteFromCollection(String collectionName,
                                          String noteTitle,
                                          String serverAddress) {
-        collectionName = URLEncoder.encode(collectionName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+        collectionName = URLEncoder.encode(collectionName, StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
         noteTitle = URLEncoder.encode(noteTitle, StandardCharsets.UTF_8);
         try {
             var response = ClientBuilder.newClient()
