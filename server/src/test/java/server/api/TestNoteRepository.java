@@ -202,4 +202,14 @@ public class TestNoteRepository implements NoteRepository {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public Optional<Note> findByTitle(String title) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Note> findByTextContaining(String text) {
+        return List.of();
+    }
 }
