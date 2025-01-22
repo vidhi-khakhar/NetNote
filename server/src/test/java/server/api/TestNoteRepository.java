@@ -204,12 +204,13 @@ public class TestNoteRepository implements NoteRepository {
     }
 
     @Override
-    public Optional<Note> findByTitle(String title) {
-        return Optional.empty();
+    public Optional<Note> findByTitle(String title) {;
+        return Optional.of(new Note("Test Title", "Test Content"));
     }
 
     @Override
     public List<Note> findByTextContaining(String text) {
         return List.of();
     }
+
 }
