@@ -3,8 +3,6 @@ package server.database;
 import commons.Note;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,10 +15,4 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
      */
     Optional<Note> findByTitle(String title);
 
-    /**
-     * Method to retrieve notes by some of their text.
-     * @param text A portion of the text to search for in notes.
-     * @return A list of notes that contain the given text.
-     */
-    List<Note> findByTextContaining(String text);
 }

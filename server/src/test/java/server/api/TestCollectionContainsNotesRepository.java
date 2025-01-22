@@ -6,6 +6,7 @@ import server.database.CollectionContainsNotesRepository;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -204,11 +205,19 @@ public class TestCollectionContainsNotesRepository implements CollectionContains
 
     @Override
     public List<CollectionContainsNotes> findByCollectionId(String collectionId) {
-        return List.of();
+        return relationships.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().getCollectionId().equals(collectionId)) // Match collection ID
+                .map(Map.Entry::getValue) // Extract the relationship object
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<CollectionContainsNotes> findByNoteId(Long noteId) {
-        return List.of();
+        return relationships.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().getNoteId().equals(noteId)) // Match note ID
+                .map(Map.Entry::getValue) // Extract the relationship object
+                .collect(Collectors.toList());
     }
 }

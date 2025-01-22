@@ -204,13 +204,11 @@ public class TestNoteRepository implements NoteRepository {
     }
 
     @Override
-    public Optional<Note> findByTitle(String title) {;
-        return Optional.of(new Note("Test Title", "Test Content"));
+    public Optional<Note> findByTitle(String title) {
+        return notes.values().stream() // Stream through all values in the map
+                .filter(note -> note.getTitle().equals(title)) // Filter by title
+                .findFirst(); // Return the first match as Optional
     }
 
-    @Override
-    public List<Note> findByTextContaining(String text) {
-        return List.of();
-    }
 
 }
