@@ -43,6 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainCtrl {
 
@@ -54,6 +55,7 @@ public class MainCtrl {
     private Scene editCollectionsMenu;
     private Scene mainView;
     private Scene networkMenu;
+    private Scene shortcutsOverview;
     private Stage stage;
     private Label noNotesMatchYourQueryLabel;
     private Collection currentCollection;
@@ -150,11 +152,13 @@ public class MainCtrl {
      * @param mainView            Holds a reference to the MainView scene.
      * @param editCollectionsMenu Holds a reference to the EditCollections menu scene.
      * @param networkMenu         Holds a reference to the NetworkMenu scene.
+     * @param shortcutsOverview   Holds a reference to the shortcutsOverview scene.
      */
     public void initialize(Stage stage,
                            Scene mainView,
                            Scene editCollectionsMenu,
-                           Scene networkMenu) {
+                           Scene networkMenu,
+                           Scene shortcutsOverview) {
         if (configLoader.getCollections().size() == 1 &&
                 configLoader.getCollections().getFirst().getAlias().equals("Main")) {
             Collection defaultMainCollection = new Collection(
@@ -174,6 +178,7 @@ public class MainCtrl {
         this.stage = stage;
         this.mainView = mainView;
         this.editCollectionsMenu = editCollectionsMenu;
+        this.shortcutsOverview = shortcutsOverview;
         this.networkMenu = networkMenu;
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
@@ -510,6 +515,92 @@ public class MainCtrl {
     }
 
     /**
+     * Moves a note from currently selected collection to the one chosen by the user.
+     */
+    public void handleMoveNote() {
+        if (notesList.getSelectionModel().getSelectedItem() == null) {
+            uiUtils.showPopUp(
+                    props.get("noNoteSelectedTitle").get(),
+                    props.get("noNoteSelectedMessage").get(),
+                    Alert.AlertType.WARNING
+            );
+            return;
+        }
+
+        List<Collection> collections = configLoader.getCollections();
+        Note selectedNote = notesList.getSelectionModel().getSelectedItem();
+        Map<String, String> aliasToUniqueNameMap =
+                getAliasToUniqueNameMap(configLoader.getCollections());
+        List<String> otherCollectionsAliases = getOtherCollectionsAliases
+                (configLoader.getCollections(), currentCollection.getAlias());
+
+        if (otherCollectionsAliases.isEmpty()) {
+            uiUtils.showPopUp(
+                    props.get("noOtherCollectionsTitle").get(),
+                    props.get("noOtherCollectionsMessage").get(),
+                    Alert.AlertType.INFORMATION
+            );
+            return;
+        }
+
+        Optional<String> result = uiUtils.showChoiceDialog(
+                props.get("moveNoteDialogTitle").get(),
+                String.format(props.get("moveNoteDialogHeader").get(), selectedNote.getTitle()),
+                props.get("moveNoteDialogContent").get(),
+                otherCollectionsAliases,
+                currentCollection.getAlias()
+        );
+
+
+        if (result.isEmpty()) {
+            return;
+        }
+        String targetCollectionAlias = result.get();
+
+        collectionServerUtils.moveNoteToAnotherCollection(
+                currentCollection.getCollectionUniqueName(),
+                selectedNote.getTitle(),
+                aliasToUniqueNameMap.get(targetCollectionAlias),
+                noteServerUtils.getServerAddress()
+        );
+
+        processNotes(collectionServerUtils.getAllNotesInCollection(
+                currentCollection.getCollectionUniqueName(),
+                currentCollection.getServer()
+        ));
+    }
+
+    /**
+     * Creates a List of all collections Aliases,
+     * without the one currently displayed.
+     *
+     * @param collections The list of current collections.
+     * @param currentAlias The alias of currently displayed collection.
+     * @return A list of Aliases of other collections.
+     */
+    public List<String> getOtherCollectionsAliases
+    (List<Collection> collections, String currentAlias) {
+        return collections.stream()
+                .map(Collection::getAlias)
+                .filter(alias -> !alias.equals(currentAlias))
+                .toList();
+    }
+
+    /**
+     * Generates a map that connects each collection alias with its unique name.
+     *
+     * @param collections The list of collections to process.
+     * @return A map where the key is the collection alias, and the value is the unique name.
+     */
+    public Map<String, String> getAliasToUniqueNameMap
+    (List<Collection> collections) {
+        return collections.stream()
+                .collect(Collectors.toMap
+                        (Collection::getAlias, Collection::getCollectionUniqueName));
+    }
+
+
+    /**
      * Updates the contents of the editor and the rendered view
      * after the user select a different note to load.
      *
@@ -743,11 +834,16 @@ public class MainCtrl {
         Note currentNote = notesList.getSelectionModel().getSelectedItem();
 
         if (query.isBlank()) {
-            notesList.setItems(FXCollections.observableArrayList(savedNotes));
+            processNotes(collectionServerUtils
+                    .getAllNotesInCollection(currentCollection.getCollectionUniqueName(),
+                            currentCollection.getServer()));
             return;
         }
 
-        List<Note> searchedNotes = NoteSearchUtils.search(savedNotes, query);
+        List<Note> searchedNotes = NoteSearchUtils.search(collectionServerUtils
+                        .getAllNotesInCollection(currentCollection.getCollectionUniqueName(),
+                                currentCollection.getServer())
+                , query);
         ObservableList<Note> filteredNotes = FXCollections.observableArrayList(searchedNotes);
         notesList.setItems(filteredNotes);
 
@@ -800,7 +896,9 @@ public class MainCtrl {
                         props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
             }
         }
+
     }
+
 
     /**
      * Renaming a file Pop-up
@@ -953,6 +1051,13 @@ public class MainCtrl {
      * @param notesInCollection The list of notes in the currently selected collection.
      */
     public void processNotes(List<Note> notesInCollection) {
+
+        if (notesInCollection.isEmpty()) {
+            notesList.setItems(FXCollections.observableArrayList());
+            notesList.setPlaceholder(new Label(props.get("noNotesInCollection").get()));
+            return;
+        }
+
         Note currentNote = notesList.getSelectionModel().getSelectedItem();
 
         List<Note> matchedRetrievedNotesWithActualNotes = new ArrayList<>();
@@ -1017,5 +1122,14 @@ public class MainCtrl {
                 + noteServerUtils.getServerAddress() + "api/files/" + noteName
                 + "/content/" + fileName + ")";
         return toAdd;
+    }
+
+    /**
+     * Opens the "Edit Collections" scene to manage the current collections
+     */
+    public void showShortcutsOverview() {
+        Stage secondaryStage = new Stage();
+        secondaryStage.setScene(shortcutsOverview);
+        secondaryStage.show();
     }
 }
