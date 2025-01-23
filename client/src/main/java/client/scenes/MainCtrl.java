@@ -900,7 +900,7 @@ public class MainCtrl {
                             Files.readAllBytes(file.toPath()),
                             notesList.getSelectionModel().getSelectedItem());
                     if (!embeddedFileServerUtils.storeEmbeddedFile
-                            (noteServerUtils.getServerAddress(),
+                            (currentCollection.getServer(),
                                     notesList.getSelectionModel().getSelectedItem().getTitle(),
                                     embeddedFile)) {
                         uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
@@ -914,6 +914,7 @@ public class MainCtrl {
                     int caretPos = noteEditor.getCaretPosition();
                     noteEditor.insertText(caretPos, toAdd);
                     updateDisplay();
+                    undoHandler.pushAction(new AddFileAction(embeddedFile, this));
                 } else
                     System.out.println("No file detected");
 
@@ -925,6 +926,36 @@ public class MainCtrl {
 
     }
 
+    /**
+     * Undoes the addition of a file (only works in the current collection)
+     *
+     * @param file The file to be removed
+     */
+    public void undoAddFile(EmbeddedFile file) {
+        handleDeleteFile((HBox) filesHBox
+                .getChildren()
+                .stream()
+                .filter(fc -> fc.getId().equals(file.getName()))
+                .findFirst()
+                .get(), file);
+    }
+
+    /**
+     * Redoes the addition of a file
+     *
+     * @param file The file to be added again
+     * @throws Exception If the file cannot be stored
+     */
+    public void redoAddFile(EmbeddedFile file) throws Exception {
+        if (!embeddedFileServerUtils.storeEmbeddedFile(currentCollection.getServer(),
+                notesList.getSelectionModel().getSelectedItem().getTitle(),
+                file)) throw new Exception("Cannot store the given file");
+        addFileElement(file);
+        String toAdd = constructLink(file);
+        int caretPos = noteEditor.getCaretPosition();
+        noteEditor.insertText(caretPos, toAdd);
+        updateDisplay();
+    }
 
     /**
      * Renaming a file Pop-up
@@ -1161,6 +1192,7 @@ public class MainCtrl {
         HBox fileContainer = new HBox(5);
         fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
                 " -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
+        fileContainer.setId(embeddedFile.getName());
 
         Label fileNameLabel = new Label(embeddedFile.getName());
 
