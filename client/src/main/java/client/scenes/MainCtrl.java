@@ -524,7 +524,7 @@ public class MainCtrl {
     public void commitDeleteNote(int noteIndex) {
         noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle());
         savedNotes.remove(noteIndex);
-        // filesHBox.getChildren().clear();
+        filesListView.getItems().clear();
         if (!savedNotes.isEmpty()) {
             int newIndex = Math.min(noteIndex, savedNotes.size() - 1);
             notesList.getSelectionModel().select(newIndex);
@@ -629,7 +629,7 @@ public class MainCtrl {
         if (note != null) {
             noteTitleInput.setText(note.getTitle());
             noteEditor.setText(note.getText());
-            // filesHBox.getChildren().clear();
+            filesListView.getItems().clear();
             content = note.getText();
 
             renderedNoteTitleLabel.textProperty().unbind();
