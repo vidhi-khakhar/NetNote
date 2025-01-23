@@ -33,6 +33,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -1077,7 +1078,6 @@ public class MainCtrl {
                             Files.readAllBytes(file.toPath()),
                             notesList.getSelectionModel().getSelectedItem());
 
-                    // Store the file on the server
                     if (!embeddedFileServerUtils.storeEmbeddedFile
                             (noteServerUtils.getServerAddress(),
                                     notesList.getSelectionModel().getSelectedItem().getTitle(),
@@ -1088,10 +1088,8 @@ public class MainCtrl {
                         return;
                     }
 
-                    // Add the file element to the ListView
                     addFileElement(embeddedFile);
 
-                    // Insert a link to the file in the note editor
                     String toAdd = constructLink(embeddedFile);
                     int caretPos = noteEditor.getCaretPosition();
                     noteEditor.insertText(caretPos, toAdd);
@@ -1168,19 +1166,14 @@ public class MainCtrl {
                     Alert.AlertType.WARNING);
             return;
         }
-        // Remove the file from the ListView
-        filesListView.getItems().remove(selectedFile);
 
-        // Delete the file from the server
         embeddedFileServerUtils.deleteEmbeddedFile(noteServerUtils.getServerAddress(),
                 notesList.getSelectionModel().getSelectedItem().getTitle(),
                 selectedFile.getName());
-
-        // Remove the file link from the note editor
-        String fileLink = constructLink(selectedFile);
-        String editorContent = noteEditor.getText();
-        editorContent = editorContent.replace(fileLink, "");
-        noteEditor.setText(editorContent);
+        String toDelete = constructLink(selectedFile);
+        String result = StringUtils.remove(noteEditor.getText(), toDelete);
+        noteEditor.setText(result);
+        filesListView.getItems().remove(selectedFile);
         updateDisplay();
     }
 
