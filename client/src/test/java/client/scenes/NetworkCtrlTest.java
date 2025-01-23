@@ -39,11 +39,9 @@ public class NetworkCtrlTest {
         n2 = new Note("Note 2", "Some more text");
         n3 = new Note("Note 3", "Some more text once more");
 
-        mockNoteServerUtils.setServerAddress(a1);
-        mockNoteServerUtils.storeNote(n1);
-        mockNoteServerUtils.setServerAddress(a2);
-        mockNoteServerUtils.storeNote(n2);
-        mockNoteServerUtils.storeNote(n3);
+        mockNoteServerUtils.storeNote(n1, a1);
+        mockNoteServerUtils.storeNote(n2, a2);
+        mockNoteServerUtils.storeNote(n3, a2);
     }
 
     public static void setUpCollections() {
