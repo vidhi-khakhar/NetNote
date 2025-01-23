@@ -110,7 +110,7 @@ public class MainCtrl {
     private Button addAFile;
 
     @FXML
-    private HBox filesHBox; // HBox in the FXML file
+    private ListView<EmbeddedFile> filesListView;
 
     @FXML
     private ListView<Note> notesList;
@@ -147,6 +147,12 @@ public class MainCtrl {
 
     @FXML
     private Button networkButton;
+
+    @FXML
+    private Button renameFile;
+
+    @FXML
+    private Button deleteFile;
 
     @FXML
     private Text selectedLanguageLabel;
@@ -516,7 +522,7 @@ public class MainCtrl {
     public void commitDeleteNote(int noteIndex) {
         noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle());
         savedNotes.remove(noteIndex);
-        filesHBox.getChildren().clear();
+        // filesHBox.getChildren().clear();
         if (!savedNotes.isEmpty()) {
             int newIndex = Math.min(noteIndex, savedNotes.size() - 1);
             notesList.getSelectionModel().select(newIndex);
@@ -621,7 +627,7 @@ public class MainCtrl {
         if (note != null) {
             noteTitleInput.setText(note.getTitle());
             noteEditor.setText(note.getText());
-            filesHBox.getChildren().clear();
+            // filesHBox.getChildren().clear();
             content = note.getText();
 
             renderedNoteTitleLabel.textProperty().unbind();
@@ -867,93 +873,6 @@ public class MainCtrl {
         }
     }
 
-    /**
-     * A local test version of adding an embedded file
-     */
-    public void handleAddFile() throws IOException {
-        if (notesList.getSelectionModel().getSelectedIndex() == -1) {
-            uiUtils.showPopUp(props.get("FileAddWarningTitle").get(),
-                    props.get("FileAddWarningText").get(),
-                    Alert.AlertType.WARNING);
-        } else {
-            try {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Open File");
-                File file = fileChooser.showOpenDialog(stage);
-                if (file != null) {
-                    EmbeddedFile embeddedFile = new EmbeddedFile(file.getName(),
-                            Files.probeContentType(file.toPath()),
-                            Files.readAllBytes(file.toPath()),
-                            notesList.getSelectionModel().getSelectedItem());
-                    if (!embeddedFileServerUtils.storeEmbeddedFile
-                            (noteServerUtils.getServerAddress(),
-                                    notesList.getSelectionModel().getSelectedItem().getTitle(),
-                                    embeddedFile)) {
-                        uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
-                                props.get("fileStoreFailAlertText").get(),
-                                Alert.AlertType.ERROR);
-                        return;
-                    }
-
-                    addFileElement(embeddedFile);
-                    String toAdd = constructLink(embeddedFile);
-                    int caretPos = noteEditor.getCaretPosition();
-                    noteEditor.insertText(caretPos, toAdd);
-                    updateDisplay();
-                } else
-                    System.out.println("No file detected");
-
-            } catch (OutOfMemoryError e) {
-                uiUtils.showPopUp(props.get("fileTooLargeAlertTitle").get(),
-                        props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
-            }
-        }
-
-    }
-
-
-    /**
-     * Renaming a file Pop-up
-     */
-    private void handleRenameFile(Label fileNameLabel, EmbeddedFile embeddedFile) {
-        TextInputDialog dialog = new TextInputDialog(fileNameLabel.getText());
-        dialog.titleProperty().bind(props.get("RenameFileConfirmationTitle"));
-        dialog.headerTextProperty().bind(props.get("renameFileAlertText"));
-        String type = embeddedFile.getType();
-        type = type.substring(type.indexOf("/") + 1);
-        // label.RenameFileConfirmationTitle=Rename File
-        // label.renameFileAlertText= Enter a new name for the file:
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
-            String newTitle = result.get() + "." + type;
-            fileNameLabel.setText(newTitle);
-            embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
-                    notesList.getSelectionModel().getSelectedItem().getTitle(),
-                    embeddedFile.getName(), result.get());
-            String oldLink = constructLink(embeddedFile);
-            embeddedFile.setName(newTitle);
-            String newLink = constructLink(embeddedFile);
-            String editorResult = StringUtils.replace(noteEditor.getText(), oldLink, newLink);
-            noteEditor.setText(editorResult);
-            updateDisplay();
-        }
-    }
-
-
-    /**
-     * Delete an embedded file (currently only removes from HBox)
-     */
-    private void handleDeleteFile(HBox fileContainer, EmbeddedFile embeddedFile) {
-        embeddedFileServerUtils.deleteEmbeddedFile(noteServerUtils.getServerAddress(),
-                notesList.getSelectionModel().getSelectedItem().getTitle(),
-                embeddedFile.getName());
-        String toDelete = constructLink(embeddedFile);
-        String result = StringUtils.remove(noteEditor.getText(), toDelete);
-        noteEditor.setText(result);
-        filesHBox.getChildren().remove(fileContainer);
-        updateDisplay();
-    }
-
 
     /**
      * Returns the currently searched query
@@ -1125,6 +1044,133 @@ public class MainCtrl {
         }
     }
 
+
+    /**
+     * A local test version of adding an embedded file
+     */
+    public void handleAddFile() throws IOException {
+        if (notesList.getSelectionModel().getSelectedIndex() == -1) {
+            uiUtils.showPopUp(props.get("FileAddWarningTitle").get(),
+                    props.get("FileAddWarningText").get(),
+                    Alert.AlertType.WARNING);
+        } else {
+            try {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Open File");
+                File file = fileChooser.showOpenDialog(stage);
+                if (file != null) {
+                    EmbeddedFile embeddedFile = new EmbeddedFile(file.getName(),
+                            Files.probeContentType(file.toPath()),
+                            Files.readAllBytes(file.toPath()),
+                            notesList.getSelectionModel().getSelectedItem());
+
+                    // Store the file on the server
+                    if (!embeddedFileServerUtils.storeEmbeddedFile
+                            (noteServerUtils.getServerAddress(),
+                                    notesList.getSelectionModel().getSelectedItem().getTitle(),
+                                    embeddedFile)) {
+                        uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
+                                props.get("fileStoreFailAlertText").get(),
+                                Alert.AlertType.ERROR);
+                        return;
+                    }
+
+                    // Add the file element to the ListView
+                    addFileElement(embeddedFile);
+
+                    // Insert a link to the file in the note editor
+                    String toAdd = constructLink(embeddedFile);
+                    int caretPos = noteEditor.getCaretPosition();
+                    noteEditor.insertText(caretPos, toAdd);
+                    updateDisplay();
+                } else {
+                    System.out.println("No file detected");
+                }
+            } catch (OutOfMemoryError e) {
+                uiUtils.showPopUp(props.get("fileTooLargeAlertTitle").get(),
+                        props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+
+    /**
+     * Renaming a file Pop-up
+     */
+    @FXML
+    private void handleRename() {
+        EmbeddedFile selectedFile = filesListView.getSelectionModel().getSelectedItem();
+
+        if (selectedFile == null) {
+            uiUtils.showPopUp(props.get("deleteFileWarningTitle").get(),
+                    props.get("deleteFileWarningText").get(),
+                    Alert.AlertType.WARNING);
+            return;
+        }
+
+        // Proceed with renaming if a file is selected
+        TextInputDialog dialog = new TextInputDialog(selectedFile.getName());
+        dialog.setTitle("Rename File");
+        dialog.setHeaderText("Enter a new name for the file:");
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isPresent()) {
+            String newName = result.get();
+            String oldName = selectedFile.getName();
+            String fileExtension = oldName.substring(oldName.lastIndexOf("."));
+
+            // Ensure the new name has the same extension
+            newName = newName + fileExtension;
+
+            // Update the name in the ListView
+            selectedFile.setName(newName);
+            filesListView.refresh();
+
+            // Rename on the server
+            embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
+                    notesList.getSelectionModel().getSelectedItem().getTitle(),
+                    oldName, newName);
+
+            // Update the note editor content with the new file name
+            String oldLink = constructLink(selectedFile);
+            String newLink = constructLink(selectedFile);
+            String editorContent = noteEditor.getText();
+            editorContent = editorContent.replace(oldLink, newLink);
+            noteEditor.setText(editorContent);
+            updateDisplay();
+        }
+    }
+
+
+    /**
+     * Delete an embedded file (currently only removes from HBox)
+     */
+    @FXML
+    private void handleDelete() {
+        EmbeddedFile selectedFile = filesListView.getSelectionModel().getSelectedItem();
+
+        if (selectedFile == null) {
+            uiUtils.showPopUp(props.get("deleteFileWarningTitle").get(),
+                    props.get("deleteFileWarningText").get(),
+                    Alert.AlertType.WARNING);
+            return;
+        }
+            // Remove the file from the ListView
+            filesListView.getItems().remove(selectedFile);
+
+            // Delete the file from the server
+            embeddedFileServerUtils.deleteEmbeddedFile(noteServerUtils.getServerAddress(),
+                    notesList.getSelectionModel().getSelectedItem().getTitle(),
+                    selectedFile.getName());
+
+            // Remove the file link from the note editor
+            String fileLink = constructLink(selectedFile);
+            String editorContent = noteEditor.getText();
+            editorContent = editorContent.replace(fileLink, "");
+            noteEditor.setText(editorContent);
+            updateDisplay();
+    }
+
     /**
      * Helper method that adds a box for a file
      *
@@ -1132,30 +1178,22 @@ public class MainCtrl {
      */
 
     public void addFileElement(EmbeddedFile embeddedFile) {
-        HBox fileContainer = new HBox(5);
-        fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
-                " -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
+        // Add the new file to the ListView
+        filesListView.getItems().add(embeddedFile); // This adds the file to the ListView
 
-        // Shorten file name if it exceeds 20 characters
-        String fullFileName = embeddedFile.getName();
-        String displayedFileName = (fullFileName.length() > 12)
-                ? fullFileName.substring(0, 12) + "..."
-                : fullFileName;
-
-        Label fileNameLabel = new Label(displayedFileName);
-        fileNameLabel.setTooltip(new Tooltip(fullFileName)); // Show full name on hover
-
-        Button renameButton = new Button("✎");
-        renameButton.setOnAction(e -> handleRenameFile(fileNameLabel, embeddedFile));
-
-        Button deleteButton = new Button("ⓧ");
-        deleteButton.setOnAction(e -> handleDeleteFile(fileContainer, embeddedFile));
-
-        fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
-
-        HBox.setMargin(fileContainer, new Insets(0, 0, 0, 5)); // Top, Right, Bottom, Left margins
-
-        filesHBox.getChildren().add(fileContainer);
+        // Optional: Update the ListView's display to show the file name
+        // You can customize the cell factory if needed, to show more info about the file
+        filesListView.setCellFactory(param -> new ListCell<EmbeddedFile>() {
+            @Override
+            protected void updateItem(EmbeddedFile file, boolean empty) {
+                super.updateItem(file, empty);
+                if (empty || file == null) {
+                    setText(null);
+                } else {
+                    setText(file.getName());
+                }
+            }
+        });
     }
 
     /**

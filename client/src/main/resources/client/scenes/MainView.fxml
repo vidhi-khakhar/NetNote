@@ -31,7 +31,7 @@
             </HBox>
          </HBox>
          <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
-               <Label fx:id="addedFilesLabel" prefHeight="50.0" prefWidth="203.0" style="-fx-font-weight: bold;" text="\%label.addedFilesLabel" HBox.hgrow="ALWAYS">
+               <Label fx:id="addedFilesLabel" prefHeight="50.0" prefWidth="218.0" style="-fx-font-weight: bold;" text="\%label.addedFilesLabel" HBox.hgrow="ALWAYS">
                   <HBox.margin>
                      <Insets left="5.0" right="5.0" />
                   </HBox.margin>
@@ -39,10 +39,11 @@
                      <Font size="14.0" />
                   </font>
                </Label>
-            <HBox fx:id="filesHBox" alignment="TOP_RIGHT" maxHeight="-Infinity" prefHeight="35.0" prefWidth="313.0" HBox.hgrow="ALWAYS">
+            <ListView fx:id="filesListView" prefHeight="40.0" prefWidth="316.0" HBox.hgrow="ALWAYS">
                <HBox.margin>
-                  <Insets bottom="5.0" right="5.0" top="5.0" />
-               </HBox.margin></HBox>
+                  <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+            </ListView>
          </HBox>
          <HBox prefHeight="370.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;" VBox.vgrow="ALWAYS">
             <VBox prefHeight="370.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
@@ -197,6 +198,16 @@
             </HBox>
          </HBox>
          <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
+            <Button fx:id="deleteFile" mnemonicParsing="false" onAction="#handleDelete" text="Delete File">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="renameFile" mnemonicParsing="false" onAction="#handleRename" text="Rename">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Button>
                <Button fx:id="networkButton" mnemonicParsing="false" onAction="#showNetworkMenu" style="-fx-background-color: #e8b419; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="%label.network">
                   <font>
                      <Font name="System Bold" size="11.0" />
