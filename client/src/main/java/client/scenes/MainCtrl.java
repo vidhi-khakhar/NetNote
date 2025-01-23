@@ -504,6 +504,7 @@ public class MainCtrl {
 
         renderedNoteTitleLabel.textProperty().unbind();
         renderedNoteTitleLabel.setText(note.getTitle());
+        Notification.create(stage, props.get("noteCreated").get(), NotificationType.INFO);
     }
 
 
@@ -522,6 +523,7 @@ public class MainCtrl {
         } else {
             notesList.getSelectionModel().clearSelection();
         }
+        Notification.create(stage, props.get("noteDeleted").get(), NotificationType.INFO);
     }
 
     /**
@@ -593,6 +595,8 @@ public class MainCtrl {
                 currentCollection.getCollectionUniqueName(),
                 currentCollection.getServer()
         ));
+
+        Notification.create(stage, props.get("noteMoved").get(), NotificationType.INFO);
     }
 
     /**
@@ -938,6 +942,7 @@ public class MainCtrl {
                 .filter(fc -> fc.getId().equals(file.getName()))
                 .findFirst()
                 .get(), file);
+        Notification.create(stage, props.get("undoAddFile").get(), NotificationType.INFO);
     }
 
     /**
@@ -955,6 +960,7 @@ public class MainCtrl {
         int caretPos = noteEditor.getCaretPosition();
         noteEditor.insertText(caretPos, toAdd);
         updateDisplay();
+        Notification.create(stage, props.get("redoAddFile").get(), NotificationType.INFO);
     }
 
     /**
