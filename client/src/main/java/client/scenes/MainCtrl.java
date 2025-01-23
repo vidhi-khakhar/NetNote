@@ -569,6 +569,8 @@ public class MainCtrl {
                 .filter(c -> c.getAlias().equals(targetCollectionAlias)).findFirst().get();
 
         commitMoveNote(selectedNote, currentCollection, target);
+
+        undoHandler.pushAction(new MoveNoteAction(selectedNote, currentCollection, target, this));
     }
 
     /**
