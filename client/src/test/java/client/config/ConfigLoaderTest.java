@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ConfigLoaderTest {
 
-    private static final String filePath = "test-config.json";
+    public static final String filePath = "test-config.json";
     private ConfigLoader loader;
     Collection col1;
     Collection col2;

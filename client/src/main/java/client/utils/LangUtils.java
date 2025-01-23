@@ -19,6 +19,7 @@ public class LangUtils {
      */
     @Inject
     public LangUtils(ConfigLoader configLoader) {
+        Locale.setDefault(Locale.ENGLISH);
         var rb = ResourceBundle.getBundle(Main.BUNDLE_NAME, configLoader.getLocale());
 
         rb.keySet()
@@ -52,5 +53,20 @@ public class LangUtils {
                     String shortKey = key.split("\\.")[1];
                     props.get(shortKey).set(rb.getString(key));
                 });
+    }
+
+    /**
+     * Returns the name of the bundle label for a specific language
+     * @param l The locale corresponding to the language
+     * @return The name of the label in the bundle
+     */
+    public String getLabelFromLocale(Locale l) {
+        return switch (l.toLanguageTag()) {
+            case "en" -> "english";
+            case "pl-PL" -> "polish";
+            case "ro-RO" -> "romanian";
+            case "nl-NL" -> "dutch";
+            default -> "";
+        };
     }
 }
