@@ -10,17 +10,19 @@ import java.util.*;
 public class NoteControllerTest {
 
     private TestNoteRepository db;
+    private TestEmbeddedFileRepository fileDb;
     private NoteController sut; // System Under Test
     private Note n1, n2;
 
     @BeforeEach
     public void setUp() {
         db = new TestNoteRepository();
+        fileDb = new TestEmbeddedFileRepository();
         n1 = new Note("Note1", "Note 1 content");
         n2 = new Note("Note2", "Note 2 content");
         db.save(n1);
         db.save(n2);
-        sut = new NoteController(db, new ServerUtils(db, null));
+        sut = new NoteController(db, new ServerUtils(db, fileDb));
     }
 
     @Test

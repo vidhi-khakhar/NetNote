@@ -4,11 +4,8 @@ import commons.EmbeddedFile;
 import commons.Note;
 import org.junit.jupiter.api.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
-import server.database.EmbeddedFileRepository;
 import server.utils.ServerUtils;
 
-import java.io.IOException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +14,7 @@ import static org.mockito.Mockito.*;
 public class EmbeddedFileControllerTest {
 
     private EmbeddedFileController sut; // System Under Test
-    private EmbeddedFileRepository mockRepository;
+    private TestEmbeddedFileRepository mockRepository;
     private ServerUtils mockServerUtils;
     private Note n1;
     private EmbeddedFile file1;
@@ -25,7 +22,7 @@ public class EmbeddedFileControllerTest {
 
     @BeforeEach
     public void setUp() {
-        mockRepository = mock(EmbeddedFileRepository.class);
+        mockRepository = mock(TestEmbeddedFileRepository.class);
         mockServerUtils = mock(ServerUtils.class);
         sut = new EmbeddedFileController(mockServerUtils, mockRepository);
 
@@ -64,7 +61,7 @@ public class EmbeddedFileControllerTest {
     }
 
     @Test
-    public void storeFileSuccess() throws IOException {
+    public void storeFileSuccess() {
         EmbeddedFile mockFile = mock(EmbeddedFile.class);
 
         when(mockFile.getName()).thenReturn("File3");
@@ -79,7 +76,7 @@ public class EmbeddedFileControllerTest {
     }
 
     @Test
-    public void storeFileAlreadyExists() throws IOException {
+    public void storeFileAlreadyExists() {
         EmbeddedFile mockFile = mock(EmbeddedFile.class);
 
         when(mockFile.getName()).thenReturn("File1");
@@ -90,7 +87,7 @@ public class EmbeddedFileControllerTest {
     }
 
     @Test
-    public void storeFileNoteNotFound() throws IOException {
+    public void storeFileNoteNotFound() {
         EmbeddedFile mockFile = mock(EmbeddedFile.class);
 
         when(mockFile.getName()).thenReturn("File3");
