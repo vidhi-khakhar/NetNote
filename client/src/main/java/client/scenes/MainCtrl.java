@@ -60,6 +60,7 @@ public class MainCtrl {
     private Scene shortcutsOverview;
     private Stage stage;
     private Label noNotesMatchYourQueryLabel;
+    private Label noNotesInCollectionLabel;
     private Collection currentCollection;
     private Collection currentDefaultCollection;
 
@@ -153,6 +154,24 @@ public class MainCtrl {
     @FXML
     private MenuButton languageDropdown;
 
+    @FXML
+    private Tooltip tooltipAddNote;
+
+    @FXML
+    private Tooltip tooltipDeleteNote;
+
+    @FXML
+    private Tooltip tooltipMoveNote;
+
+    @FXML
+    private Tooltip tooltipRefresh;
+
+    @FXML
+    private Tooltip tooltipUploadFile;
+
+    @FXML
+    private Tooltip tooltipShowShortcuts;
+
     /**
      * Initializes the controller.
      *
@@ -194,6 +213,7 @@ public class MainCtrl {
                 currentCollection.getCollectionUniqueName(),
                 currentCollection.getServer()));
         noNotesMatchYourQueryLabel = new Label();
+        noNotesInCollectionLabel = new Label();
         // This part was created with the help of generative AI,
         // it makes only the Title of the note appear in ListView
         notesList.setCellFactory(_ -> new ListCell<>() {
@@ -291,7 +311,14 @@ public class MainCtrl {
         editCollectionsDropdownOption.textProperty().bind(
                 props.get("collectionsDropdownEditCollections"));
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
+        noNotesInCollectionLabel.textProperty().bind(props.get("noNotesInCollection"));
         networkButton.textProperty().bind(props.get("network"));
+        tooltipAddNote.textProperty().bind(props.get("addDialogTitle"));
+        tooltipDeleteNote.textProperty().bind(props.get("deleteNoteConfirmationTitle"));
+        tooltipMoveNote.textProperty().bind(props.get("moveNoteTooltip"));
+        tooltipRefresh.textProperty().bind(props.get("refresh"));
+        tooltipUploadFile.textProperty().bind(props.get("uploadFileTooltip"));
+        tooltipShowShortcuts.textProperty().bind(props.get("showShortcutsTooltip"));
 
         setLocale(configLoader.getLocale());
     }
@@ -1111,7 +1138,7 @@ public class MainCtrl {
 
         if (notesInCollection.isEmpty()) {
             notesList.setItems(FXCollections.observableArrayList());
-            notesList.setPlaceholder(new Label(props.get("noNotesInCollection").get()));
+            notesList.setPlaceholder(noNotesInCollectionLabel);
             return;
         }
 
