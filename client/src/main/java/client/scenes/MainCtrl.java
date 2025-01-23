@@ -3,6 +3,7 @@ package client.scenes;
 import client.components.NotificationType;
 import client.config.ConfigLoader;
 import client.components.Notification;
+import client.utils.ServerUtils;
 import client.utils.file.EmbeddedFileServerUtils;
 import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
@@ -92,6 +93,9 @@ public class MainCtrl {
 
     @Inject
     private EmbeddedFileServerUtils embeddedFileServerUtils;
+
+    @Inject
+    private ServerUtils serverUtils;
 
     @FXML
     private TextField searchBar;
@@ -189,7 +193,8 @@ public class MainCtrl {
         this.shortcutsOverview = shortcutsOverview;
         this.networkMenu = networkMenu;
         props = langUtils.getProps();
-        savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
+        savedNotes = FXCollections.observableArrayList(
+                noteServerUtils.getAllNotes(serverUtils.getLocalAddress()));
         processNotes(collectionServerUtils.getAllNotesInCollection(
                 currentCollection.getCollectionUniqueName(),
                 currentCollection.getServer()));
@@ -483,7 +488,7 @@ public class MainCtrl {
      */
     public void commitAddNote(Note note, int index) {
         savedNotes.add(index, note);
-        noteServerUtils.storeNote(note);
+        noteServerUtils.storeNote(note, currentCollection.getServer());
 
         collectionServerUtils.addNoteToCollection(
                 currentDefaultCollection.getCollectionUniqueName(),
@@ -513,7 +518,8 @@ public class MainCtrl {
      * @param noteIndex The index (in the note list) of the note to be deleted.
      */
     public void commitDeleteNote(int noteIndex) {
-        noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle());
+        noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle(),
+                currentCollection.getServer());
         savedNotes.remove(noteIndex);
         filesHBox.getChildren().clear();
         if (!savedNotes.isEmpty()) {
@@ -571,7 +577,7 @@ public class MainCtrl {
                 currentCollection.getCollectionUniqueName(),
                 selectedNote.getTitle(),
                 aliasToUniqueNameMap.get(targetCollectionAlias),
-                noteServerUtils.getServerAddress()
+                currentCollection.getServer()
         );
 
         processNotes(collectionServerUtils.getAllNotesInCollection(
@@ -629,7 +635,7 @@ public class MainCtrl {
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
             List<EmbeddedFile> files = embeddedFileServerUtils.getFilesFromNote(
-                    noteServerUtils.getServerAddress(), note.getTitle());
+                    currentCollection.getServer(), note.getTitle());
             if (files != null)
                 for (int i = 0; i < files.size(); i++) {
                     addFileElement(files.get(i));
@@ -677,7 +683,9 @@ public class MainCtrl {
             HashMap<String, String> patch = new HashMap<>();
             patch.put("title", selectedNote.getTitle());
             patch.put("text", content);
-            noteServerUtils.updateNote(selectedNote.getTitle(), patch);
+            noteServerUtils.updateNote(selectedNote.getTitle(),
+                    patch,
+                    currentCollection.getServer());
 
             selectedNote.setText(content);
             notesList.refresh();
@@ -693,7 +701,7 @@ public class MainCtrl {
      * and adds them to the list.
      */
     public void handleRefreshNote() {
-        List<Note> serverNotes = noteServerUtils.getAllNotes();
+        List<Note> serverNotes = noteServerUtils.getAllNotes(currentCollection.getServer());
         noteUtils.sync(savedNotes, serverNotes);
         notesList.refresh();
     }
@@ -777,7 +785,9 @@ public class MainCtrl {
                 selectedNote.setTitle(updatedTitle);
 
                 try {
-                    noteServerUtils.updateNote(previousTitle, Map.of("title", updatedTitle));
+                    noteServerUtils.updateNote(previousTitle,
+                            Map.of("title", updatedTitle),
+                            currentCollection.getServer());
                 } catch (Exception e) {
                     selectedNote.setTitle(previousTitle);
                     return;
@@ -797,7 +807,7 @@ public class MainCtrl {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
             notesList.getSelectionModel().select(newIndex);
             notesList.refresh();
-            noteServerUtils.storeNote(firstNote);
+            noteServerUtils.storeNote(firstNote, currentCollection.getServer());
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(updatedTitle);
@@ -813,7 +823,7 @@ public class MainCtrl {
      */
     public boolean isTitlePresent(String title) {
         return noteServerUtils.
-                getAllNotes().
+                getAllNotes(currentCollection.getServer()).
                 stream().
                 anyMatch(note -> note.getTitle().equals(title));
     }
@@ -885,7 +895,7 @@ public class MainCtrl {
                             Files.readAllBytes(file.toPath()),
                             notesList.getSelectionModel().getSelectedItem());
                     if (!embeddedFileServerUtils.storeEmbeddedFile
-                            (noteServerUtils.getServerAddress(),
+                            (currentCollection.getServer(),
                                     notesList.getSelectionModel().getSelectedItem().getTitle(),
                                     embeddedFile)) {
                         uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
@@ -926,7 +936,7 @@ public class MainCtrl {
         if (result.isPresent()) {
             String newTitle = result.get() + "." + type;
             fileNameLabel.setText(newTitle);
-            embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
+            embeddedFileServerUtils.renameEmbeddedFile(currentCollection.getServer(),
                     notesList.getSelectionModel().getSelectedItem().getTitle(),
                     embeddedFile.getName(), result.get());
             String oldLink = constructLink(embeddedFile);
@@ -943,7 +953,7 @@ public class MainCtrl {
      * Delete an embedded file (currently only removes from HBox)
      */
     private void handleDeleteFile(HBox fileContainer, EmbeddedFile embeddedFile) {
-        embeddedFileServerUtils.deleteEmbeddedFile(noteServerUtils.getServerAddress(),
+        embeddedFileServerUtils.deleteEmbeddedFile(currentCollection.getServer(),
                 notesList.getSelectionModel().getSelectedItem().getTitle(),
                 embeddedFile.getName());
         String toDelete = constructLink(embeddedFile);
@@ -1176,7 +1186,7 @@ public class MainCtrl {
                         getSelectedItem().getTitle(),
                 StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         toAdd = toAdd + "[" + embeddedFile.getName() + "]("
-                + noteServerUtils.getServerAddress() + "api/files/" + noteName
+                + currentCollection.getServer() + "api/files/" + noteName
                 + "/content/" + fileName + ")";
         return toAdd;
     }

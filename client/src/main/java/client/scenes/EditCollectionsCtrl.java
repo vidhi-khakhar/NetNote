@@ -1,7 +1,7 @@
 package client.scenes;
 
 import client.config.ConfigLoader;
-import client.utils.note.NoteServerUtils;
+import client.utils.ServerUtils;
 import client.utils.UiUtils;
 import client.utils.collection.CollectionServerStatus;
 import client.utils.collection.CollectionServerUtils;
@@ -33,7 +33,7 @@ public class EditCollectionsCtrl {
     private CollectionServerUtils collectionServerUtils;
 
     @Inject
-    private NoteServerUtils noteServerUtils;
+    private ServerUtils serverUtils;
 
     @Inject
     private ConfigLoader configLoader;
@@ -186,13 +186,13 @@ public class EditCollectionsCtrl {
      */
     public void handleRemoveCollection() {
         int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
-        Collection currentCollection = collections.get(currentIndex);
         if (currentIndex == -1) {
             uiUtils.showPopUp(props.get("noCollectionSelectedAlertTitle").get(),
                     props.get("noCollectionSelectedAlertText").get(),
                     Alert.AlertType.ERROR);
             return;
         }
+        Collection currentCollection = collections.get(currentIndex);
         if (currentCollection.getCollectionUniqueName().
                 equals(configLoader.getDefaultCollectionUniqueName())) {
             uiUtils.showPopUp(props.get("CannotRemoveDefaultCollectionTitle").get(),
@@ -304,7 +304,7 @@ public class EditCollectionsCtrl {
      * {@code ADD_COLLECTION}.
      */
     public void addCollection() {
-        if (!noteServerUtils.isServerAvailable(serverInput.getText())) {
+        if (!serverUtils.isServerAvailable(serverInput.getText())) {
             uiUtils.showPopUp(props.get("serverNotReachableAlertTitle").get(),
                     props.get("serverNotReachableAlertText").get(),
                     Alert.AlertType.ERROR);
@@ -361,7 +361,7 @@ public class EditCollectionsCtrl {
      * @return The server status based on the provided address and collection name
      */
     public CollectionServerStatus getStatus(String serverAddress, String uniqueName) {
-        if (!noteServerUtils.isServerAvailable(serverAddress))
+        if (!serverUtils.isServerAvailable(serverAddress))
             return CollectionServerStatus.SERVER_NOT_REACHABLE;
         List<Collection> serverCollections =
                 collectionServerUtils.getAllCollections(serverAddress);

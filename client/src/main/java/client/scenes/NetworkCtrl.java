@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.config.ConfigLoader;
+import client.utils.ServerUtils;
 import client.utils.file.EmbeddedFileServerUtils;
 import client.utils.LangUtils;
 import client.utils.collection.CollectionServerUtils;
@@ -48,6 +49,9 @@ public class NetworkCtrl {
     private EmbeddedFileServerUtils fileServerUtils;
 
     @Inject
+    private ServerUtils serverUtils;
+
+    @Inject
     private LangUtils langUtils;
 
     @FXML
@@ -92,7 +96,7 @@ public class NetworkCtrl {
      * appropriate event listeners.
      */
     public void initialize() {
-        String localAddress = NoteServerUtils.getLocalAddress();
+        String localAddress = serverUtils.getLocalAddress();
         currentAddress = null;
 
         ToggleGroup radioGroup = new ToggleGroup();
@@ -142,8 +146,8 @@ public class NetworkCtrl {
                     .toList());
         }
         // Ensure there is at least one address listed
-        if (!servers.contains(NoteServerUtils.getLocalAddress()))
-            servers.add(NoteServerUtils.getLocalAddress());
+        if (!servers.contains(serverUtils.getLocalAddress()))
+            servers.add(serverUtils.getLocalAddress());
     }
 
     /**
@@ -155,7 +159,7 @@ public class NetworkCtrl {
     public void copyLocalAddressToClipboard() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
         ClipboardContent content = new ClipboardContent();
-        content.putString(NoteServerUtils.getLocalAddress());
+        content.putString(serverUtils.getLocalAddress());
         clipboard.setContent(content);
         copyButton.textProperty().bind(langUtils.getProps().get("copied"));
         Thread.ofPlatform().start(() -> {
@@ -244,8 +248,7 @@ public class NetworkCtrl {
      */
     public List<String> getNewNoteResults(String serverAddress,
                                           NoteServerUtils noteServerUtils) {
-        noteServerUtils.setServerAddress(serverAddress);
-        List<Note> notes = noteServerUtils.getAllNotes();
+        List<Note> notes = noteServerUtils.getAllNotes(serverAddress);
         return notes.stream().map(Note::getTitle).toList();
     }
 
@@ -260,8 +263,7 @@ public class NetworkCtrl {
     public List<String> getNewFileResults(String serverAddress,
                                           NoteServerUtils noteServerUtils,
                                           EmbeddedFileServerUtils fileServerUtils) {
-        noteServerUtils.setServerAddress(serverAddress);
-        List<Note> notes = noteServerUtils.getAllNotes();
+        List<Note> notes = noteServerUtils.getAllNotes(serverAddress);
         List<EmbeddedFile> files = new ArrayList<>();
         notes.forEach(n -> {
             List<EmbeddedFile> currentFiles =
