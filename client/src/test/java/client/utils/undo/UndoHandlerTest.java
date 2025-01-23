@@ -143,4 +143,10 @@ public class UndoHandlerTest {
             fail("Should be able to undo/redo");
         }
     }
+
+    @Test
+    void clearUndoStackTest() {
+        sut.clear();
+        assertThrows(CannotUndoException.class, () -> sut.undoAction());
+    }
 }

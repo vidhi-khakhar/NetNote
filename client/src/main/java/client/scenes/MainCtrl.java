@@ -1125,6 +1125,7 @@ public class MainCtrl {
             MenuItem itemCollection = new MenuItem(displayName);
             itemCollection.setOnAction(_ -> {
                 currentCollection = collection;
+                undoHandler.clear();
                 if (currentCollection.getCollectionUniqueName()
                         .equals(configLoader.getDefaultCollectionUniqueName())) {
                     currentDefaultCollection = collection;
