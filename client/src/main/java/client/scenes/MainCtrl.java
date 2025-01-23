@@ -1108,6 +1108,9 @@ public class MainCtrl {
     /**
      * Renaming a file Pop-up
      */
+    /**
+     * Renaming a file Pop-up
+     */
     @FXML
     private void handleRename() {
         EmbeddedFile selectedFile = filesListView.getSelectionModel().getSelectedItem();
@@ -1119,6 +1122,7 @@ public class MainCtrl {
             return;
         }
 
+        // Proceed with renaming if a file is selected
         TextInputDialog dialog = new TextInputDialog(selectedFile.getName());
         dialog.setTitle("Rename File");
         dialog.setHeaderText("Enter a new name for the file:");
@@ -1129,19 +1133,20 @@ public class MainCtrl {
             String oldName = selectedFile.getName();
             String fileExtension = oldName.substring(oldName.lastIndexOf("."));
 
-            newName = newName + fileExtension;
-            selectedFile.setName(newName);
-            filesListView.refresh();
-
+            // Rename on the server
             embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
                     notesList.getSelectionModel().getSelectedItem().getTitle(),
                     oldName, newName);
 
+            // Update the note editor content with the new file name
             String oldLink = constructLink(selectedFile);
+            selectedFile.setName(newName + fileExtension);
+            filesListView.refresh();
             String newLink = constructLink(selectedFile);
             String editorContent = noteEditor.getText();
-            editorContent = editorContent.replace(oldLink, newLink);
+            editorContent = StringUtils.replace(editorContent, oldLink, newLink);
             noteEditor.setText(editorContent);
+            // Update the name in the ListView
             updateDisplay();
         }
     }
