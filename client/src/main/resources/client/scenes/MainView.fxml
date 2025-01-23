@@ -9,6 +9,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -18,7 +19,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="450.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.MainCtrl">
+<AnchorPane prefHeight="540.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.MainCtrl">
    <HBox prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: #f4f4f4;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <VBox prefHeight="450.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
          <HBox prefHeight="40.0" prefWidth="800.0">
@@ -57,37 +58,69 @@
                   <VBox.margin>
                      <Insets bottom="5.0" top="5.0" />
                   </VBox.margin>
-                  <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="+">
+                  <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
                      <HBox.margin>
                         <Insets left="5.0" />
                      </HBox.margin>
                      <font>
                         <Font size="14.0" />
                      </font>
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <Image url="@/images/icons/add.png" />
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip fx:id="tooltipAddNote" text="%label.addDialogTitle" />
+                     </tooltip>
                   </Button>
-                  <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="-">
+                  <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
                      <HBox.margin>
                         <Insets left="5.0" />
                      </HBox.margin>
                      <font>
                         <Font size="14.0" />
                      </font>
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <Image url="@/images/icons/delete.png" />
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip fx:id="tooltipDeleteNote" text="%label.deleteNoteConfirmationTitle" />
+                     </tooltip>
                   </Button>
-                  <Button fx:id="moveNoteButton" mnemonicParsing="false" onAction="#handleMoveNote" prefHeight="26.0" prefWidth="50.0" style="-fx-background-color: #ffcbcb; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="→">
+                  <Button fx:id="moveNoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleMoveNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #ffcbcb; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
                   <HBox.margin>
                      <Insets left="5.0" />
                   </HBox.margin>
                   <font>
                      <Font size="14.0" />
                   </font>
+                     <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                           <Image url="@/images/icons/move.png" />
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip fx:id="tooltipMoveNote" text="%label.moveNoteTooltip" />
+                     </tooltip>
                   </Button>
-                  <Button layoutX="35.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="⟳">
+                  <Button layoutX="35.0" layoutY="10.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleRefreshNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #6fbed5; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
                      <HBox.margin>
                         <Insets left="5.0" right="10.0" />
                      </HBox.margin>
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <Image url="@/images/icons/refresh.png" />
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip fx:id="tooltipRefresh" text="%label.refresh" />
+                     </tooltip>
                   </Button>
                </HBox>
             </VBox>
@@ -188,13 +221,21 @@
                      </HBox>
                   </graphic>
                </MenuButton>
-               <Button mnemonicParsing="false" onAction="#showShortcutsOverview" prefHeight="27.0" prefWidth="27.0" style="-fx-border-color: black; -fx-border-radius: 3;" text="?">
+               <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#showShortcutsOverview" prefHeight="27.0" prefWidth="27.0" style="-fx-border-color: black; -fx-border-radius: 3;">
                   <font>
                      <Font name="System Bold" size="12.0" />
                   </font>
                   <HBox.margin>
                      <Insets right="3.0" />
                   </HBox.margin>
+                  <graphic>
+                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@/images/icons/info.png" />
+                     </ImageView>
+                  </graphic>
+                  <tooltip>
+                     <Tooltip fx:id="tooltipShowShortcuts" text="%label.showShortcutsTooltip" />
+                  </tooltip>
                </Button>
             </HBox>
          </HBox>
