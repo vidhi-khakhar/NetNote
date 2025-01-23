@@ -31,20 +31,21 @@
                </TextField>
             </HBox>
          </HBox>
-         <HBox maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
-            <HBox prefHeight="40.0" prefWidth="484.0">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" />
-               </HBox.margin>
-               <Label fx:id="filterByTagLabel" maxWidth="220.0" prefHeight="20.0" prefWidth="175.0" style="-fx-font-weight: bold;" text="%label.filterByTagName" HBox.hgrow="NEVER">
+         <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
+               <Label fx:id="addedFilesLabel" prefHeight="50.0" prefWidth="228.0" style="-fx-font-weight: bold;" text="\%label.addedFilesLabel" HBox.hgrow="ALWAYS">
+                  <HBox.margin>
+                     <Insets left="5.0" right="5.0" />
+                  </HBox.margin>
                   <font>
                      <Font size="14.0" />
                   </font>
-                  <HBox.margin>
-                     <Insets bottom="5.0" left="5.0" top="9.0" />
-                  </HBox.margin>
                </Label>
-            </HBox>
+            <HBox prefHeight="50.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+            <ListView fx:id="filesListView" prefHeight="40.0" prefWidth="326.0" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+            </ListView>
          </HBox>
          <HBox prefHeight="370.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;" VBox.vgrow="ALWAYS">
             <VBox prefHeight="370.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
@@ -151,27 +152,10 @@
                   <VBox.margin>
                      <Insets bottom="5.0" top="5.0" />
                   </VBox.margin>
-                     <Label fx:id="addedFilesLabel" prefHeight="20.0" prefWidth="194.0" style="-fx-font-weight: bold;" text="\%label.addedFiles" HBox.hgrow="ALWAYS">
+                     <Button fx:id="addAFile" alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddFile" prefHeight="27.0" prefWidth="178.0" style="-fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="\%label.addAFile" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                         <HBox.margin>
-                           <Insets left="5.0" right="5.0" />
+                           <Insets left="5.0" />
                         </HBox.margin>
-                        <font>
-                           <Font size="14.0" />
-                        </font>
-                     </Label>
-                     <HBox fx:id="filesHBox" prefHeight="30.0" prefWidth="155.0" />
-                     <Button maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddFile" prefHeight="30.0" prefWidth="30.0" style="-fx-font-weight: bold; -fx-background-color: #1bbf51; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
-                        <HBox.margin>
-                           <Insets />
-                        </HBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <Image url="@/images/icons/upload.png" />
-                        </ImageView>
-                     </graphic>
-                     <tooltip>
-                        <Tooltip fx:id="tooltipUploadFile" text="%label.uploadFileTooltip" />
-                     </tooltip>
                      </Button>
                </HBox>
             </VBox>
@@ -255,7 +239,24 @@
                </Button>
             </HBox>
          </HBox>
-         <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
+         <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Button fx:id="deleteFile" mnemonicParsing="false" onAction="#handleDelete" text="\%label.deleteFile">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="renameFile" mnemonicParsing="false" onAction="#handleRename" text="\%label.renameFile">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </HBox>
                <Button fx:id="networkButton" mnemonicParsing="false" onAction="#showNetworkMenu" style="-fx-background-color: #e8b419; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="%label.network">
                   <font>
                      <Font name="System Bold" size="11.0" />
