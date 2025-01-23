@@ -299,6 +299,8 @@ public class MainCtrl {
                 props.get("collectionsDropdownEditCollections"));
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
         networkButton.textProperty().bind(props.get("network"));
+        renameFile.textProperty().bind(props.get("RenameFileConfirmationTitle"));
+        deleteFile.textProperty().bind(props.get("DeleteFileConfirmationTitle"));
 
         setLocale(configLoader.getLocale());
     }
