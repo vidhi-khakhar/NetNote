@@ -1153,7 +1153,7 @@ public class MainCtrl {
 
         fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
 
-        HBox.setMargin(fileContainer, new Insets(0, 0, 0, 3)); // Top, Right, Bottom, Left margins
+        HBox.setMargin(fileContainer, new Insets(0, 0, 0, 5)); // Top, Right, Bottom, Left margins
 
         filesHBox.getChildren().add(fileContainer);
     }
