@@ -537,10 +537,7 @@ public class MainCtrl {
             return;
         }
 
-        List<Collection> collections = configLoader.getCollections();
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
-        Map<String, String> aliasToUniqueNameMap =
-                getAliasToUniqueNameMap(configLoader.getCollections());
         List<String> otherCollectionsAliases = getOtherCollectionsAliases
                 (configLoader.getCollections(), currentCollection.getAlias());
 
@@ -567,11 +564,27 @@ public class MainCtrl {
         }
         String targetCollectionAlias = result.get();
 
+        Collection target = configLoader.getCollections()
+                .stream()
+                .filter(c -> c.getAlias().equals(targetCollectionAlias)).findFirst().get();
+
+        commitMoveNote(selectedNote, currentCollection, target);
+    }
+
+    /**
+     * Modifies the current collection by moving the given note to a different collection
+     *
+     * @param note The note to be moved
+     * @param source The collection that currently stores the note
+     * @param collection The collection where the note should be moved to
+     */
+    public void commitMoveNote(Note note, Collection source, Collection collection) {
+
         collectionServerUtils.moveNoteToAnotherCollection(
-                currentCollection.getCollectionUniqueName(),
-                selectedNote.getTitle(),
-                aliasToUniqueNameMap.get(targetCollectionAlias),
-                noteServerUtils.getServerAddress()
+                source.getCollectionUniqueName(),
+                note.getTitle(),
+                collection.getCollectionUniqueName(),
+                collection.getServer()
         );
 
         processNotes(collectionServerUtils.getAllNotesInCollection(
