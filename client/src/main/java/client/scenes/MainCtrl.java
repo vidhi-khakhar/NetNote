@@ -1119,7 +1119,6 @@ public class MainCtrl {
             return;
         }
 
-        // Proceed with renaming if a file is selected
         TextInputDialog dialog = new TextInputDialog(selectedFile.getName());
         dialog.setTitle("Rename File");
         dialog.setHeaderText("Enter a new name for the file:");
@@ -1130,19 +1129,14 @@ public class MainCtrl {
             String oldName = selectedFile.getName();
             String fileExtension = oldName.substring(oldName.lastIndexOf("."));
 
-            // Ensure the new name has the same extension
             newName = newName + fileExtension;
-
-            // Update the name in the ListView
             selectedFile.setName(newName);
             filesListView.refresh();
 
-            // Rename on the server
             embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
                     notesList.getSelectionModel().getSelectedItem().getTitle(),
                     oldName, newName);
 
-            // Update the note editor content with the new file name
             String oldLink = constructLink(selectedFile);
             String newLink = constructLink(selectedFile);
             String editorContent = noteEditor.getText();
@@ -1184,11 +1178,7 @@ public class MainCtrl {
      */
 
     public void addFileElement(EmbeddedFile embeddedFile) {
-        // Add the new file to the ListView
-        filesListView.getItems().add(embeddedFile); // This adds the file to the ListView
-
-        // Optional: Update the ListView's display to show the file name
-        // You can customize the cell factory if needed, to show more info about the file
+        filesListView.getItems().add(embeddedFile);
         filesListView.setCellFactory(param -> new ListCell<EmbeddedFile>() {
             @Override
             protected void updateItem(EmbeddedFile file, boolean empty) {
