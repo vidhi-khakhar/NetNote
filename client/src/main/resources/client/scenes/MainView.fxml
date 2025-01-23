@@ -30,20 +30,19 @@
                </TextField>
             </HBox>
          </HBox>
-         <HBox maxHeight="-Infinity" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
-            <HBox prefHeight="40.0" prefWidth="484.0">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" />
-               </HBox.margin>
-               <Label fx:id="filterByTagLabel" maxWidth="220.0" prefHeight="20.0" prefWidth="175.0" style="-fx-font-weight: bold;" text="%label.filterByTagName" HBox.hgrow="NEVER">
+         <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
+               <Label fx:id="addedFilesLabel" prefHeight="53.0" prefWidth="170.0" style="-fx-font-weight: bold;" text="\%label.addedFilesLabel" HBox.hgrow="ALWAYS">
+                  <HBox.margin>
+                     <Insets left="5.0" right="5.0" />
+                  </HBox.margin>
                   <font>
                      <Font size="14.0" />
                   </font>
-                  <HBox.margin>
-                     <Insets bottom="5.0" left="5.0" top="9.0" />
-                  </HBox.margin>
                </Label>
-            </HBox>
+            <HBox fx:id="filesHBox" maxHeight="-Infinity" prefHeight="35.0" prefWidth="313.0">
+               <HBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </HBox.margin></HBox>
          </HBox>
          <HBox prefHeight="370.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;" VBox.vgrow="ALWAYS">
             <VBox prefHeight="370.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
@@ -72,7 +71,7 @@
                         <Font size="14.0" />
                      </font>
                   </Button>
-                  <Button fx:id="moveNoteButton" mnemonicParsing="false" onAction="#handleMoveNote" prefHeight="26.0" prefWidth="50.0" style="-fx-background-color:	#ffcbcb; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="→">
+                  <Button fx:id="moveNoteButton" mnemonicParsing="false" onAction="#handleMoveNote" prefHeight="26.0" prefWidth="50.0" style="-fx-background-color: #ffcbcb; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="→">
                   <HBox.margin>
                      <Insets left="5.0" />
                   </HBox.margin>
@@ -118,18 +117,9 @@
                   <VBox.margin>
                      <Insets bottom="5.0" top="5.0" />
                   </VBox.margin>
-                     <Label fx:id="addedFilesLabel" prefHeight="20.0" prefWidth="194.0" style="-fx-font-weight: bold;" text="\%label.addedFiles" HBox.hgrow="ALWAYS">
+                     <Button fx:id="addAFile" alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddFile" prefHeight="27.0" prefWidth="178.0" style="-fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="\%label.addAFile" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                         <HBox.margin>
-                           <Insets left="5.0" right="5.0" />
-                        </HBox.margin>
-                        <font>
-                           <Font size="14.0" />
-                        </font>
-                     </Label>
-                     <HBox fx:id="filesHBox" prefHeight="30.0" prefWidth="155.0" />
-                     <Button mnemonicParsing="false" onAction="#handleAddFile" prefHeight="26.0" prefWidth="30.0" style="-fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="+">
-                        <HBox.margin>
-                           <Insets />
+                           <Insets left="5.0" />
                         </HBox.margin>
                      </Button>
                </HBox>
@@ -181,7 +171,7 @@
                      <MenuItem mnemonicParsing="false" onAction="#setPL">
                         <graphic>
                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                              <Image url="@/images/pl_PL.png"/>
+                              <Image url="@/images/pl_PL.png" />
                            </ImageView>
                         </graphic>
                      </MenuItem>
@@ -191,9 +181,8 @@
                   </font>
                   <graphic>
                      <HBox alignment="CENTER" spacing="4.0">
-                        <ImageView fx:id="selectedLanguageImage" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
-                                   preserveRatio="true"/>
-                        <Text fx:id="selectedLanguageLabel" strokeType="OUTSIDE" strokeWidth="0.0"/>
+                        <ImageView fx:id="selectedLanguageImage" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
+                        <Text fx:id="selectedLanguageLabel" strokeType="OUTSIDE" strokeWidth="0.0" />
                      </HBox>
                   </graphic>
                </MenuButton>
@@ -207,7 +196,7 @@
                </Button>
             </HBox>
          </HBox>
-         <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
+         <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
                <Button fx:id="networkButton" mnemonicParsing="false" onAction="#showNetworkMenu" style="-fx-background-color: #e8b419; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="%label.network">
                   <font>
                      <Font name="System Bold" size="11.0" />

@@ -22,6 +22,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -103,10 +104,10 @@ public class MainCtrl {
     private Label collectionLabel;
 
     @FXML
-    private Label filterByTagLabel;
+    private Label addedFilesLabel;
 
     @FXML
-    private Label addedFilesLabel;
+    private Button addAFile;
 
     @FXML
     private HBox filesHBox; // HBox in the FXML file
@@ -286,8 +287,8 @@ public class MainCtrl {
         renderedNoteTitleLabel.textProperty().bind(props.get("renderedNoteTitleDefaultLabel"));
         collectionDropdown.setText(currentCollection.getAlias() + " (Default)");
         collectionLabel.textProperty().bind(props.get("collectionLabel"));
-        filterByTagLabel.textProperty().bind(props.get("filterByTagName"));
         addedFilesLabel.textProperty().bind(props.get("addedFilesName"));
+        addAFile.textProperty().bind(props.get("addAFileName"));
         editCollectionsDropdownOption.textProperty().bind(
                 props.get("collectionsDropdownEditCollections"));
         noNotesMatchYourQueryLabel.textProperty().bind(props.get("noNotesMatchYourQuery"));
@@ -1135,7 +1136,14 @@ public class MainCtrl {
         fileContainer.setStyle("-fx-border-color: black; -fx-background-color: white;" +
                 " -fx-border-width: 1; -fx-padding: 5px; -fx-border-radius: 3;");
 
-        Label fileNameLabel = new Label(embeddedFile.getName());
+        // Shorten file name if it exceeds 20 characters
+        String fullFileName = embeddedFile.getName();
+        String displayedFileName = (fullFileName.length() > 12)
+                ? fullFileName.substring(0, 12) + "..."
+                : fullFileName;
+
+        Label fileNameLabel = new Label(displayedFileName);
+        fileNameLabel.setTooltip(new Tooltip(fullFileName)); // Show full name on hover
 
         Button renameButton = new Button("✎");
         renameButton.setOnAction(e -> handleRenameFile(fileNameLabel, embeddedFile));
@@ -1144,6 +1152,8 @@ public class MainCtrl {
         deleteButton.setOnAction(e -> handleDeleteFile(fileContainer, embeddedFile));
 
         fileContainer.getChildren().addAll(fileNameLabel, renameButton, deleteButton);
+
+        HBox.setMargin(fileContainer, new Insets(0, 0, 0, 3)); // Top, Right, Bottom, Left margins
 
         filesHBox.getChildren().add(fileContainer);
     }
