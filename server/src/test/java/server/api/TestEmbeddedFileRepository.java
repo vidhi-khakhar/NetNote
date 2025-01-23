@@ -23,9 +23,7 @@ public class TestEmbeddedFileRepository implements EmbeddedFileRepository {
     }
 
     private Optional<EmbeddedFile> find(Long id) {
-        EmbeddedFile embeddedFile = embeddedFiles.get(id);
-        if (embeddedFile == null) return Optional.empty();
-        return Optional.of(embeddedFile);
+        return Optional.ofNullable(embeddedFiles.get(id));
     }
 
     @Override
