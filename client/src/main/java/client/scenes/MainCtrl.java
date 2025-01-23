@@ -22,20 +22,17 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -244,7 +241,7 @@ public class MainCtrl {
         updateDisplay();
     }
 
-    private void initializeShortcuts(){
+    private void initializeShortcuts() {
         mainView.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             List<String> eventKeys = new ArrayList<>();
             if (event.isControlDown()) eventKeys.add("Ctrl");
@@ -334,6 +331,7 @@ public class MainCtrl {
 
     /**
      * Returns a list of all files ending in {@code .css} from an array of files
+     *
      * @param files The array of files to filter
      * @return A list of all CSS stylesheets in the array
      */
@@ -347,6 +345,7 @@ public class MainCtrl {
 
     /**
      * Returns the appropriate bundle label name given a list of CSS files
+     *
      * @param cssFiles The list of CSS files for which the length is tested
      * @return The appropriate bundle label name
      */
@@ -593,7 +592,7 @@ public class MainCtrl {
      * Creates a List of all collections Aliases,
      * without the one currently displayed.
      *
-     * @param collections The list of current collections.
+     * @param collections  The list of current collections.
      * @param currentAlias The alias of currently displayed collection.
      * @return A list of Aliases of other collections.
      */
@@ -1157,20 +1156,20 @@ public class MainCtrl {
                     Alert.AlertType.WARNING);
             return;
         }
-            // Remove the file from the ListView
-            filesListView.getItems().remove(selectedFile);
+        // Remove the file from the ListView
+        filesListView.getItems().remove(selectedFile);
 
-            // Delete the file from the server
-            embeddedFileServerUtils.deleteEmbeddedFile(noteServerUtils.getServerAddress(),
-                    notesList.getSelectionModel().getSelectedItem().getTitle(),
-                    selectedFile.getName());
+        // Delete the file from the server
+        embeddedFileServerUtils.deleteEmbeddedFile(noteServerUtils.getServerAddress(),
+                notesList.getSelectionModel().getSelectedItem().getTitle(),
+                selectedFile.getName());
 
-            // Remove the file link from the note editor
-            String fileLink = constructLink(selectedFile);
-            String editorContent = noteEditor.getText();
-            editorContent = editorContent.replace(fileLink, "");
-            noteEditor.setText(editorContent);
-            updateDisplay();
+        // Remove the file link from the note editor
+        String fileLink = constructLink(selectedFile);
+        String editorContent = noteEditor.getText();
+        editorContent = editorContent.replace(fileLink, "");
+        noteEditor.setText(editorContent);
+        updateDisplay();
     }
 
     /**
@@ -1199,7 +1198,6 @@ public class MainCtrl {
     }
 
     /**
-     *
      * @param embeddedFile file inserted from the user
      * @return path to the file on the server
      */
