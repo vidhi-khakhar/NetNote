@@ -314,7 +314,8 @@ public class CollectionServerUtils {
                     } else {
                         System.out.println("Failed to remove note from source." +
                                 " Status: " + removeResponse.getStatus());
-                        System.out.println("Response message: " + removeResponse.readEntity(String.class));
+                        System.out.println("Response message: " +
+                                removeResponse.readEntity(String.class));
                     }
                 } else {
                     System.out.println("Failed to add note to target collection." +
