@@ -277,14 +277,18 @@ public class MainCtrl {
                     try {
                         undoHandler.undoAction();
                     } catch (CannotUndoException e) {
-                        Notification.create(stage, e.getMessage(), NotificationType.ERROR);
+                        Notification.create(stage,
+                                props.get(e.getMessage()).get(),
+                                NotificationType.ERROR);
                     }
                 }
                 case "Ctrl+Y" -> {
                     try {
                         undoHandler.redoAction();
                     } catch (CannotRedoException e) {
-                        Notification.create(stage, e.getMessage(), NotificationType.ERROR);
+                        Notification.create(stage,
+                                props.get(e.getMessage()).get(),
+                                NotificationType.ERROR);
                     }
                 }
                 case "Ctrl+N" -> handleAddNote();
