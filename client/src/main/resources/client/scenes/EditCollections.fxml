@@ -5,6 +5,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -29,15 +31,25 @@
          </padding>
          <ListView fx:id="collectionsList" minWidth="150.0" prefHeight="314.0" prefWidth="134.0" style="-fx-border-color: BLACK;" VBox.vgrow="ALWAYS" />
          <HBox alignment="CENTER" fillHeight="false" prefHeight="30.0" prefWidth="200.0" spacing="8.0" VBox.vgrow="NEVER">
-            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddCollection" prefHeight="26.0" prefWidth="26.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="+">
+            <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddCollection" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;">
                <font>
                   <Font size="14.0" />
                </font>
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@/images/icons/add.png" />
+                  </ImageView>
+               </graphic>
             </Button>
-            <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#handleRemoveCollection" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="-">
+            <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleRemoveCollection" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;">
                <font>
                   <Font size="14.0" />
                </font>
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@/images/icons/remove.png" />
+                  </ImageView>
+               </graphic>
             </Button>
          </HBox>
       </VBox>
@@ -60,7 +72,12 @@
          <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="4.0" VBox.vgrow="NEVER">
             <Label fx:id="labelStatus" text="%label.editCollectionsMenuLabelStatus" textAlignment="RIGHT" HBox.hgrow="NEVER" />
             <HBox alignment="CENTER_LEFT" maxWidth="-Infinity" prefHeight="100.0" prefWidth="200.0" spacing="4.0" HBox.hgrow="ALWAYS">
-                  <Button mnemonicParsing="false" onAction="#updateServerStatusText" text="↺" />
+                  <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#updateServerStatusText" prefHeight="30.0" prefWidth="30.0" style="-fx-border-color: BLACK; -fx-border-radius: 3; -fx-background-color: #6fbed5;">
+                  <graphic>
+                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@/images/icons/refresh.png" />
+                     </ImageView>
+                  </graphic></Button>
                   <Text fx:id="serverStatusText" strokeType="OUTSIDE" strokeWidth="0.0" />
                <padding>
                   <Insets left="4.0" />
@@ -72,16 +89,31 @@
                <font>
                   <Font size="14.0" />
                </font>
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@/images/icons/default.png" />
+                  </ImageView>
+               </graphic>
             </Button>
             <Button fx:id="buttonSave" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#handleSave" prefHeight="30.0" style="-fx-background-color: #13d5ec; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonSave" textAlignment="CENTER" HBox.hgrow="NEVER">
                <font>
                   <Font size="14.0" />
                </font>
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@/images/icons/save.png" />
+                  </ImageView>
+               </graphic>
             </Button>
             <Button fx:id="buttonDiscard" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#handleDiscard" prefHeight="30.0" style="-fx-background-color: #ff5959; -fx-font-weight: bold; -fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.buttonDiscard" textAlignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@/images/icons/cancel.png" />
+                  </ImageView>
+               </graphic>
             </Button>
          </HBox>
       </VBox>
