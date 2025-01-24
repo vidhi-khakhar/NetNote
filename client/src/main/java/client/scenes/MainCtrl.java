@@ -1117,6 +1117,7 @@ public class MainCtrl {
                     int caretPos = noteEditor.getCaretPosition();
                     noteEditor.insertText(caretPos, toAdd);
                     updateDisplay();
+                    Notification.create(stage, props.get("fileAdded").get(), NotificationType.INFO);
                 } else {
                     System.out.println("No file detected");
                 }
@@ -1170,6 +1171,7 @@ public class MainCtrl {
             String editorContent = noteEditor.getText();
             editorContent = StringUtils.replace(editorContent, oldLink, newLink);
             noteEditor.setText(editorContent);
+            Notification.create(stage, props.get("fileRenamed").get(), NotificationType.INFO);
             // Update the name in the ListView
             updateDisplay();
         }
@@ -1197,6 +1199,7 @@ public class MainCtrl {
         String result = StringUtils.remove(noteEditor.getText(), toDelete);
         noteEditor.setText(result);
         filesListView.getItems().remove(selectedFile);
+        Notification.create(stage, props.get("fileDeleted").get(), NotificationType.INFO);
         updateDisplay();
     }
 
