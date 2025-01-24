@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.config.ConfigLoader;
 import client.utils.ServerUtils;
+import client.utils.UiUtils;
 import client.utils.file.EmbeddedFileServerUtils;
 import client.utils.LangUtils;
 import client.utils.collection.CollectionServerUtils;
@@ -15,10 +16,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.text.Text;
@@ -53,6 +51,9 @@ public class NetworkCtrl {
 
     @Inject
     private LangUtils langUtils;
+
+    @Inject
+    private UiUtils uiUtils;
 
     @FXML
     private RadioButton radioNotes;
@@ -112,6 +113,14 @@ public class NetworkCtrl {
         refreshServerList();
 
         serverList.getSelectionModel().selectedItemProperty().addListener((_, _, selected) -> {
+            if (!serverUtils.isServerAvailable(selected)) {
+                uiUtils.showPopUp(langUtils.getProps().get("serverNotReachableAlertTitle").get(),
+                        langUtils.getProps().get("serverNotReachableAlertTitle").get() +
+                                ": " +
+                                selected,
+                        Alert.AlertType.ERROR);
+                return;
+            }
             currentAddress = selected;
             updateResults(currentAddress, currentType);
         });

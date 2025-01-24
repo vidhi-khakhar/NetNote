@@ -3,6 +3,7 @@ package client.scenes;
 import client.components.NotificationType;
 import client.config.ConfigLoader;
 import client.components.Notification;
+import client.utils.ServerUtils;
 import client.utils.file.EmbeddedFileServerUtils;
 import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
@@ -88,6 +89,9 @@ public class MainCtrl {
 
     @Inject
     private EmbeddedFileServerUtils embeddedFileServerUtils;
+
+    @Inject
+    private ServerUtils serverUtils;
 
     @FXML
     private TextField searchBar;
@@ -1137,6 +1141,14 @@ public class MainCtrl {
             MenuItem itemCollection = new MenuItem(displayName);
             itemCollection.setId(collection.getCollectionUniqueName());
             itemCollection.setOnAction(_ -> {
+                if (!serverUtils.isServerAvailable(collection.getServer())) {
+                    Notification.create(stage,
+                            props.get("serverNotReachableAlertTitle").get() +
+                                    ": " +
+                                    collection.getServer(),
+                            NotificationType.ERROR);
+                    return;
+                }
                 currentCollection = collection;
                 undoHandler.clear();
                 savedNotes.clear();
