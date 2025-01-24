@@ -220,7 +220,12 @@ public class EditCollectionsCtrl {
      */
     public void handleSave() {
         switch (currentAction) {
-            case ADD_COLLECTION -> addCollection();
+            case ADD_COLLECTION -> {
+                uiUtils.showPopUp(props.get("NewCollectionCreatedTitle").get(),
+                        props.get("NewCollectionCreatedText").get(),
+                        Alert.AlertType.INFORMATION);
+                addCollection();
+            }
             case CHANGE_COLLECTION_ALIAS -> changeCollectionAlias();
         }
         updateServerStatusText();
