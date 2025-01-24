@@ -276,14 +276,18 @@ public class MainCtrl {
                     try {
                         undoHandler.undoAction();
                     } catch (CannotUndoException e) {
-                        Notification.create(stage, e.getMessage(), NotificationType.ERROR);
+                        Notification.create(stage,
+                                props.get(e.getMessage()).get(),
+                                NotificationType.ERROR);
                     }
                 }
                 case "Ctrl+Y" -> {
                     try {
                         undoHandler.redoAction();
                     } catch (CannotRedoException e) {
-                        Notification.create(stage, e.getMessage(), NotificationType.ERROR);
+                        Notification.create(stage,
+                                props.get(e.getMessage()).get(),
+                                NotificationType.ERROR);
                     }
                 }
                 case "Ctrl+N" -> handleAddNote();
@@ -535,6 +539,9 @@ public class MainCtrl {
 
         renderedNoteTitleLabel.textProperty().unbind();
         renderedNoteTitleLabel.setText(note.getTitle());
+        Notification.create(stage,
+                props.get("noteCreated").get() + ": " + note.getTitle(),
+                NotificationType.INFO);
     }
 
 
@@ -544,6 +551,7 @@ public class MainCtrl {
      * @param noteIndex The index (in the note list) of the note to be deleted.
      */
     public void commitDeleteNote(int noteIndex) {
+        Note deletedNote = savedNotes.get(noteIndex);
         noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle(),
                 currentCollection.getServer());
         savedNotes.remove(noteIndex);
@@ -554,6 +562,9 @@ public class MainCtrl {
         } else {
             notesList.getSelectionModel().clearSelection();
         }
+        Notification.create(stage,
+                props.get("noteDeleted").get() + ": " + deletedNote.getTitle(),
+                NotificationType.INFO);
     }
 
     /**
@@ -570,8 +581,6 @@ public class MainCtrl {
         }
 
         Note selectedNote = notesList.getSelectionModel().getSelectedItem();
-        Map<String, String> aliasToUniqueNameMap =
-                getAliasToUniqueNameMap(configLoader.getCollections());
         List<String> otherCollectionsAliases = getOtherCollectionsAliases
                 (configLoader.getCollections(), currentCollection.getAlias());
 
@@ -598,17 +607,42 @@ public class MainCtrl {
         }
         String targetCollectionAlias = result.get();
 
+        Collection target = configLoader.getCollections()
+                .stream()
+                .filter(c -> c.getAlias().equals(targetCollectionAlias)).findFirst().get();
+
+        commitMoveNote(selectedNote, currentCollection, target);
+
+        undoHandler.pushAction(new MoveNoteAction(selectedNote, currentCollection, target, this));
+    }
+
+    /**
+     * Modifies the current collection by moving the given note to a different collection
+     *
+     * @param note The note to be moved
+     * @param source The collection that currently stores the note
+     * @param collection The collection where the note should be moved to
+     */
+    public void commitMoveNote(Note note, Collection source, Collection collection) {
+
         collectionServerUtils.moveNoteToAnotherCollection(
-                currentCollection.getCollectionUniqueName(),
-                selectedNote.getTitle(),
-                aliasToUniqueNameMap.get(targetCollectionAlias),
-                currentCollection.getServer()
+                source.getCollectionUniqueName(),
+                note.getTitle(),
+                collection.getCollectionUniqueName(),
+                collection.getServer()
         );
 
         processNotes(collectionServerUtils.getAllNotesInCollection(
                 currentCollection.getCollectionUniqueName(),
                 currentCollection.getServer()
         ));
+
+        Notification.create(stage,
+                props.get("noteMoved").get() + ": " +
+                        note.getTitle() +
+                        " -> " +
+                        collection.getAlias(),
+                NotificationType.INFO);
     }
 
     /**
@@ -906,6 +940,81 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * A local test version of adding an embedded file
+     */
+    public void handleAddFile() throws IOException {
+        if (notesList.getSelectionModel().getSelectedIndex() == -1) {
+            uiUtils.showPopUp(props.get("FileAddWarningTitle").get(),
+                    props.get("FileAddWarningText").get(),
+                    Alert.AlertType.WARNING);
+        } else {
+            try {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Open File");
+                File file = fileChooser.showOpenDialog(stage);
+                if (file != null) {
+                    EmbeddedFile embeddedFile = new EmbeddedFile(file.getName(),
+                            Files.probeContentType(file.toPath()),
+                            Files.readAllBytes(file.toPath()),
+                            notesList.getSelectionModel().getSelectedItem());
+                    if (!embeddedFileServerUtils.storeEmbeddedFile
+                            (currentCollection.getServer(),
+                                    notesList.getSelectionModel().getSelectedItem().getTitle(),
+                                    embeddedFile)) {
+                        uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
+                                props.get("fileStoreFailAlertText").get(),
+                                Alert.AlertType.ERROR);
+                        return;
+                    }
+
+                    addFileElement(embeddedFile);
+                    String toAdd = constructLink(embeddedFile);
+                    int caretPos = noteEditor.getCaretPosition();
+                    noteEditor.insertText(caretPos, toAdd);
+                    updateDisplay();
+                    undoHandler.pushAction(new AddFileAction(embeddedFile, this));
+                } else
+                    System.out.println("No file detected");
+
+            } catch (OutOfMemoryError e) {
+                uiUtils.showPopUp(props.get("fileTooLargeAlertTitle").get(),
+                        props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    /**
+     * Undoes the addition of a file (only works in the current collection)
+     *
+     * @param file The file to be removed
+     */
+    public void undoAddFile(EmbeddedFile file) {
+        handleDelete(file);
+        Notification.create(stage,
+                props.get("undoAddFile").get() + ": " + file.getName(),
+                NotificationType.INFO);
+    }
+
+    /**
+     * Redoes the addition of a file
+     *
+     * @param file The file to be added again
+     * @throws Exception If the file cannot be stored
+     */
+    public void redoAddFile(EmbeddedFile file) throws Exception {
+        if (!embeddedFileServerUtils.storeEmbeddedFile(currentCollection.getServer(),
+                notesList.getSelectionModel().getSelectedItem().getTitle(),
+                file)) throw new Exception("Cannot store the given file");
+        addFileElement(file);
+        String toAdd = constructLink(file);
+        int caretPos = noteEditor.getCaretPosition();
+        noteEditor.insertText(caretPos, toAdd);
+        updateDisplay();
+        Notification.create(stage,
+                props.get("redoAddFile").get() + ": " + file.getName(),
+                NotificationType.INFO);
+    }
 
     /**
      * Returns the currently searched query
@@ -1027,6 +1136,7 @@ public class MainCtrl {
             itemCollection.setId(collection.getCollectionUniqueName());
             itemCollection.setOnAction(_ -> {
                 currentCollection = collection;
+                undoHandler.clear();
                 savedNotes.clear();
                 savedNotes.addAll(collectionServerUtils.getAllNotesInCollection(
                         collection.getCollectionUniqueName(),
@@ -1082,52 +1192,6 @@ public class MainCtrl {
         }
     }
 
-
-    /**
-     * A local test version of adding an embedded file
-     */
-    public void handleAddFile() throws IOException {
-        if (notesList.getSelectionModel().getSelectedIndex() == -1) {
-            uiUtils.showPopUp(props.get("FileAddWarningTitle").get(),
-                    props.get("FileAddWarningText").get(),
-                    Alert.AlertType.WARNING);
-        } else {
-            try {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Open File");
-                File file = fileChooser.showOpenDialog(stage);
-                if (file != null) {
-                    EmbeddedFile embeddedFile = new EmbeddedFile(file.getName(),
-                            Files.probeContentType(file.toPath()),
-                            Files.readAllBytes(file.toPath()),
-                            notesList.getSelectionModel().getSelectedItem());
-
-                    if (!embeddedFileServerUtils.storeEmbeddedFile
-                            (currentCollection.getServer(),
-                                    notesList.getSelectionModel().getSelectedItem().getTitle(),
-                                    embeddedFile)) {
-                        uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
-                                props.get("fileStoreFailAlertText").get(),
-                                Alert.AlertType.ERROR);
-                        return;
-                    }
-
-                    addFileElement(embeddedFile);
-
-                    String toAdd = constructLink(embeddedFile);
-                    int caretPos = noteEditor.getCaretPosition();
-                    noteEditor.insertText(caretPos, toAdd);
-                    updateDisplay();
-                } else {
-                    System.out.println("No file detected");
-                }
-            } catch (OutOfMemoryError e) {
-                uiUtils.showPopUp(props.get("fileTooLargeAlertTitle").get(),
-                        props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
-            }
-        }
-    }
-
     /**
      * Renaming a file Pop-up
      */
@@ -1171,13 +1235,21 @@ public class MainCtrl {
         }
     }
 
+    /**
+     * Overload for deleting the currently selected file
+     */
+    public void handleDelete() {
+        EmbeddedFile selectedFile = filesListView.getSelectionModel().getSelectedItem();
+        handleDelete(selectedFile);
+    }
 
     /**
-     * Delete an embedded file (currently only removes from HBox)
+     * Delete an embedded file
+     *
+     * @param selectedFile The file to be deleted
      */
     @FXML
-    private void handleDelete() {
-        EmbeddedFile selectedFile = filesListView.getSelectionModel().getSelectedItem();
+    public void handleDelete(EmbeddedFile selectedFile) {
 
         if (selectedFile == null) {
             uiUtils.showPopUp(props.get("deleteFileWarningTitle").get(),

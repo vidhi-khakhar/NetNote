@@ -95,4 +95,12 @@ public class UndoHandler {
             // Caught before index is incremented, so the stack remains unchanged
         }
     }
+
+    /**
+     * Clears all the actions from the undo stack
+     */
+    public void clear() {
+        this.currentIndex = -1;
+        this.actions.clear();
+    }
 }
