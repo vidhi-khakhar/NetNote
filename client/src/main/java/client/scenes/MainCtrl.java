@@ -963,6 +963,7 @@ public class MainCtrl {
                     String toAdd = constructLink(embeddedFile);
                     int caretPos = noteEditor.getCaretPosition();
                     noteEditor.insertText(caretPos, toAdd);
+                    Notification.create(stage, props.get("fileAdded").get(), NotificationType.INFO);
                     updateDisplay();
                     undoHandler.pushAction(new AddFileAction(embeddedFile, this));
                 } else
@@ -1189,54 +1190,6 @@ public class MainCtrl {
             notesList.getSelectionModel().clearSelection();
         }
     }
-
-
-    /**
-     * A local test version of adding an embedded file
-     */
-    public void handleAddFile() throws IOException {
-        if (notesList.getSelectionModel().getSelectedIndex() == -1) {
-            uiUtils.showPopUp(props.get("FileAddWarningTitle").get(),
-                    props.get("FileAddWarningText").get(),
-                    Alert.AlertType.WARNING);
-        } else {
-            try {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Open File");
-                File file = fileChooser.showOpenDialog(stage);
-                if (file != null) {
-                    EmbeddedFile embeddedFile = new EmbeddedFile(file.getName(),
-                            Files.probeContentType(file.toPath()),
-                            Files.readAllBytes(file.toPath()),
-                            notesList.getSelectionModel().getSelectedItem());
-
-                    if (!embeddedFileServerUtils.storeEmbeddedFile
-                            (noteServerUtils.getServerAddress(),
-                                    notesList.getSelectionModel().getSelectedItem().getTitle(),
-                                    embeddedFile)) {
-                        uiUtils.showPopUp(props.get("fileStoreFailAlertTitle").get(),
-                                props.get("fileStoreFailAlertText").get(),
-                                Alert.AlertType.ERROR);
-                        return;
-                    }
-
-                    addFileElement(embeddedFile);
-
-                    String toAdd = constructLink(embeddedFile);
-                    int caretPos = noteEditor.getCaretPosition();
-                    noteEditor.insertText(caretPos, toAdd);
-                    updateDisplay();
-                    Notification.create(stage, props.get("fileAdded").get(), NotificationType.INFO);
-                } else {
-                    System.out.println("No file detected");
-                }
-            } catch (OutOfMemoryError e) {
-                uiUtils.showPopUp(props.get("fileTooLargeAlertTitle").get(),
-                        props.get("fileTooLargeAlertText").get(), Alert.AlertType.ERROR);
-            }
-        }
-    }
-
 
     /**
      * Renaming a file Pop-up
