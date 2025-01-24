@@ -3,7 +3,6 @@ package client.scenes;
 import client.components.NotificationType;
 import client.config.ConfigLoader;
 import client.components.Notification;
-import client.utils.ServerUtils;
 import client.utils.file.EmbeddedFileServerUtils;
 import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
@@ -93,9 +92,6 @@ public class MainCtrl {
 
     @Inject
     private EmbeddedFileServerUtils embeddedFileServerUtils;
-
-    @Inject
-    private ServerUtils serverUtils;
 
     @FXML
     private TextField searchBar;
@@ -194,7 +190,9 @@ public class MainCtrl {
         this.networkMenu = networkMenu;
         props = langUtils.getProps();
         savedNotes = FXCollections.observableArrayList(
-                noteServerUtils.getAllNotes(serverUtils.getLocalAddress()));
+                collectionServerUtils.getAllNotesInCollection(
+                        currentCollection.getCollectionUniqueName(),
+                        currentCollection.getServer()));
         processNotes(collectionServerUtils.getAllNotesInCollection(
                 currentCollection.getCollectionUniqueName(),
                 currentCollection.getServer()));
@@ -1083,6 +1081,10 @@ public class MainCtrl {
             MenuItem itemCollection = new MenuItem(displayName);
             itemCollection.setOnAction(_ -> {
                 currentCollection = collection;
+                savedNotes.clear();
+                savedNotes.addAll(collectionServerUtils.getAllNotesInCollection(
+                        collection.getCollectionUniqueName(),
+                        collection.getServer()));
                 if (currentCollection.getCollectionUniqueName()
                         .equals(configLoader.getDefaultCollectionUniqueName())) {
                     currentDefaultCollection = collection;
