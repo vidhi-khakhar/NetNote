@@ -699,9 +699,13 @@ public class MainCtrl {
      * and adds them to the list.
      */
     public void handleRefreshNote() {
-        List<Note> serverNotes = noteServerUtils.getAllNotes(currentCollection.getServer());
-        noteUtils.sync(savedNotes, serverNotes);
-        notesList.refresh();
+        Optional<MenuItem> menuItem = collectionDropdown
+                .getItems()
+                .stream()
+                .filter(mi -> mi.getId().equals(currentCollection.getCollectionUniqueName()))
+                .findFirst();
+        if (menuItem.isEmpty()) System.out.println("Could not fetch the current collection from the server");
+        else menuItem.get().fire();
     }
 
     /**
@@ -1079,6 +1083,7 @@ public class MainCtrl {
                     : collection.getAlias();
 
             MenuItem itemCollection = new MenuItem(displayName);
+            itemCollection.setId(collection.getCollectionUniqueName());
             itemCollection.setOnAction(_ -> {
                 currentCollection = collection;
                 savedNotes.clear();
