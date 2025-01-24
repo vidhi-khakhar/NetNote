@@ -220,12 +220,7 @@ public class EditCollectionsCtrl {
      */
     public void handleSave() {
         switch (currentAction) {
-            case ADD_COLLECTION -> {
-                uiUtils.showPopUp(props.get("NewCollectionCreatedTitle").get(),
-                        props.get("NewCollectionCreatedText").get(),
-                        Alert.AlertType.INFORMATION);
-                addCollection();
-            }
+            case ADD_COLLECTION -> addCollection();
             case CHANGE_COLLECTION_ALIAS -> changeCollectionAlias();
         }
         updateServerStatusText();
@@ -332,6 +327,9 @@ public class EditCollectionsCtrl {
         currentAction = CollectionAction.NO_ACTION;
         if (getStatus(server, uniqueName) == CollectionServerStatus.COLLECTION_WILL_BE_CREATED) {
             collectionServerUtils.createCollection(newCollection, server);
+            uiUtils.showPopUp(props.get("NewCollectionCreatedTitle").get(),
+                    props.get("NewCollectionCreatedText").get(),
+                    Alert.AlertType.INFORMATION);
         }
         configLoader.addCollection(newCollection);
         collections.set(collections.size() - 1, newCollection);
