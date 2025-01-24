@@ -1154,7 +1154,8 @@ public class MainCtrl {
         if (result.isPresent()) {
             String newName = result.get();
             String oldName = selectedFile.getName();
-            String fileExtension = oldName.substring(oldName.lastIndexOf("."));
+            String fileExtension = "." + selectedFile.getType()
+                    .substring(selectedFile.getType().indexOf('/') + 1);
 
             // Rename on the server
             embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
@@ -1214,7 +1215,29 @@ public class MainCtrl {
                 if (empty || file == null) {
                     setText(null);
                 } else {
-                    setText(file.getName());
+                    // Get file name, type, and size
+                    String fileName = file.getName();
+                    String fileType = file.getType();  // MIME type
+                    long fileSize = file.getData().length; // File size in bytes
+
+                    // Convert file size to KB/MB for better readability
+                    String readableSize = formatFileSize(fileSize);
+
+                    // Set the text with the desired format
+                    setText(fileName + " [" + fileType + ", " + readableSize + "]");
+                }
+            }
+
+
+            private String formatFileSize(long bytes) {
+                if (bytes < 1024) {
+                    return bytes + " B";
+                } else if (bytes < 1024 * 1024) {
+                    return String.format("%.1f KB", bytes / 1024.0);
+                } else if (bytes < 1024 * 1024 * 1024) {
+                    return String.format("%.1f MB", bytes / (1024.0 * 1024));
+                } else {
+                    return String.format("%.1f GB", bytes / (1024.0 * 1024 * 1024));
                 }
             }
         });
