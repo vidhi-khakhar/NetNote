@@ -111,6 +111,84 @@ public class CollectionServerUtilsTest {
         assertTrue(collectionExists, "The test collection should exist.");
     }
 
+    @Test
+    void createDuplicateCollectionTest() {
+        Collection duplicate = new Collection("test-collection", "Duplicate Alias", SERVER_ADDRESS);
+        collectionServerUtils.createCollection(duplicate, SERVER_ADDRESS);
+
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
+        long count = collections.stream()
+                .filter(c -> c.getCollectionUniqueName().equals("test-collection"))
+                .count();
+
+        assertEquals(1, count, "Duplicate collections with the same unique name should not exist.");
+    }
+
+    @Test
+    void addNoteToNonExistentCollectionTest() {
+        String nonExistentCollection = "non-existent-collection";
+        Note note = new Note("TestNote", "Test Content");
+        noteServerUtils.storeNote(note);
+
+        collectionServerUtils.addNoteToCollection(nonExistentCollection, note.getTitle(), SERVER_ADDRESS);
+        List<Note> notes = collectionServerUtils.getAllNotesInCollection(nonExistentCollection, SERVER_ADDRESS);
+
+        assertNull(notes, "Notes should not be added to a non-existent collection.");
+    }
+
+    @Test
+    void moveNoteBetweenCollectionsTest() {
+        Collection targetCollection = new Collection("target-collection", "Target Collection", SERVER_ADDRESS);
+        collectionServerUtils.createCollection(targetCollection, SERVER_ADDRESS);
+
+        Note note = new Note("NoteToMove", "Content to move");
+        noteServerUtils.storeNote(note);
+        collectionServerUtils.addNoteToCollection(testCollection.getCollectionUniqueName(), note.getTitle(), SERVER_ADDRESS);
+
+        collectionServerUtils.moveNoteToAnotherCollection(testCollection.getCollectionUniqueName(), note.getTitle(), targetCollection.getCollectionUniqueName(), SERVER_ADDRESS);
+
+        List<Note> sourceNotes = collectionServerUtils.getAllNotesInCollection(testCollection.getCollectionUniqueName(), SERVER_ADDRESS);
+        List<Note> targetNotes = collectionServerUtils.getAllNotesInCollection(targetCollection.getCollectionUniqueName(), SERVER_ADDRESS);
+
+        assertTrue(sourceNotes.isEmpty(), "Note should be removed from the source collection.");
+        assertEquals(1, targetNotes.size(), "Note should be added to the target collection.");
+        assertEquals(note.getTitle(), targetNotes.get(0).getTitle(), "Moved note should match the original note.");
+    }
+
+    @Test
+    void updateAliasForNonExistentCollectionTest() {
+        String nonExistentCollection = "non-existent-collection";
+        String newAlias = "New Alias";
+
+        collectionServerUtils.updateCollectionAlias(nonExistentCollection, newAlias, SERVER_ADDRESS);
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
+
+        boolean aliasUpdated = collections.stream()
+                .anyMatch(c -> c.getCollectionUniqueName().equals(nonExistentCollection) && c.getAlias().equals(newAlias));
+
+        assertFalse(aliasUpdated, "Alias for a non-existent collection should not be updated.");
+    }
+
+    @Test
+    void deleteNonExistentCollectionTest() {
+        String nonExistentCollection = "non-existent-collection";
+        collectionServerUtils.deleteCollection(nonExistentCollection, SERVER_ADDRESS);
+
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
+        boolean collectionExists = collections.stream()
+                .anyMatch(c -> c.getCollectionUniqueName().equals(nonExistentCollection));
+
+        assertFalse(collectionExists, "Non-existent collection should not be present after delete attempt.");
+    }
+
+    @Test
+    void invalidServerAddressTest() {
+        String invalidServerAddress = "http://invalid-address";
+        List<Collection> collections = collectionServerUtils.getAllCollections(invalidServerAddress);
+
+        assertTrue(collections.isEmpty(), "Fetching collections from an invalid server should return an empty list.");
+    }
+
     @AfterEach
     void cleanup() {
         List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);

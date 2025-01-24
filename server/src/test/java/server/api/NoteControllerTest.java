@@ -103,4 +103,79 @@ public class NoteControllerTest {
     public void deleteNoteSuccess() {
         assertEquals(200, sut.deleteNote("Note2").getStatusCode().value());
     }
+    @Test
+    public void storeNoteDuplicateTitle() {
+        Note duplicate = new Note("Note1", "Duplicate content");
+        sut.storeNote(duplicate);
+        // Assuming duplicate titles are allowed, the new note is added
+        assertEquals(List.of(n1, n2, duplicate), db.findAll());
+    }
+
+    @Test
+    public void getNoteByTitleInvalidTitle() {
+        assertEquals(404, sut.getNoteByTitle("NonExistentTitle").getStatusCode().value());
+        assertNull(sut.getNoteByTitle("NonExistentTitle").getBody());
+    }
+
+    @Test
+    public void updateNoteWithNoChanges() {
+        Map<String, String> requestBody = new HashMap<>();
+        assertEquals(200, sut.updateNote("Note1", requestBody).getStatusCode().value());
+        assertEquals(n1, db.getById((long) 0));
+    }
+
+
+    @Test
+    public void deleteNoteNonExistent() {
+        assertEquals(404, sut.deleteNote("NonExistentTitle").getStatusCode().value());
+        assertEquals(List.of(n1, n2), db.findAll());
+    }
+
+
+    @Test
+    public void updateNoteWithExtraFields() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("title", "Updated title");
+        requestBody.put("text", "Updated text");
+        requestBody.put("extra", "Extra field");
+        assertEquals(400, sut.updateNote("Note1", requestBody).getStatusCode().value());
+        assertEquals(n1, db.getById((long) 0));
+    }
+    @Test
+    public void storeNoteNewNote() {
+        Note newNote = new Note("Note3", "New note content");
+        sut.storeNote(newNote);
+        assertEquals(List.of(n1, n2, newNote), db.findAll());
+    }
+
+    @Test
+    public void getAllNotesNonEmpty() {
+        List<Note> notes = sut.getAllNotes();
+        assertEquals(2, notes.size());
+        assertTrue(notes.contains(n1));
+        assertTrue(notes.contains(n2));
+    }
+
+
+    @Test
+    public void updateNoteTitleOnlyValid() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("title", "Updated Title");
+        assertEquals(200, sut.updateNote("Note1", requestBody).getStatusCode().value());
+        Note updatedNote = db.getById((long) 0);
+        assertEquals("Updated Title", updatedNote.getTitle());
+        assertEquals("Note 1 content", updatedNote.getText());
+    }
+
+    @Test
+    public void updateNoteTextOnlyValid() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("text", "Updated text content");
+        assertEquals(200, sut.updateNote("Note2", requestBody).getStatusCode().value());
+        Note updatedNote = db.getById((long) 1);
+        assertEquals("Note2", updatedNote.getTitle());
+        assertEquals("Updated text content", updatedNote.getText());
+    }
+
+
 }
