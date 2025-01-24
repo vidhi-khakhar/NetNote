@@ -627,8 +627,9 @@ public class MainCtrl {
 
         collectionServerUtils.moveNoteToAnotherCollection(
                 source.getCollectionUniqueName(),
-                note.getTitle(),
+                note,
                 collection.getCollectionUniqueName(),
+                source.getServer(),
                 collection.getServer()
         );
 
@@ -1193,9 +1194,6 @@ public class MainCtrl {
         }
     }
 
-    /**
-     * Renaming a file Pop-up
-     */
     /**
      * Renaming a file Pop-up
      */

@@ -222,7 +222,7 @@ public class CollectionServerUtils {
      * @param targetUniqueName The unique name of the target collection.
      * @param serverAddress The address of the server to send the request to
      */
-    public void moveNoteToAnotherCollection
+    private void moveNoteToAnotherCollection
     (String uniqueName, String noteTitle, String targetUniqueName, String serverAddress) {
         try {
             uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8)
@@ -244,6 +244,86 @@ public class CollectionServerUtils {
                 System.out.println("Failed to move note." +
                         " Status: " + response.getStatus());
                 System.out.println("Response message: " + response.readEntity(String.class));
+            }
+        } catch (Exception e) {
+            System.err.println("Error occurred while moving note to another collection: "
+                    + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Moves a note from one collection to another. <br>
+     * Sends a POST request to the
+     * "api/collections/{uniqueName}/notes/{noteTitle}" endpoint. <br>
+     * Sends a DELETE request to the
+     * "api/collections/{uniqueName}/notes/{noteTitle}" endpoint.
+     *
+     * @param uniqueName          The unique name of the source collection.
+     * @param note                The note to move.
+     * @param targetUniqueName    The unique name of the target collection.
+     * @param serverAddress       The address of the server to remove the note from.
+     * @param targetServerAddress The address of the server to add the note to.
+     */
+    public void moveNoteToAnotherCollection(String uniqueName,
+                                            Note note,
+                                            String targetUniqueName,
+                                            String serverAddress,
+                                            String targetServerAddress) {
+        if (targetServerAddress.equals(serverAddress)) {
+            moveNoteToAnotherCollection(
+                    uniqueName, note.getTitle(), targetUniqueName, serverAddress);
+            return;
+        }
+        try {
+            uniqueName = URLEncoder.encode(uniqueName, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+            String noteTitle = URLEncoder.encode(note.getTitle(), StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+            targetUniqueName = URLEncoder.encode(targetUniqueName, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+
+
+            // Add note to target server
+            var storeResponse = ClientBuilder.newClient()
+                    .target(targetServerAddress).path("api/notes/")
+                    .request(MediaType.APPLICATION_JSON)
+                    .post(Entity.entity(note, MediaType.APPLICATION_JSON));
+            if (storeResponse.getStatus() == 200) {
+                System.out.println("Note stored successfully.");
+
+                // Add note to target collection
+                var addResponse = ClientBuilder.newClient()
+                        .target(targetServerAddress + "api/collections/"
+                                + targetUniqueName + "/notes/"
+                                + noteTitle)
+                        .request(MediaType.APPLICATION_JSON)
+                        .post(null);
+                if (addResponse.getStatus() == 200) {
+                    System.out.println("Note added to target collection successfully.");
+
+                    // Remove note from source server
+                    var removeResponse = ClientBuilder.newClient()
+                            .target(serverAddress + "api/collections/"
+                                    + uniqueName + "/notes/"
+                                    + noteTitle)
+                            .request(MediaType.APPLICATION_JSON)
+                            .delete();
+                    if (removeResponse.getStatus() == 200) {
+                        System.out.println("Note removed from source successfully.");
+                    } else {
+                        System.out.println("Failed to remove note from source." +
+                                " Status: " + removeResponse.getStatus());
+                        System.out.println("Response message: " + removeResponse.readEntity(String.class));
+                    }
+                } else {
+                    System.out.println("Failed to add note to target collection." +
+                            " Status: " + addResponse.getStatus());
+                    System.out.println("Response message: " + addResponse.readEntity(String.class));
+                }
+            } else {
+                System.out.println("Failed to store note in target. Status: "
+                        + storeResponse.getStatus());
             }
         } catch (Exception e) {
             System.err.println("Error occurred while moving note to another collection: "
