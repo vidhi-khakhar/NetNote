@@ -209,7 +209,7 @@ public class CollectionController {
                     .body("Collection with the specified unique name does not exist.");
         }
 
-        Optional<Note> noteOptional = noteRepository.findByTitle(noteTitle);
+        Optional<Note> noteOptional = serverUtils.getNoteByTitle(noteTitle);
 
         if (noteOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

@@ -17,13 +17,10 @@ package client.utils.note;
 
 import commons.Note;
 
-import java.net.InetAddress;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -31,7 +28,6 @@ import jakarta.ws.rs.core.Response;
 
 import jakarta.ws.rs.client.*;
 import jakarta.ws.rs.core.*;
-import org.glassfish.jersey.client.ClientConfig;
 
 /**
  * A client utility class for making HTTP requests to a REST API.
@@ -39,83 +35,14 @@ import org.glassfish.jersey.client.ClientConfig;
  */
 public class NoteServerUtils {
 
-    private String serverAddress;
-
-    /**
-     * Default constructor for NoteServerUtils used by Guice
-     * Sets the default server address to the address of the current device.
-     */
-    public NoteServerUtils() {
-        this.serverAddress = getLocalAddress();
-    }
-
-    /**
-     * Getter for the server address
-     *
-     * @return Getter for the server address
-     */
-    public String getServerAddress() {
-        return this.serverAddress;
-    }
-
-    /**
-     * Setter for the server address
-     *
-     * @param serverAddress The new server address
-     */
-    public void setServerAddress(String serverAddress) {
-        this.serverAddress = serverAddress;
-    }
-
-    /**
-     * Getter for the local address of the current device in the network.
-     *
-     * @return The local address of the current device.
-     */
-    public static String getLocalAddress() {
-        try {
-            return "http://" + InetAddress.getLocalHost().getHostAddress() + ":8080/";
-        } catch (UnknownHostException e) {
-            System.out.println("Unknown host");
-            return "";
-        }
-    }
-
-    /**
-     * Method to check if an address corresponds to an available server.
-     * The server must send a 200 OK response containing JSON when a
-     * GET request is made to /api/notes for it to be considered available.
-     *
-     * @param address The address of the server to try to connect to.
-     * @return {@code true} if the server is reachable and valid and
-     * {@code false} otherwise
-     */
-    public boolean isServerAvailable(String address) {
-        try (
-                Client client = ClientBuilder
-                        .newBuilder()
-                        .withConfig(new ClientConfig())
-                        .connectTimeout(2, TimeUnit.SECONDS)
-                        .build()
-        ) {
-            if (client
-                    .target(address + "api/notes/")
-                    .request(MediaType.APPLICATION_JSON)
-                    .get()
-                    .getStatus() != 200) return false;
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
     /**
      * This method sends a GET request to the "api/notes/" endpoint to fetch all notes.
      *
+     * @param serverAddress The address of the server to send the request to
      * @return a list of all notes if the server responds with an HTTP status code 200
      * and an empty list if the request fails
      */
-    public List<Note> getAllNotes() {
+    public List<Note> getAllNotes(String serverAddress) {
         List<Note> notes = new ArrayList<>();
         try {
             Response response = ClientBuilder.newClient()
@@ -140,8 +67,9 @@ public class NoteServerUtils {
      * The method uses the REST API endpoint at "api/notes/" to store the provided note.
      *
      * @param note - the Note object to be stored on the server.
+     * @param serverAddress The address of the server to send the request to
      */
-    public void storeNote(Note note) {
+    public void storeNote(Note note, String serverAddress) {
         try {
             Response response = ClientBuilder.newClient()
                     .target(serverAddress).path("api/notes/")
@@ -165,8 +93,9 @@ public class NoteServerUtils {
      * @param noteData - A map containing the fields to update and their new values.
      *                 The keys in the map are "title" or "text", and their values
      *                 are the corresponding updated values for the note.
+     * @param serverAddress The address of the server to send the request to
      */
-    public void updateNote(String title, Map<String, String> noteData) {
+    public void updateNote(String title, Map<String, String> noteData, String serverAddress) {
         try {
             String jsonData = new ObjectMapper()
                     .writeValueAsString(noteData);  // Convert Map to JSON
@@ -201,8 +130,9 @@ public class NoteServerUtils {
      * the note with the given title.
      *
      * @param title - The title of the note to be deleted.
+     * @param serverAddress The address of the server to send the request to
      */
-    public void deleteNote(String title) {
+    public void deleteNote(String title, String serverAddress) {
         title = URLEncoder.encode(title, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         try {
             Response response = ClientBuilder.newClient()

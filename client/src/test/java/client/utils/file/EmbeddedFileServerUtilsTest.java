@@ -1,5 +1,6 @@
 package client.utils.file;
 
+import client.utils.ServerUtils;
 import client.utils.note.NoteServerUtils;
 import commons.EmbeddedFile;
 import commons.Note;
@@ -26,9 +27,10 @@ class EmbeddedFileServerUtilsTest {
 
         embeddedFileServerUtils = new EmbeddedFileServerUtils();
         noteServerUtils = new NoteServerUtils();
+        ServerUtils serverUtils = new ServerUtils();
 
         // Initialize the server address
-        serverAddress = noteServerUtils.getServerAddress();  // Fetch the server address
+        serverAddress = serverUtils.getLocalAddress();  // Fetch the server address
 
         // Allow the tests only if the server is available
         assumeTrue(embeddedFileServerUtils.isServerAvailable(serverAddress), "Server is not available," +
@@ -40,8 +42,8 @@ class EmbeddedFileServerUtilsTest {
         file1 = new EmbeddedFile("File 1", ".pdf", new byte[]{1, 2, 3, 4}, noteWithFile);
 
         // Store the notes and attach a file to one of them
-        noteServerUtils.storeNote(noteWithFile);
-        noteServerUtils.storeNote(noteWithoutFile);
+        noteServerUtils.storeNote(noteWithFile, serverAddress);
+        noteServerUtils.storeNote(noteWithoutFile, serverAddress);
         embeddedFileServerUtils.storeEmbeddedFile(serverAddress, noteWithFile.getTitle(), file1);
     }
 
@@ -86,9 +88,9 @@ class EmbeddedFileServerUtilsTest {
 
     @Test
     void deleteNoteWithFiles() {
-        noteServerUtils.deleteNote(noteWithFile.getTitle());
+        noteServerUtils.deleteNote(noteWithFile.getTitle(), serverAddress);
 
-        List<Note> notes = noteServerUtils.getAllNotes();
+        List<Note> notes = noteServerUtils.getAllNotes(serverAddress);
         boolean noteExists = notes.stream().anyMatch(note -> note.getTitle().equals(noteWithFile.getTitle()));
         assertFalse(noteExists);
 
@@ -102,7 +104,7 @@ class EmbeddedFileServerUtilsTest {
         assumeTrue(embeddedFileServerUtils.isServerAvailable(serverAddress));
 
         embeddedFileServerUtils.deleteEmbeddedFile(serverAddress, noteWithFile.getTitle(), file1.getName());
-        noteServerUtils.deleteNote(noteWithFile.getTitle());
-        noteServerUtils.deleteNote(noteWithoutFile.getTitle());
+        noteServerUtils.deleteNote(noteWithFile.getTitle(), serverAddress);
+        noteServerUtils.deleteNote(noteWithoutFile.getTitle(), serverAddress);
     }
 }

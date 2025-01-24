@@ -3,10 +3,10 @@ package client.scenes;
 import client.components.NotificationType;
 import client.config.ConfigLoader;
 import client.components.Notification;
+import client.utils.ServerUtils;
 import client.utils.file.EmbeddedFileServerUtils;
 import client.utils.markdown.MarkdownUtils;
 import client.utils.note.NoteSearchUtils;
-import client.utils.note.NoteUtils;
 import client.utils.LangUtils;
 import client.utils.UiUtils;
 import client.utils.markdown.MarkdownShortcutUtils;
@@ -73,9 +73,6 @@ public class MainCtrl {
     private NoteServerUtils noteServerUtils;
 
     @Inject
-    private NoteUtils noteUtils;
-
-    @Inject
     private CollectionServerUtils collectionServerUtils;
 
     @Inject
@@ -92,6 +89,9 @@ public class MainCtrl {
 
     @Inject
     private EmbeddedFileServerUtils embeddedFileServerUtils;
+
+    @Inject
+    private ServerUtils serverUtils;
 
     @FXML
     private TextField searchBar;
@@ -210,7 +210,10 @@ public class MainCtrl {
         this.shortcutsOverview = shortcutsOverview;
         this.networkMenu = networkMenu;
         props = langUtils.getProps();
-        savedNotes = FXCollections.observableArrayList(noteServerUtils.getAllNotes());
+        savedNotes = FXCollections.observableArrayList(
+                collectionServerUtils.getAllNotesInCollection(
+                        currentCollection.getCollectionUniqueName(),
+                        currentCollection.getServer()));
         processNotes(collectionServerUtils.getAllNotesInCollection(
                 currentCollection.getCollectionUniqueName(),
                 currentCollection.getServer()));
@@ -519,7 +522,7 @@ public class MainCtrl {
      */
     public void commitAddNote(Note note, int index) {
         savedNotes.add(index, note);
-        noteServerUtils.storeNote(note);
+        noteServerUtils.storeNote(note, currentCollection.getServer());
 
         collectionServerUtils.addNoteToCollection(
                 currentDefaultCollection.getCollectionUniqueName(),
@@ -553,7 +556,8 @@ public class MainCtrl {
      */
     public void commitDeleteNote(int noteIndex) {
         Note deletedNote = savedNotes.get(noteIndex);
-        noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle());
+        noteServerUtils.deleteNote(savedNotes.get(noteIndex).getTitle(),
+                currentCollection.getServer());
         savedNotes.remove(noteIndex);
         filesListView.getItems().clear();
         if (!savedNotes.isEmpty()) {
@@ -627,8 +631,9 @@ public class MainCtrl {
 
         collectionServerUtils.moveNoteToAnotherCollection(
                 source.getCollectionUniqueName(),
-                note.getTitle(),
+                note,
                 collection.getCollectionUniqueName(),
+                source.getServer(),
                 collection.getServer()
         );
 
@@ -694,10 +699,10 @@ public class MainCtrl {
                 renderedNoteView.getEngine().loadContent(props.get("renderedNoteViewEmpty").get());
             }
             List<EmbeddedFile> files = embeddedFileServerUtils.getFilesFromNote(
-                    noteServerUtils.getServerAddress(), note.getTitle());
+                    currentCollection.getServer(), note.getTitle());
             if (files != null)
-                for (int i = 0; i < files.size(); i++) {
-                    addFileElement(files.get(i));
+                for (EmbeddedFile file : files) {
+                    addFileElement(file);
                 }
 
 
@@ -742,7 +747,9 @@ public class MainCtrl {
             HashMap<String, String> patch = new HashMap<>();
             patch.put("title", selectedNote.getTitle());
             patch.put("text", content);
-            noteServerUtils.updateNote(selectedNote.getTitle(), patch);
+            noteServerUtils.updateNote(selectedNote.getTitle(),
+                    patch,
+                    currentCollection.getServer());
 
             selectedNote.setText(content);
             notesList.refresh();
@@ -758,9 +765,14 @@ public class MainCtrl {
      * and adds them to the list.
      */
     public void handleRefreshNote() {
-        List<Note> serverNotes = noteServerUtils.getAllNotes();
-        noteUtils.sync(savedNotes, serverNotes);
-        notesList.refresh();
+        Optional<MenuItem> menuItem = collectionDropdown
+                .getItems()
+                .stream()
+                .filter(mi -> mi.getId().equals(currentCollection.getCollectionUniqueName()))
+                .findFirst();
+        if (menuItem.isEmpty())
+            System.out.println("Could not fetch the current collection from the server");
+        else menuItem.get().fire();
     }
 
     /**
@@ -842,7 +854,9 @@ public class MainCtrl {
                 selectedNote.setTitle(updatedTitle);
 
                 try {
-                    noteServerUtils.updateNote(previousTitle, Map.of("title", updatedTitle));
+                    noteServerUtils.updateNote(previousTitle,
+                            Map.of("title", updatedTitle),
+                            currentCollection.getServer());
                 } catch (Exception e) {
                     selectedNote.setTitle(previousTitle);
                     return;
@@ -862,7 +876,7 @@ public class MainCtrl {
             notesList.setItems(FXCollections.observableArrayList(savedNotes));
             notesList.getSelectionModel().select(newIndex);
             notesList.refresh();
-            noteServerUtils.storeNote(firstNote);
+            noteServerUtils.storeNote(firstNote, currentCollection.getServer());
 
             renderedNoteTitleLabel.textProperty().unbind();
             renderedNoteTitleLabel.setText(updatedTitle);
@@ -878,7 +892,7 @@ public class MainCtrl {
      */
     public boolean isTitlePresent(String title) {
         return noteServerUtils.
-                getAllNotes().
+                getAllNotes(currentCollection.getServer()).
                 stream().
                 anyMatch(note -> note.getTitle().equals(title));
     }
@@ -1125,9 +1139,22 @@ public class MainCtrl {
                     : collection.getAlias();
 
             MenuItem itemCollection = new MenuItem(displayName);
+            itemCollection.setId(collection.getCollectionUniqueName());
             itemCollection.setOnAction(_ -> {
+                if (!serverUtils.isServerAvailable(collection.getServer())) {
+                    Notification.create(stage,
+                            props.get("serverNotReachableAlertTitle").get() +
+                                    ": " +
+                                    collection.getServer(),
+                            NotificationType.ERROR);
+                    return;
+                }
                 currentCollection = collection;
                 undoHandler.clear();
+                savedNotes.clear();
+                savedNotes.addAll(collectionServerUtils.getAllNotesInCollection(
+                        collection.getCollectionUniqueName(),
+                        collection.getServer()));
                 if (currentCollection.getCollectionUniqueName()
                         .equals(configLoader.getDefaultCollectionUniqueName())) {
                     currentDefaultCollection = collection;
@@ -1142,18 +1169,6 @@ public class MainCtrl {
             });
             collectionDropdown.getItems().add(itemCollection);
         }
-        MenuItem itemAll = new MenuItem(props.get("AllCollectionDropdown").get());
-        itemAll.setOnAction(_ -> {
-            Set setOfNotes = new HashSet<>();
-            for(Collection collection : configLoader.getCollections()) {
-                for(Note note : collectionServerUtils.getAllNotesInCollection(
-                        collection.getCollectionUniqueName(),collection.getServer())) {
-                    setOfNotes.add(note);
-                }
-            }
-            processNotes(setOfNotes.stream().toList());
-        });
-        collectionDropdown.getItems().add(itemAll);
         collectionDropdown.getItems().add(editCollectionsDropdownOption);
     }
 
@@ -1194,9 +1209,6 @@ public class MainCtrl {
     /**
      * Renaming a file Pop-up
      */
-    /**
-     * Renaming a file Pop-up
-     */
     @FXML
     private void handleRename() {
         EmbeddedFile selectedFile = filesListView.getSelectionModel().getSelectedItem();
@@ -1221,7 +1233,7 @@ public class MainCtrl {
                     .substring(selectedFile.getType().indexOf('/') + 1);
 
             // Rename on the server
-            embeddedFileServerUtils.renameEmbeddedFile(noteServerUtils.getServerAddress(),
+            embeddedFileServerUtils.renameEmbeddedFile(currentCollection.getServer(),
                     notesList.getSelectionModel().getSelectedItem().getTitle(),
                     oldName, newName);
 
@@ -1262,7 +1274,7 @@ public class MainCtrl {
             return;
         }
 
-        embeddedFileServerUtils.deleteEmbeddedFile(noteServerUtils.getServerAddress(),
+        embeddedFileServerUtils.deleteEmbeddedFile(currentCollection.getServer(),
                 notesList.getSelectionModel().getSelectedItem().getTitle(),
                 selectedFile.getName());
         String toDelete = constructLink(selectedFile);
@@ -1281,7 +1293,7 @@ public class MainCtrl {
 
     public void addFileElement(EmbeddedFile embeddedFile) {
         filesListView.getItems().add(embeddedFile);
-        filesListView.setCellFactory(param -> new ListCell<EmbeddedFile>() {
+        filesListView.setCellFactory(_ -> new ListCell<>() {
             @Override
             protected void updateItem(EmbeddedFile file, boolean empty) {
                 super.updateItem(file, empty);
@@ -1337,7 +1349,7 @@ public class MainCtrl {
                         getSelectedItem().getTitle(),
                 StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         toAdd = toAdd + "[" + embeddedFile.getName() + "]("
-                + noteServerUtils.getServerAddress() + "api/files/" + noteName
+                + currentCollection.getServer() + "api/files/" + noteName
                 + "/content/" + fileName + ")";
         return toAdd;
     }

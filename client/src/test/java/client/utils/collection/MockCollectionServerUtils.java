@@ -65,7 +65,7 @@ public class MockCollectionServerUtils extends CollectionServerUtils {
     }
 
     @Override
-    public void moveNoteToAnotherCollection(String uniqueName, String noteTitle, String targetUniqueName, String serverAddress) {
+    public void moveNoteToAnotherCollection(String uniqueName, Note note, String targetUniqueName, String serverAddress, String targetServerAddress) {
         // TODO
     }
 
