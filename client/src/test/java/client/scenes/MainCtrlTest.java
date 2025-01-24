@@ -179,4 +179,10 @@ class MainCtrlTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    public void formatFileSizeTest(){
+        long size = 2048;
+        String s = sut.formatFileSize(size);
+        assertEquals("2.0 KB", s);
+    }
 }
