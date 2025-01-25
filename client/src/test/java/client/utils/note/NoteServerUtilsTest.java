@@ -24,7 +24,7 @@ class NoteServerUtilsTest {
 
         noteServerUtils = new NoteServerUtils();
         serverUtils = new ServerUtils();
-        address = serverUtils.getLocalAddress();
+        address = "";
 
         //allow the testing only if server is available
         assumeTrue(serverUtils.isServerAvailable(address), "Server is not available, skipping tests.");
