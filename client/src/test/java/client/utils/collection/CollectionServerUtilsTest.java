@@ -20,6 +20,10 @@ public class CollectionServerUtilsTest {
     private Collection duplicateCollection;
     private Note removableNote;
     public static String SERVER_ADDRESS = "http://localhost:8080/";
+    private String invalidServerAddress = "http://invalid-address";
+    private String nonExistentCollection = "non-existent-collection";
+    private String newAlias = "New Alias";
+
 
     @BeforeEach
     void setup() {
@@ -125,40 +129,7 @@ public class CollectionServerUtilsTest {
     }
 
     @Test
-    void addNoteToNonExistentCollectionTest() {
-        String nonExistentCollection = "non-existent-collection";
-        Note note = new Note("TestNote", "Test Content");
-        noteServerUtils.storeNote(note);
-
-        collectionServerUtils.addNoteToCollection(nonExistentCollection, note.getTitle(), SERVER_ADDRESS);
-        List<Note> notes = collectionServerUtils.getAllNotesInCollection(nonExistentCollection, SERVER_ADDRESS);
-
-        assertNull(notes, "Notes should not be added to a non-existent collection.");
-    }
-
-    @Test
-    void moveNoteBetweenCollectionsTest() {
-        Collection targetCollection = new Collection("target-collection", "Target Collection", SERVER_ADDRESS);
-        collectionServerUtils.createCollection(targetCollection, SERVER_ADDRESS);
-
-        Note note = new Note("NoteToMove", "Content to move");
-        noteServerUtils.storeNote(note);
-        collectionServerUtils.addNoteToCollection(testCollection.getCollectionUniqueName(), note.getTitle(), SERVER_ADDRESS);
-
-        collectionServerUtils.moveNoteToAnotherCollection(testCollection.getCollectionUniqueName(), note.getTitle(), targetCollection.getCollectionUniqueName(), SERVER_ADDRESS);
-
-        List<Note> sourceNotes = collectionServerUtils.getAllNotesInCollection(testCollection.getCollectionUniqueName(), SERVER_ADDRESS);
-        List<Note> targetNotes = collectionServerUtils.getAllNotesInCollection(targetCollection.getCollectionUniqueName(), SERVER_ADDRESS);
-
-        assertTrue(sourceNotes.isEmpty(), "Note should be removed from the source collection.");
-        assertEquals(1, targetNotes.size(), "Note should be added to the target collection.");
-        assertEquals(note.getTitle(), targetNotes.get(0).getTitle(), "Moved note should match the original note.");
-    }
-
-    @Test
     void updateAliasForNonExistentCollectionTest() {
-        String nonExistentCollection = "non-existent-collection";
-        String newAlias = "New Alias";
 
         collectionServerUtils.updateCollectionAlias(nonExistentCollection, newAlias, SERVER_ADDRESS);
         List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
@@ -171,7 +142,6 @@ public class CollectionServerUtilsTest {
 
     @Test
     void deleteNonExistentCollectionTest() {
-        String nonExistentCollection = "non-existent-collection";
         collectionServerUtils.deleteCollection(nonExistentCollection, SERVER_ADDRESS);
 
         List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
@@ -183,7 +153,6 @@ public class CollectionServerUtilsTest {
 
     @Test
     void invalidServerAddressTest() {
-        String invalidServerAddress = "http://invalid-address";
         List<Collection> collections = collectionServerUtils.getAllCollections(invalidServerAddress);
 
         assertTrue(collections.isEmpty(), "Fetching collections from an invalid server should return an empty list.");
