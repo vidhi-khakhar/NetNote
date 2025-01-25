@@ -31,6 +31,7 @@ public class CollectionServerUtilsTest {
         serverUtils = new ServerUtils();
 
         assumeTrue(serverUtils.isServerAvailable(SERVER_ADDRESS), "Server is not available, skipping tests.");
+
         testCollection = new Collection("test-collection", "Test Collection Alias", SERVER_ADDRESS);
         collectionServerUtils.createCollection(testCollection, SERVER_ADDRESS);
         Collection duplicateCollection = new Collection("test-collection", "Duplicate Alias", SERVER_ADDRESS);
