@@ -15,10 +15,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Controller for the "Edit collections..." menu
@@ -52,6 +53,9 @@ public class EditCollectionsCtrl {
     private Map<String, StringProperty> props;
     private boolean isSelectedCollectionListenerDisabled = false;
     private String oldAlias;
+
+    @FXML
+    private AnchorPane root;
 
     @FXML
     private Text menuTitle;
@@ -155,8 +159,25 @@ public class EditCollectionsCtrl {
                     serverInput.setText(newValue.getServer());
                     uniqueNameInput.setText(newValue.getCollectionUniqueName());
                 });
-
+        initializeShortcuts();
         initializeTextProperties();
+    }
+
+    private void initializeShortcuts() {
+        root.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            List<String> eventKeys = new ArrayList<>();
+            if (event.isControlDown()) eventKeys.add("Ctrl");
+            if (event.isAltDown()) eventKeys.add("Alt");
+            if (event.isShiftDown()) eventKeys.add("Shift");
+            eventKeys.add(event.getCode().getChar());
+
+            switch (String.join("+", eventKeys)) {
+                case "Ctrl+N" -> handleAddCollection();
+                case "Ctrl+D" -> handleRemoveCollection();
+                case "Ctrl+S" -> handleSave();
+                case "Alt+L" -> collectionsList.requestFocus();
+            }
+        });
     }
 
     private void initializeTextProperties() {

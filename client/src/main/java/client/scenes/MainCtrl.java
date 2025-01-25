@@ -276,6 +276,7 @@ public class MainCtrl {
             }
 
             switch (String.join("+", eventKeys)) {
+                case "Esc", "Ctrl+F" -> searchBar.requestFocus();
                 case "Ctrl+Z" -> {
                     try {
                         undoHandler.undoAction();
@@ -296,11 +297,22 @@ public class MainCtrl {
                 }
                 case "Ctrl+N" -> handleAddNote();
                 case "Ctrl+D" -> handleDeleteNote();
+                case "Ctrl+M" -> handleMoveNote();
+                case "Ctrl+R" -> handleRefreshNote();
                 case "Ctrl+B" -> applyMarkdownShortcut("**", "**");
                 case "Ctrl+I" -> applyMarkdownShortcut("*", "*");
                 case "Ctrl+U" -> applyMarkdownShortcut("<u>", "</u>");
                 case "Ctrl+L" -> cycleLanguage(false);
                 case "Ctrl+Shift+L" -> cycleLanguage(true);
+                case "Ctrl+Shift+C" -> showEditCollectionsMenu();
+                case "Ctrl+Alt+M" -> problemsCheckbox.fire();
+                case "Alt+N" -> notesList.requestFocus();
+                case "Alt+E" -> noteEditor.requestFocus();
+                case "Alt+F" -> filesListView.requestFocus();
+                case "Alt+C" -> {
+                    populateCollectionsDropdown();
+                    collectionDropdown.fire();
+                }
             }
         });
     }
@@ -1370,6 +1382,7 @@ public class MainCtrl {
      */
     public void showShortcutsOverview() {
         Stage secondaryStage = new Stage();
+        secondaryStage.titleProperty().bind(props.get("keyboardShortcutName"));
         secondaryStage.setScene(shortcutsOverview);
         secondaryStage.show();
     }

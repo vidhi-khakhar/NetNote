@@ -8,193 +8,442 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="600.0" maxWidth="500.0" prefHeight="368.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.ShortcutCtrl">
-    <children>
-        <VBox prefHeight="368.0" prefWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>
-                <HBox prefHeight="75.0" prefWidth="260.0" style="-fx-background-color: #ceddf5; -fx-border-color: #6c8bbd; -fx-border-width: 5 5 0 5;">
-                    <children>
-                        <Label fx:id="keyboardShortcut" alignment="CENTER" prefHeight="46.0" prefWidth="301.0" text="\%label.keyboardShortcuts" HBox.hgrow="ALWAYS">
-                            <font>
-                                <Font name="System Bold" size="16.0" />
-                            </font>
-                            <HBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </HBox.margin>
-                        </Label>
-                    </children>
+<AnchorPane maxHeight="600.0" maxWidth="594.0" prefHeight="561.0" prefWidth="449.0"
+            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="client.scenes.ShortcutCtrl">
+    <VBox prefHeight="368.0" prefWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <HBox alignment="CENTER" prefHeight="75.0" prefWidth="450.0"
+              style="-fx-background-color: #ceddf5; -fx-border-color: #6c8bbd; -fx-border-width: 5 5 0 5;">
+            <Label fx:id="keyboardShortcut" alignment="CENTER" prefHeight="46.0" prefWidth="301.0"
+                   text="\%label.keyboardShortcuts" HBox.hgrow="ALWAYS">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+                <HBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </HBox.margin>
+            </Label>
+        </HBox>
+        <HBox prefHeight="314.0" prefWidth="260.0" style="-fx-background-color: #6c8bbd;" VBox.vgrow="ALWAYS">
+            <VBox spacing="5.0" style="-fx-background-color: #ceddf5;" HBox.hgrow="ALWAYS">
+                <HBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0"/>
+                </HBox.margin>
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </padding>
+                <HBox alignment="CENTER_LEFT" minHeight="-Infinity" minWidth="-Infinity"
+                      style="-fx-background-color: white; -fx-background-radius: 2;" VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                    <Label fx:id="searchShortcut" maxWidth="250.0" text="\%label.searchShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="ESC / Ctrl + F" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
                 </HBox>
-                <HBox prefHeight="314.0" prefWidth="260.0" style="-fx-background-color: #6c8bbd;" VBox.vgrow="ALWAYS">
-                    <children>
-                        <VBox prefHeight="286.0" prefWidth="269.0" style="-fx-background-color: #ceddf5;" HBox.hgrow="ALWAYS">
-                            <HBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </HBox.margin>
-                            <children>
-                                <HBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="244.0" style="-fx-background-color: white; -fx-background-radius: 2;" VBox.vgrow="ALWAYS">
-                                    <VBox.margin>
-                                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
-                                    </VBox.margin>
-                                    <children>
-                                        <Label fx:id="searchShortcut" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="150.0" text="\%label.searchShortcut" HBox.hgrow="ALWAYS">
-                                            <HBox.margin>
-                                                <Insets left="7.0" />
-                                            </HBox.margin>
-                                            <font>
-                                                <Font name="System Bold" size="12.0" />
-                                            </font>
-                                        </Label>
-                                        <Label alignment="CENTER" layoutX="17.0" layoutY="10.0" prefHeight="38.0" prefWidth="116.0" text="ESC" HBox.hgrow="NEVER">
-                                            <font>
-                                                <Font name="System Italic" size="12.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                </HBox>
-                                <HBox layoutX="13.0" layoutY="13.0" prefHeight="35.0" prefWidth="244.0" style="-fx-background-color: white; -fx-background-radius: 2;" VBox.vgrow="ALWAYS">
-                                    <children>
-                                        <Label fx:id="addShortcut" prefHeight="38.0" prefWidth="150.0" text="\%label.addShortcut" HBox.hgrow="ALWAYS">
-                                            <HBox.margin>
-                                                <Insets left="7.0" />
-                                            </HBox.margin>
-                                            <font>
-                                                <Font name="System Bold" size="12.0" />
-                                            </font>
-                                        </Label>
-                                        <Label alignment="CENTER" layoutX="17.0" layoutY="10.0" prefHeight="38.0" prefWidth="116.0" text="Ctrl + N" HBox.hgrow="ALWAYS">
-                                            <font>
-                                                <Font name="System Italic" size="12.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                    <VBox.margin>
-                                        <Insets bottom="3.0" left="3.0" right="3.0" />
-                                    </VBox.margin>
-                                </HBox>
-                                <HBox layoutX="10.0" layoutY="52.0" prefHeight="35.0" prefWidth="244.0" style="-fx-background-color: white; -fx-background-radius: 2;" VBox.vgrow="ALWAYS">
-                                    <children>
-                                        <Label fx:id="deleteShortcut" prefHeight="38.0" prefWidth="150.0" text="\%label.deleteShortcut" HBox.hgrow="ALWAYS">
-                                            <HBox.margin>
-                                                <Insets left="7.0" />
-                                            </HBox.margin>
-                                            <font>
-                                                <Font name="System Bold" size="12.0" />
-                                            </font>
-                                        </Label>
-                                        <Label alignment="CENTER" layoutX="17.0" layoutY="10.0" prefHeight="38.0" prefWidth="116.0" text="Ctrl + D">
-                                            <font>
-                                                <Font name="System Italic" size="12.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                    <VBox.margin>
-                                        <Insets bottom="3.0" left="3.0" right="3.0" />
-                                    </VBox.margin>
-                                </HBox>
-                                <HBox layoutX="10.0" layoutY="87.0" prefHeight="35.0" prefWidth="244.0" style="-fx-background-color: white; -fx-background-radius: 2;" VBox.vgrow="ALWAYS">
-                                    <children>
-                                        <Label fx:id="refreshShortcut" prefHeight="38.0" prefWidth="150.0" text="\%label.refreshShortcut" HBox.hgrow="ALWAYS">
-                                            <HBox.margin>
-                                                <Insets left="7.0" />
-                                            </HBox.margin>
-                                            <font>
-                                                <Font name="System Bold" size="12.0" />
-                                            </font>
-                                        </Label>
-                                        <Label alignment="CENTER" layoutX="17.0" layoutY="10.0" prefHeight="38.0" prefWidth="116.0" text="Ctrl + R">
-                                            <font>
-                                                <Font name="System Italic" size="12.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                    <VBox.margin>
-                                        <Insets bottom="3.0" left="3.0" right="3.0" />
-                                    </VBox.margin>
-                                </HBox>
-                                <HBox layoutX="10.0" layoutY="122.0" prefHeight="35.0" prefWidth="244.0" style="-fx-background-color: white; -fx-background-radius: 2;" VBox.vgrow="ALWAYS">
-                                    <children>
-                                        <Label fx:id="undoShortcut" prefHeight="38.0" prefWidth="150.0" text="\%label.undoShortcut" HBox.hgrow="ALWAYS">
-                                            <HBox.margin>
-                                                <Insets left="7.0" />
-                                            </HBox.margin>
-                                            <font>
-                                                <Font name="System Bold" size="12.0" />
-                                            </font>
-                                        </Label>
-                                        <Label alignment="CENTER" layoutX="17.0" layoutY="10.0" prefHeight="38.0" prefWidth="116.0" text="Ctrl + Z">
-                                            <font>
-                                                <Font name="System Italic" size="12.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                    <VBox.margin>
-                                        <Insets bottom="3.0" left="3.0" right="3.0" />
-                                    </VBox.margin>
-                                </HBox>
-                                <HBox layoutX="10.0" layoutY="157.0" prefHeight="35.0" prefWidth="244.0" style="-fx-background-color: white; -fx-background-radius: 2;" VBox.vgrow="ALWAYS">
-                                    <children>
-                                        <Label fx:id="redoShortcut" prefHeight="38.0" prefWidth="150.0" text="\%label.redoShortcut" HBox.hgrow="ALWAYS">
-                                            <HBox.margin>
-                                                <Insets left="7.0" />
-                                            </HBox.margin>
-                                            <font>
-                                                <Font name="System Bold" size="12.0" />
-                                            </font>
-                                        </Label>
-                                        <Label alignment="CENTER" layoutX="17.0" layoutY="10.0" prefHeight="38.0" prefWidth="116.0" text="Ctrl + Y">
-                                            <font>
-                                                <Font name="System Italic" size="12.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                    <VBox.margin>
-                                        <Insets bottom="3.0" left="3.0" right="3.0" />
-                                    </VBox.margin>
-                                </HBox>
-                                <HBox layoutX="13.0" layoutY="205.0" prefHeight="35.0" prefWidth="244.0" style="-fx-background-color: white; -fx-background-radius: 2;" VBox.vgrow="ALWAYS">
-                                    <children>
-                                        <Label fx:id="cycleShortcut" prefHeight="38.0" prefWidth="150.0" text="\%label.cycleShortcut" HBox.hgrow="ALWAYS">
-                                            <HBox.margin>
-                                                <Insets left="7.0" />
-                                            </HBox.margin>
-                                            <font>
-                                                <Font name="System Bold" size="12.0" />
-                                            </font>
-                                        </Label>
-                                        <Label alignment="CENTER" layoutX="17.0" layoutY="10.0" prefHeight="38.0" prefWidth="116.0" text="Ctrl + A">
-                                            <font>
-                                                <Font name="System Italic" size="12.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                    <VBox.margin>
-                                        <Insets bottom="3.0" left="3.0" right="3.0" />
-                                    </VBox.margin>
-                                </HBox>
-                            </children>
-                        </VBox>
-                    </children>
+                <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 2;"
+                      VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                    <Label fx:id="addShortcut" maxWidth="250.0" text="\%label.addShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + N" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
                 </HBox>
-                <HBox prefHeight="50.0" prefWidth="260.0" style="-fx-background-color: #6c8bbd;">
-                    <children>
-                        <HBox prefHeight="41.0" prefWidth="250.0" style="-fx-background-color: #ceddf5; -fx-background-radius: 2;" HBox.hgrow="ALWAYS">
-                            <HBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" />
-                            </HBox.margin>
-                            <children>
-                                <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#closeShortcutOverview" prefHeight="10.0" prefWidth="40.0" text="OK">
-                                    <HBox.margin>
-                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                    </HBox.margin>
-                                    <font>
-                                        <Font name="System Bold" size="10.0" />
-                                    </font>
-                                </Button>
-                            </children>
-                        </HBox>
-                    </children>
+                <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 2;"
+                      VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                    <Label fx:id="deleteShortcut" maxWidth="250.0" text="\%label.deleteShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + D" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
                 </HBox>
-            </children>
-        </VBox>
-    </children>
+                <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 2;"
+                      VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                    <Label fx:id="refreshShortcut" maxWidth="250.0" text="\%label.refreshShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + R" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 2;"
+                      VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                    <Label fx:id="undoShortcut" maxWidth="250.0" text="\%label.undoShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + Z" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 2;"
+                      VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                    <Label fx:id="redoShortcut" maxWidth="250.0" text="\%label.redoShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + Y" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 2;"
+                      VBox.vgrow="ALWAYS">
+                    <Label fx:id="moveNoteShortcut" maxWidth="250.0" text="\%label.moveNoteShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + M" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="boldTextShortcut" maxWidth="250.0" text="\%label.boldTextShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + B" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="italicTextShortcut" maxWidth="250.0" text="\%label.italicTextShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + I" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="underlineTextShortcut" maxWidth="250.0"
+                           text="\%label.underlineTextShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + U" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="cycleLanguageShortcut" maxWidth="250.0"
+                           text="\%label.cycleLanguageShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + L" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="cycleLanguageShortcutReverse" maxWidth="250.0"
+                           text="\%label.cycleLanguageShortcutReverse" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + Shift + L" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="editCollectionsShortcut" maxWidth="250.0"
+                           text="\%label.editCollectionsShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + Shift + C" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="toggleProblemsShortcut" maxWidth="250.0"
+                           text="\%label.toggleProblemsShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + Alt + M" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="focusNoteListShortcut" maxWidth="250.0"
+                           text="\%label.focusNoteListShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Alt + N" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="focusFileListShortcut" maxWidth="250.0"
+                           text="\%label.focusFileListShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Alt + F" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="focusNoteEditorShortcut" maxWidth="250.0"
+                           text="\%label.focusNoteEditorShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Alt + E" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="focusCollectionDropdownShortcut" maxWidth="250.0"
+                           text="\%label.focusCollectionDropdownShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Alt + C" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="addCollectionShortcut" maxWidth="250.0"
+                           text="\%label.addCollectionShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + N" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="removeCollectionShortcut" maxWidth="250.0"
+                           text="\%label.removeCollectionShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + D" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="saveShortcut" maxWidth="250.0" text="\%label.saveShortcut"
+                           HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Ctrl + S" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT"
+                      style="-fx-background-color: white; -fx-background-radius: 2;">
+                    <Label fx:id="focusCollectionListShortcut" maxWidth="250.0"
+                           text="\%label.focusCollectionListShortcut" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="7.0"/>
+                        </HBox.margin>
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Label layoutX="17.0" layoutY="10.0" text="Alt + L" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Italic" size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+            </VBox>
+        </HBox>
+        <HBox prefHeight="50.0" prefWidth="260.0" style="-fx-background-color: #6c8bbd;">
+            <HBox alignment="CENTER" prefHeight="41.0" prefWidth="250.0"
+                  style="-fx-background-color: #ceddf5; -fx-background-radius: 2;" HBox.hgrow="ALWAYS">
+                <HBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0"/>
+                </HBox.margin>
+                <Button maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false"
+                        onAction="#closeShortcutOverview" prefHeight="40.0" prefWidth="50.0"
+                        style="-fx-border-color: BLACK; -fx-border-radius: 3;" text="OK">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </HBox.margin>
+                    <font>
+                        <Font name="System Bold" size="10.0"/>
+                    </font>
+                </Button>
+            </HBox>
+        </HBox>
+    </VBox>
 </AnchorPane>

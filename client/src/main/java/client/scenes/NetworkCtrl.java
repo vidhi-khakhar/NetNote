@@ -113,7 +113,7 @@ public class NetworkCtrl {
         refreshServerList();
 
         serverList.getSelectionModel().selectedItemProperty().addListener((_, _, selected) -> {
-            if (!serverUtils.isServerAvailable(selected)) {
+            if (selected != null && !serverUtils.isServerAvailable(selected)) {
                 uiUtils.showPopUp(langUtils.getProps().get("serverNotReachableAlertTitle").get(),
                         langUtils.getProps().get("serverNotReachableAlertTitle").get() +
                                 ": " +
