@@ -615,6 +615,15 @@ public class MainCtrl {
                 .stream()
                 .filter(c -> c.getAlias().equals(targetCollectionAlias)).findFirst().get();
 
+        if (!serverUtils.isServerAvailable(target.getServer())) {
+            uiUtils.showPopUp(langUtils.getProps().get("serverNotReachableAlertTitle").get(),
+                    langUtils.getProps().get("serverNotReachableAlertTitle").get() +
+                            ": " +
+                            target.getServer(),
+                    Alert.AlertType.ERROR);
+            return;
+        }
+
         commitMoveNote(selectedNote, currentCollection, target);
 
         undoHandler.pushAction(new MoveNoteAction(selectedNote, currentCollection, target, this));
