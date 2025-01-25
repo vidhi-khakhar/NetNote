@@ -15,7 +15,7 @@
 
 <?import javafx.scene.control.Tooltip?>
 <AnchorPane prefHeight="250.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EditCollectionsCtrl">
-   <HBox alignment="CENTER" fillHeight="false" minWidth="-Infinity" prefWidth="500.0" style="-fx-border-color: BLACK; -fx-border-width: 0 0 1 0; -fx-background-color: WHITE;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+   <HBox alignment="CENTER" fillHeight="false" minWidth="-Infinity" prefWidth="500.0" style="-fx-border-color: #496BA2; -fx-border-width: 0 0 3 0; -fx-background-color: #ceddf5;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <padding>
          <Insets bottom="8.0" top="8.0" />
       </padding>
@@ -59,6 +59,9 @@
                </graphic>
             </Button>
          </HBox>
+         <HBox.margin>
+            <Insets top="5.0" />
+         </HBox.margin>
       </VBox>
       <VBox spacing="4.0" style="-fx-border-color: BLACK; -fx-border-width: 0 0 0 1;" HBox.hgrow="SOMETIMES">
          <padding>
