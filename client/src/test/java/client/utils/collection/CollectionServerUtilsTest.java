@@ -19,7 +19,7 @@ public class CollectionServerUtilsTest {
     private Collection testCollection;
     private Collection duplicateCollection;
     private Note removableNote;
-    public static String SERVER_ADDRESS = "http://localhost:8080/";
+    public static String SERVER_ADDRESS = ""; //  there isn't a mock server to be used when testing
     private String invalidServerAddress = "http://invalid-address";
     private String nonExistentCollection = "non-existent-collection";
     private String newAlias = "New Alias";
