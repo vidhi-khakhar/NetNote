@@ -1382,6 +1382,7 @@ public class MainCtrl {
      */
     public void showShortcutsOverview() {
         Stage secondaryStage = new Stage();
+        secondaryStage.titleProperty().bind(props.get("keyboardShortcutName"));
         secondaryStage.setScene(shortcutsOverview);
         secondaryStage.show();
     }

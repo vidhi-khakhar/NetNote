@@ -54,7 +54,7 @@
                      <Insets left="5.0" top="5.0" />
                   </VBox.margin>
                </ListView>
-               <HBox alignment="CENTER" prefHeight="30.0" prefWidth="234.0" style="-fx-background-color: #ceddf5; -fx-border-color: #496BA2; -fx-border-width: 5 0 5 0;">
+               <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="46.0" prefWidth="251.0" style="-fx-background-color: #ceddf5; -fx-border-color: #496BA2; -fx-border-width: 5 0 5 0;">
                   <VBox.margin>
                      <Insets top="5.0" />
                   </VBox.margin>
@@ -248,18 +248,16 @@
          <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: #496BA2; -fx-border-width: 3 0 0 0; -fx-background-color: #ceddf5;">
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                <HBox.margin>
-                  <Insets right="5.0"/>
+                  <Insets right="5.0" />
                </HBox.margin>
-               <Button fx:id="deleteFile" mnemonicParsing="false" onAction="#handleDelete"
-                       style="-fx-border-color: BLACK; -fx-border-radius: 3px;" text="\%label.deleteFile">
+               <Button fx:id="deleteFile" mnemonicParsing="false" onAction="#handleDelete" style="-fx-border-color: BLACK; -fx-border-radius: 3px;" text="\%label.deleteFile">
                   <HBox.margin>
-                     <Insets right="5.0"/>
+                     <Insets right="5.0" />
                   </HBox.margin>
                </Button>
-               <Button fx:id="renameFile" mnemonicParsing="false" onAction="#handleRename"
-                       style="-fx-border-color: BLACK; -fx-border-radius: 3px;" text="\%label.renameFile">
+               <Button fx:id="renameFile" mnemonicParsing="false" onAction="#handleRename" style="-fx-border-color: BLACK; -fx-border-radius: 3px;" text="\%label.renameFile">
                   <HBox.margin>
-                     <Insets right="5.0"/>
+                     <Insets right="5.0" />
                   </HBox.margin>
                </Button>
             </HBox>
