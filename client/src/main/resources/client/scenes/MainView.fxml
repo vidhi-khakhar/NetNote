@@ -23,15 +23,15 @@
    <HBox prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: #f4f4f4;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <VBox prefHeight="450.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
          <HBox prefHeight="40.0" prefWidth="800.0">
-            <HBox maxWidth="975.0" prefHeight="40.0" prefWidth="500.0" HBox.hgrow="ALWAYS">
+            <HBox prefHeight="40.0" prefWidth="500.0" style="-fx-background-color: #ceddf5;" HBox.hgrow="ALWAYS">
                <TextField fx:id="searchBar" prefHeight="26.0" prefWidth="416.0" promptText="%label.searchPlaceholder" style="-fx-background-color: #ffffff; -fx-border-color: BLACK;" HBox.hgrow="ALWAYS">
                   <HBox.margin>
-                     <Insets left="5.0" top="5.0" />
+                     <Insets left="5.0" right="5.0" top="5.0" />
                   </HBox.margin>
                </TextField>
             </HBox>
          </HBox>
-         <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
+         <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: #496BA2; -fx-border-width: 3 0 0 0; -fx-background-color: #ceddf5;">
                <Label fx:id="addedFilesLabel" prefHeight="50.0" prefWidth="228.0" style="-fx-font-weight: bold;" text="\%label.addedFilesLabel" HBox.hgrow="ALWAYS">
                   <HBox.margin>
                      <Insets left="5.0" right="5.0" />
@@ -47,16 +47,16 @@
                </HBox.margin>
             </ListView>
          </HBox>
-         <HBox prefHeight="370.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;" VBox.vgrow="ALWAYS">
+         <HBox prefHeight="370.0" prefWidth="800.0" style="-fx-border-color: #496BA2; -fx-border-width: 3 0 0 0; -fx-background-color: #ceddf5;" VBox.vgrow="ALWAYS">
             <VBox prefHeight="370.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                <ListView fx:id="notesList" maxWidth="400.0" prefHeight="330.0" prefWidth="134.0" style="-fx-border-width: 1; -fx-border-color: black;" VBox.vgrow="ALWAYS">
                   <VBox.margin>
                      <Insets left="5.0" top="5.0" />
                   </VBox.margin>
                </ListView>
-               <HBox alignment="CENTER" prefHeight="30.0" prefWidth="100.0">
+               <HBox alignment="CENTER" prefHeight="30.0" prefWidth="234.0" style="-fx-background-color: #ceddf5; -fx-border-color: #496BA2; -fx-border-width: 5 0 5 0;">
                   <VBox.margin>
-                     <Insets bottom="5.0" top="5.0" />
+                     <Insets top="5.0" />
                   </VBox.margin>
                   <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="30.0" prefWidth="30.0" style="-fx-background-color: #1bbf51; -fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;">
                      <HBox.margin>
@@ -122,11 +122,14 @@
                         <Tooltip fx:id="tooltipRefresh" text="%label.refresh" />
                      </tooltip>
                   </Button>
+                  <padding>
+                     <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                  </padding>
                </HBox>
             </VBox>
-            <VBox layoutX="10.0" layoutY="10.0" maxWidth="550.0" prefHeight="370.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
+            <VBox layoutX="10.0" layoutY="10.0" maxWidth="550.0" prefHeight="370.0" prefWidth="278.0" HBox.hgrow="ALWAYS">
                <HBox.margin>
-                  <Insets left="5.0" right="5.0" />
+                  <Insets />
                </HBox.margin>
                <Label fx:id="noteEditorLabel" style="-fx-font-weight: bold;" text="%label.noteEditorName">
                   <font>
@@ -148,31 +151,34 @@
                      <Insets left="5.0" right="5.0" top="5.0" />
                   </VBox.margin>
                </TextArea>
-               <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="30.0" prefWidth="100.0">
+               <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="46.0" prefWidth="100.0" style="-fx-background-color: #ceddf5; -fx-border-color: #496BA2; -fx-border-width: 5 0 5 0;">
                   <VBox.margin>
-                     <Insets bottom="5.0" top="5.0" />
+                     <Insets top="5.0" />
                   </VBox.margin>
                      <Button fx:id="addAFile" alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddFile" prefHeight="27.0" prefWidth="178.0" style="-fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="\%label.addAFile" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                         <HBox.margin>
                            <Insets left="5.0" />
                         </HBox.margin>
                      </Button>
+                  <padding>
+                     <Insets bottom="3.0" left="5.0" right="3.0" top="3.0" />
+                  </padding>
                </HBox>
             </VBox>
          </HBox>
       </VBox>
       <VBox maxWidth="550.0" prefHeight="450.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
          <HBox.margin>
-            <Insets right="5.0" />
+            <Insets />
          </HBox.margin>
          <HBox prefHeight="40.0" prefWidth="800.0">
-            <HBox alignment="CENTER_RIGHT" onKeyPressed="#setRO" prefHeight="40.0" prefWidth="250.0" spacing="4.0" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_RIGHT" onKeyPressed="#setRO" prefHeight="40.0" prefWidth="250.0" spacing="4.0" style="-fx-background-color: #ceddf5;" HBox.hgrow="ALWAYS">
                <Label fx:id="collectionLabel" maxWidth="90.0" style="-fx-font-weight: bold;" text="%label.collectionLabel" HBox.hgrow="NEVER">
                   <font>
                      <Font size="14.0" />
                   </font>
                   <HBox.margin>
-                     <Insets bottom="5.0" left="7.0" top="7.0" />
+                     <Insets bottom="5.0" top="7.0" />
                   </HBox.margin>
                </Label>
                <MenuButton fx:id="collectionDropdown" accessibleRole="COMBO_BOX" mnemonicParsing="false" onMouseClicked="#populateCollectionsDropdown" prefWidth="150.0" style="-fx-border-color: BLACK; -fx-border-radius: 2;" text="%label.currentCollectionName" HBox.hgrow="ALWAYS">
@@ -239,15 +245,15 @@
                </Button>
             </HBox>
          </HBox>
-         <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;">
+         <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: #496BA2; -fx-border-width: 3 0 0 0; -fx-background-color: #ceddf5;">
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Button fx:id="deleteFile" mnemonicParsing="false" onAction="#handleDelete" text="\%label.deleteFile">
+                  <Button fx:id="deleteFile" mnemonicParsing="false" onAction="#handleDelete" style="-fx-border-color: black; -fx-font-weight: bold; -fx-border-radius: 3;" text="\%label.deleteFile">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
                   </Button>
-                  <Button fx:id="renameFile" mnemonicParsing="false" onAction="#handleRename" text="\%label.renameFile">
+                  <Button fx:id="renameFile" mnemonicParsing="false" onAction="#handleRename" style="-fx-border-radius: 3; -fx-border-color: black; -fx-font-weight: bold;" text="\%label.renameFile">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
@@ -266,9 +272,12 @@
                            <Image url="@/images/icons/network.png" />
                      </ImageView>
                   </graphic>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
                </Button>
             </HBox>
-         <VBox prefHeight="370.0" prefWidth="300.0" style="-fx-border-color: black; -fx-border-width: 1 0 0 0;" VBox.vgrow="ALWAYS">
+         <VBox prefHeight="370.0" prefWidth="300.0" style="-fx-border-color: #496BA2; -fx-border-width: 3 0 0 0; -fx-background-color: #ceddf5;" VBox.vgrow="ALWAYS">
             <Label fx:id="renderedNoteLabel" maxWidth="1.7976931348623157E308" prefHeight="27.0" style="-fx-font-weight: bold;" text="%label.renderedViewName">
                <font>
                   <Font size="14.0" />
@@ -303,9 +312,9 @@
                </VBox.margin>
                <WebView fx:id="renderedNoteView" maxWidth="550.0" prefHeight="277.0" prefWidth="287.0" HBox.hgrow="ALWAYS" />
             </HBox>
-            <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="30.0" prefWidth="100.0">
+            <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="46.0" prefWidth="100.0" style="-fx-background-color: #ceddf5; -fx-border-color: #496BA2; -fx-border-width: 5 0 5 0;">
                <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
+                  <Insets top="5.0" />
                </VBox.margin>
             </HBox>
          </VBox>

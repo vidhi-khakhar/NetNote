@@ -69,6 +69,12 @@ public class EditCollectionsCtrl {
     private Label labelStatus;
 
     @FXML
+    private Tooltip toolTipAddCollection;
+
+    @FXML
+    private Tooltip toolTipRemoveCollection;
+
+    @FXML
     private Button buttonMakeDefault;
 
     @FXML
@@ -162,6 +168,8 @@ public class EditCollectionsCtrl {
         buttonMakeDefault.textProperty().bind(props.get("buttonMakeDefault"));
         buttonSave.textProperty().bind(props.get("buttonSave"));
         buttonDiscard.textProperty().bind(props.get("buttonDiscard"));
+        toolTipAddCollection.textProperty().bind(props.get("tooltipAddCollection"));
+        toolTipRemoveCollection.textProperty().bind(props.get("tooltipRemoveCollection"));
     }
 
     /**
@@ -327,6 +335,9 @@ public class EditCollectionsCtrl {
         currentAction = CollectionAction.NO_ACTION;
         if (getStatus(server, uniqueName) == CollectionServerStatus.COLLECTION_WILL_BE_CREATED) {
             collectionServerUtils.createCollection(newCollection, server);
+            uiUtils.showPopUp(props.get("NewCollectionCreatedTitle").get(),
+                    props.get("NewCollectionCreatedText").get(),
+                    Alert.AlertType.INFORMATION);
         }
         configLoader.addCollection(newCollection);
         collections.set(collections.size() - 1, newCollection);
@@ -406,7 +417,23 @@ public class EditCollectionsCtrl {
      */
     public void handleMakeDefault() {
         int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
+        if (currentIndex == -1) {
+            uiUtils.showPopUp(props.get("noCollectionSelectedAlertTitle").get(),
+                    props.get("noCollectionToMakeDefaultText").get(),
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        if (currentAction != CollectionAction.NO_ACTION) {
+            showActionConflictPopup();
+            return;
+        }
         Collection currentCollection = collections.get(currentIndex);
+        if (!serverUtils.isServerAvailable(currentCollection.getServer())) {
+            uiUtils.showPopUp(props.get("cannotDefaultUnavailableServerTitle").get(),
+                    props.get("cannotDefaultUnavailableServerText").get(),
+                    Alert.AlertType.ERROR);
+            return;
+        }
 
         configLoader.setDefaultCollectionUniqueName(currentCollection.getCollectionUniqueName());
         configLoader.save();
