@@ -42,6 +42,54 @@ public class ShortcutCtrl {
     @FXML
     private Label undoShortcut;
 
+    @FXML
+    private Label moveNoteShortcut;
+
+    @FXML
+    private Label boldTextShortcut;
+
+    @FXML
+    private Label italicTextShortcut;
+
+    @FXML
+    private Label underlineTextShortcut;
+
+    @FXML
+    private Label cycleLanguageShortcut;
+
+    @FXML
+    private Label cycleLanguageShortcutReverse;
+
+    @FXML
+    private Label editCollectionsShortcut;
+
+    @FXML
+    private Label toggleProblemsShortcut;
+
+    @FXML
+    private Label focusNoteListShortcut;
+
+    @FXML
+    private Label focusFileListShortcut;
+
+    @FXML
+    private Label focusNoteEditorShortcut;
+
+    @FXML
+    private Label focusCollectionDropdownShortcut;
+
+    @FXML
+    private Label addCollectionShortcut;
+
+    @FXML
+    private Label removeCollectionShortcut;
+
+    @FXML
+    private Label saveShortcut;
+
+    @FXML
+    private Label focusCollectionListShortcut;
+
     /**
      * This initialises the controller.
      */
@@ -61,6 +109,23 @@ public class ShortcutCtrl {
         refreshShortcut.textProperty().bind(props.get("refreshShortcutName"));
         undoShortcut.textProperty().bind(props.get("undoShortcutName"));
         redoShortcut.textProperty().bind(props.get("redoShortcutName"));
+        moveNoteShortcut.textProperty().bind(props.get("moveNoteShortcut"));
+        boldTextShortcut.textProperty().bind(props.get("boldTextShortcut"));
+        italicTextShortcut.textProperty().bind(props.get("italicTextShortcut"));
+        underlineTextShortcut.textProperty().bind(props.get("underlineTextShortcut"));
+        cycleLanguageShortcut.textProperty().bind(props.get("cycleLanguageShortcut"));
+        cycleLanguageShortcutReverse.textProperty().bind(props.get("cycleLanguageShortcutReverse"));
+        editCollectionsShortcut.textProperty().bind(props.get("editCollectionsShortcut"));
+        toggleProblemsShortcut.textProperty().bind(props.get("toggleProblemsShortcut"));
+        focusNoteListShortcut.textProperty().bind(props.get("focusNoteListShortcut"));
+        focusFileListShortcut.textProperty().bind(props.get("focusFileListShortcut"));
+        focusNoteEditorShortcut.textProperty().bind(props.get("focusNoteEditorShortcut"));
+        focusCollectionDropdownShortcut.textProperty().bind(
+                props.get("focusCollectionDropdownShortcut"));
+        addCollectionShortcut.textProperty().bind(props.get("addCollectionShortcut"));
+        removeCollectionShortcut.textProperty().bind(props.get("removeCollectionShortcut"));
+        saveShortcut.textProperty().bind(props.get("saveShortcut"));
+        focusCollectionListShortcut.textProperty().bind(props.get("focusCollectionListShortcut"));
     }
 
     /**
