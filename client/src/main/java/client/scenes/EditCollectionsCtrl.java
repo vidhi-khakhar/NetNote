@@ -438,7 +438,23 @@ public class EditCollectionsCtrl {
      */
     public void handleMakeDefault() {
         int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
+        if (currentIndex == -1) {
+            uiUtils.showPopUp(props.get("noCollectionSelectedAlertTitle").get(),
+                    props.get("noCollectionToMakeDefaultText").get(),
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        if (currentAction != CollectionAction.NO_ACTION) {
+            showActionConflictPopup();
+            return;
+        }
         Collection currentCollection = collections.get(currentIndex);
+        if (!serverUtils.isServerAvailable(currentCollection.getServer())) {
+            uiUtils.showPopUp(props.get("cannotDefaultUnavailableServerTitle").get(),
+                    props.get("cannotDefaultUnavailableServerText").get(),
+                    Alert.AlertType.ERROR);
+            return;
+        }
 
         configLoader.setDefaultCollectionUniqueName(currentCollection.getCollectionUniqueName());
         configLoader.save();
