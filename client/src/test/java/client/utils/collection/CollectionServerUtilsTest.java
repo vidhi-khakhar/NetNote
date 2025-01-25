@@ -1,6 +1,6 @@
 package client.utils.collection;
 
-import client.utils.note.NoteServerUtils;
+import client.utils.ServerUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Collection;
 import commons.Note;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class CollectionServerUtilsTest {
 
     private CollectionServerUtils collectionServerUtils;
-    private NoteServerUtils noteServerUtils;
+    private ServerUtils serverUtils;
     private Collection testCollection;
     private Collection duplicateCollection;
     private Note removableNote;
@@ -24,9 +24,9 @@ public class CollectionServerUtilsTest {
     @BeforeEach
     void setup() {
         collectionServerUtils = new CollectionServerUtils(new ObjectMapper());
-        noteServerUtils = new NoteServerUtils();
+        serverUtils = new ServerUtils();
 
-        assumeTrue(noteServerUtils.isServerAvailable(SERVER_ADDRESS), "Server is not available, skipping tests.");
+        assumeTrue(serverUtils.isServerAvailable(SERVER_ADDRESS), "Server is not available, skipping tests.");
         testCollection = new Collection("test-collection", "Test Collection Alias", SERVER_ADDRESS);
         collectionServerUtils.createCollection(testCollection, SERVER_ADDRESS);
         Collection duplicateCollection = new Collection("test-collection", "Duplicate Alias", SERVER_ADDRESS);

@@ -181,6 +181,7 @@ class MainCtrlTest {
 
     @Test
     public void formatFileSizeTest(){
+        Locale.setDefault(Locale.US);
         long size = 2048;
         String s = sut.formatFileSize(size);
         assertEquals("2.0 KB", s);

@@ -10,21 +10,21 @@ public class MockNoteServerUtils extends NoteServerUtils {
     public static Map<String, List<Note>> notes = new HashMap<>();
 
     @Override
-    public List<Note> getAllNotes() {
-        return notes.get(getServerAddress());
+    public List<Note> getAllNotes(String serverAddress) {
+        return notes.get(serverAddress);
     }
 
     @Override
-    public void storeNote(Note note) {
-        if (!notes.containsKey(getServerAddress())) {
-            notes.put(getServerAddress(), new ArrayList<>());
+    public void storeNote(Note note, String serverAddress) {
+        if (!notes.containsKey(serverAddress)) {
+            notes.put(serverAddress, new ArrayList<>());
         }
-        notes.get(getServerAddress()).add(note);
+        notes.get(serverAddress).add(note);
     }
 
     @Override
-    public void updateNote(String title, Map<String, String> noteData) {
-        Optional<Note> noteOptional = notes.get(getServerAddress()).stream().filter(n -> n.getTitle().equals(title)).findFirst();
+    public void updateNote(String title, Map<String, String> noteData, String serverAddress) {
+        Optional<Note> noteOptional = notes.get(serverAddress).stream().filter(n -> n.getTitle().equals(title)).findFirst();
         if (noteOptional.isEmpty()) return;
         Note note = noteOptional.get();
 
@@ -39,10 +39,10 @@ public class MockNoteServerUtils extends NoteServerUtils {
     }
 
     @Override
-    public void deleteNote(String title) {
-        Optional<Note> noteOptional = notes.get(getServerAddress()).stream().filter(n -> n.getTitle().equals(title)).findFirst();
+    public void deleteNote(String title, String serverAddress) {
+        Optional<Note> noteOptional = notes.get(serverAddress).stream().filter(n -> n.getTitle().equals(title)).findFirst();
         if (noteOptional.isEmpty()) return;
         Note note = noteOptional.get();
-        notes.get(getServerAddress()).remove(note);
+        notes.get(serverAddress).remove(note);
     }
 }
