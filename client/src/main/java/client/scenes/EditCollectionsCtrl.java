@@ -428,6 +428,12 @@ public class EditCollectionsCtrl {
             return;
         }
         Collection currentCollection = collections.get(currentIndex);
+        if (!serverUtils.isServerAvailable(currentCollection.getServer())) {
+            uiUtils.showPopUp(props.get("cannotDefaultUnavailableServerTitle").get(),
+                    props.get("cannotDefaultUnavailableServerText").get(),
+                    Alert.AlertType.ERROR);
+            return;
+        }
 
         configLoader.setDefaultCollectionUniqueName(currentCollection.getCollectionUniqueName());
         configLoader.save();
