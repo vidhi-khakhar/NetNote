@@ -406,6 +406,16 @@ public class EditCollectionsCtrl {
      */
     public void handleMakeDefault() {
         int currentIndex = collectionsList.getSelectionModel().getSelectedIndex();
+        if (currentIndex == -1) {
+            uiUtils.showPopUp(props.get("noCollectionSelectedAlertTitle").get(),
+                    props.get("noCollectionToMakeDefaultText").get(),
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        if (currentAction != CollectionAction.NO_ACTION) {
+            showActionConflictPopup();
+            return;
+        }
         Collection currentCollection = collections.get(currentIndex);
 
         configLoader.setDefaultCollectionUniqueName(currentCollection.getCollectionUniqueName());
