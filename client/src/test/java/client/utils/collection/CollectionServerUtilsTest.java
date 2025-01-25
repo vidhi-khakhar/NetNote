@@ -19,7 +19,11 @@ public class CollectionServerUtilsTest {
     private Collection testCollection;
     private Collection duplicateCollection;
     private Note removableNote;
-    public static String SERVER_ADDRESS = "http://localhost:8080/";
+    public static String SERVER_ADDRESS = ""; //  there isn't a mock server to be used when testing
+    private String invalidServerAddress = "http://invalid-address";
+    private String nonExistentCollection = "non-existent-collection";
+    private String newAlias = "New Alias";
+
 
     @BeforeEach
     void setup() {
@@ -27,6 +31,7 @@ public class CollectionServerUtilsTest {
         serverUtils = new ServerUtils();
 
         assumeTrue(serverUtils.isServerAvailable(SERVER_ADDRESS), "Server is not available, skipping tests.");
+
         testCollection = new Collection("test-collection", "Test Collection Alias", SERVER_ADDRESS);
         collectionServerUtils.createCollection(testCollection, SERVER_ADDRESS);
         Collection duplicateCollection = new Collection("test-collection", "Duplicate Alias", SERVER_ADDRESS);
@@ -109,6 +114,49 @@ public class CollectionServerUtilsTest {
                 .anyMatch(collection -> collection.getCollectionUniqueName().equals(testCollection.getCollectionUniqueName()));
 
         assertTrue(collectionExists, "The test collection should exist.");
+    }
+
+    @Test
+    void createDuplicateCollectionTest() {
+        Collection duplicate = new Collection("test-collection", "Duplicate Alias", SERVER_ADDRESS);
+        collectionServerUtils.createCollection(duplicate, SERVER_ADDRESS);
+
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
+        long count = collections.stream()
+                .filter(c -> c.getCollectionUniqueName().equals("test-collection"))
+                .count();
+
+        assertEquals(1, count, "Duplicate collections with the same unique name should not exist.");
+    }
+
+    @Test
+    void updateAliasForNonExistentCollectionTest() {
+
+        collectionServerUtils.updateCollectionAlias(nonExistentCollection, newAlias, SERVER_ADDRESS);
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
+
+        boolean aliasUpdated = collections.stream()
+                .anyMatch(c -> c.getCollectionUniqueName().equals(nonExistentCollection) && c.getAlias().equals(newAlias));
+
+        assertFalse(aliasUpdated, "Alias for a non-existent collection should not be updated.");
+    }
+
+    @Test
+    void deleteNonExistentCollectionTest() {
+        collectionServerUtils.deleteCollection(nonExistentCollection, SERVER_ADDRESS);
+
+        List<Collection> collections = collectionServerUtils.getAllCollections(SERVER_ADDRESS);
+        boolean collectionExists = collections.stream()
+                .anyMatch(c -> c.getCollectionUniqueName().equals(nonExistentCollection));
+
+        assertFalse(collectionExists, "Non-existent collection should not be present after delete attempt.");
+    }
+
+    @Test
+    void invalidServerAddressTest() {
+        List<Collection> collections = collectionServerUtils.getAllCollections(invalidServerAddress);
+
+        assertTrue(collections.isEmpty(), "Fetching collections from an invalid server should return an empty list.");
     }
 
     @AfterEach

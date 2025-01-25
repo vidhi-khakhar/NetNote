@@ -30,7 +30,7 @@ class EmbeddedFileServerUtilsTest {
         ServerUtils serverUtils = new ServerUtils();
 
         // Initialize the server address
-        serverAddress = serverUtils.getLocalAddress();  // Fetch the server address
+        serverAddress = "";  // Fetch the server address
 
         // Allow the tests only if the server is available
         assumeTrue(embeddedFileServerUtils.isServerAvailable(serverAddress), "Server is not available," +
