@@ -616,10 +616,12 @@ public class MainCtrl {
                 .filter(c -> c.getAlias().equals(targetCollectionAlias)).findFirst().get();
 
         if (!serverUtils.isServerAvailable(target.getServer())) {
-            uiUtils.showPopUp(langUtils.getProps().get("serverNotReachableAlertTitle").get(),
-                    langUtils.getProps().get("serverNotReachableAlertTitle").get() +
+            uiUtils.showPopUp(props.get("serverNotReachableAlertTitle").get(),
+                    props.get("serverNotReachableAlertTitle").get() +
                             ": " +
-                            target.getServer(),
+                            target.getServer() +
+                            ". " +
+                            props.get("noteNotMoved").get(),
                     Alert.AlertType.ERROR);
             return;
         }
