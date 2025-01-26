@@ -36,6 +36,7 @@ import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -173,6 +174,9 @@ public class MainCtrl {
 
     @FXML
     private Tooltip tooltipShowShortcuts;
+
+    @FXML
+    private Button downloadFile;
 
     /**
      * Initializes the controller.
@@ -341,6 +345,7 @@ public class MainCtrl {
         tooltipMoveNote.textProperty().bind(props.get("moveNoteTooltip"));
         tooltipRefresh.textProperty().bind(props.get("refresh"));
         tooltipShowShortcuts.textProperty().bind(props.get("showShortcutsTooltip"));
+        downloadFile.textProperty().bind(props.get("downloadFile"));
 
         setLocale(configLoader.getLocale());
     }
@@ -1385,5 +1390,51 @@ public class MainCtrl {
         secondaryStage.titleProperty().bind(props.get("keyboardShortcutName"));
         secondaryStage.setScene(shortcutsOverview);
         secondaryStage.show();
+    }
+
+    /**
+     * Handles the downloading of a selected embedded file.
+     *
+     * @throws IOException If an error occurs while downloading the file.
+     */
+    public void handleDownloadFile() throws IOException {
+        EmbeddedFile selectedFile = filesListView.getSelectionModel().getSelectedItem();
+        if (selectedFile == null) {
+            uiUtils.showPopUp(props.get("deleteFileWarningTitle").get(),
+                    props.get("deleteFileWarningText").get(),
+                    Alert.AlertType.WARNING);
+            return;
+        }
+        downloadFile(selectedFile);
+    }
+
+    /**
+     * Downloads the selected file from the server and saves it to a specified location.
+     *
+     * @param selectedFile The file to be downloaded.
+     * @throws IOException If an error occurs while retrieving or saving the file.
+     */
+    private void downloadFile(EmbeddedFile selectedFile) throws IOException {
+        EmbeddedFile file = new EmbeddedFile();
+        List<EmbeddedFile> allFiles = embeddedFileServerUtils
+                .getFilesFromNote(serverUtils.getLocalAddress(),
+                        notesList.getSelectionModel().getSelectedItem().getTitle());
+        for (EmbeddedFile files : allFiles)
+            if (files.getName().equals(selectedFile.getName())) {
+                file = files;
+                break;
+            }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Set save location");
+        String type = file.getType().substring(file.getType().lastIndexOf('/') + 1);
+        fileChooser.setInitialFileName(file.getName() + "." + type);
+        File f = fileChooser.showSaveDialog(stage);
+        if (f != null) {
+            try (FileOutputStream fos = new FileOutputStream(f)) {
+                fos.write(file.getData());
+                Notification.create(stage, props.get("fileDownloaded").get(), NotificationType.INFO);
+            }
+            System.out.println("File saved to " + f.getAbsolutePath());
+        }
     }
 }
