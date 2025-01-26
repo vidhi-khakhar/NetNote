@@ -1005,7 +1005,8 @@ public class MainCtrl {
                     String toAdd = constructLink(embeddedFile);
                     int caretPos = noteEditor.getCaretPosition();
                     noteEditor.insertText(caretPos, toAdd);
-                    Notification.create(stage, props.get("fileAdded").get(), NotificationType.INFO);
+                    Notification.create(stage, props.get("fileAdded").get()
+                            + embeddedFile.getName(), NotificationType.INFO);
                     updateDisplay();
                     undoHandler.pushAction(new AddFileAction(embeddedFile, this));
                 } else
@@ -1276,7 +1277,9 @@ public class MainCtrl {
             }
 
             if(newName.length() >= 4) {
-                String s = newName.substring(newName.length() - fileExtension.length());
+                String s = newName.substring(newName.length() - fileExtension.length());;
+                if(fileExtension.equals(".jpeg") && s.equals(".jpg"))
+                    s = newName.substring(newName.length() - fileExtension.length() + 1);
                 if (s.equals(fileExtension)) {
                     uiUtils.showPopUp(props.get("fileRenameError").get(),
                             props.get("fileRenameTypeError").get(),
@@ -1298,7 +1301,8 @@ public class MainCtrl {
             String editorContent = noteEditor.getText();
             editorContent = StringUtils.replace(editorContent, oldLink, newLink);
             noteEditor.setText(editorContent);
-            Notification.create(stage, props.get("fileRenamed").get(), NotificationType.INFO);
+            Notification.create(stage, props.get("fileRenamed").get()
+                     + selectedFile.getName(), NotificationType.INFO);
             // Update the name in the ListView
             updateDisplay();
         }
@@ -1458,7 +1462,7 @@ public class MainCtrl {
             try (FileOutputStream fos = new FileOutputStream(f)) {
                 fos.write(file.getData());
                 Notification.create(stage, props.get("fileDownloaded")
-                        .get(), NotificationType.INFO);
+                        .get() + file.getName(), NotificationType.INFO);
             }
             System.out.println("File saved to " + f.getAbsolutePath());
         }
