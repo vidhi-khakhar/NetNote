@@ -29,6 +29,9 @@ It contains useful information about the application, for the examiners.
 
 ## Accessibility
 
+- Tooltips will appear when hovering over buttons with no text. This helps keep the interface more compact.
+- The self-destructing notifications use a separate stage so they might affect the appearance of other opened windows.
+
 ### Undo / redo
 
 Both *undo* and *redo* have been implemented for the following actions:
