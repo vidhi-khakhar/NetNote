@@ -984,7 +984,7 @@ public class MainCtrl {
         } else {
             try {
                 FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Open File");
+                fileChooser.setTitle(props.get("openFile").get());
                 File file = fileChooser.showOpenDialog(stage);
                 if (file != null) {
                     EmbeddedFile embeddedFile = new EmbeddedFile(file.getName(),
@@ -1425,7 +1425,7 @@ public class MainCtrl {
                 break;
             }
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Set save location");
+        fileChooser.setTitle(props.get("setSaveLocation").get());
         String type = file.getType().substring(file.getType().lastIndexOf('/') + 1);
         fileChooser.setInitialFileName(file.getName() + "." + type);
         File f = fileChooser.showSaveDialog(stage);
