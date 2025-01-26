@@ -32,7 +32,7 @@
             </HBox>
          </HBox>
          <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="800.0" style="-fx-border-color: #496BA2; -fx-border-width: 3 0 0 0; -fx-background-color: #ceddf5;">
-               <Label fx:id="addedFilesLabel" prefHeight="50.0" prefWidth="228.0" style="-fx-font-weight: bold;" text="\%label.addedFilesLabel" HBox.hgrow="ALWAYS">
+               <Label fx:id="addedFilesLabel" prefHeight="50.0" prefWidth="228.0" style="-fx-font-weight: bold;" text="\\%label.addedFilesLabel" HBox.hgrow="ALWAYS">
                   <HBox.margin>
                      <Insets left="5.0" right="5.0" />
                   </HBox.margin>
@@ -160,6 +160,11 @@
                            <Insets left="5.0" />
                         </HBox.margin>
                      </Button>
+                  <Button fx:id="downloadFile" alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleDownloadFile" prefHeight="27.0" prefWidth="178.0" style="-fx-font-weight: bold; -fx-border-color: black; -fx-border-width: 1; -fx-border-radius: 3;" text="%label.downloadFile" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets left="5.0" />
+                     </HBox.margin>
+                  </Button>
                   <padding>
                      <Insets bottom="3.0" left="5.0" right="3.0" top="3.0" />
                   </padding>

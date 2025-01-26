@@ -36,6 +36,7 @@ import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -173,6 +174,9 @@ public class MainCtrl {
 
     @FXML
     private Tooltip tooltipShowShortcuts;
+
+    @FXML
+    private Button downloadFile;
 
     /**
      * Initializes the controller.
@@ -341,6 +345,7 @@ public class MainCtrl {
         tooltipMoveNote.textProperty().bind(props.get("moveNoteTooltip"));
         tooltipRefresh.textProperty().bind(props.get("refresh"));
         tooltipShowShortcuts.textProperty().bind(props.get("showShortcutsTooltip"));
+        downloadFile.textProperty().bind(props.get("downloadFile"));
 
         setLocale(configLoader.getLocale());
     }
@@ -979,7 +984,7 @@ public class MainCtrl {
         } else {
             try {
                 FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Open File");
+                fileChooser.setTitle(props.get("openFile").get());
                 File file = fileChooser.showOpenDialog(stage);
                 if (file != null) {
                     EmbeddedFile embeddedFile = new EmbeddedFile(file.getName(),
@@ -1000,7 +1005,8 @@ public class MainCtrl {
                     String toAdd = constructLink(embeddedFile);
                     int caretPos = noteEditor.getCaretPosition();
                     noteEditor.insertText(caretPos, toAdd);
-                    Notification.create(stage, props.get("fileAdded").get(), NotificationType.INFO);
+                    Notification.create(stage, props.get("fileAdded").get()
+                            + embeddedFile.getName(), NotificationType.INFO);
                     updateDisplay();
                     undoHandler.pushAction(new AddFileAction(embeddedFile, this));
                 } else
@@ -1251,9 +1257,36 @@ public class MainCtrl {
 
         if (result.isPresent()) {
             String newName = result.get();
+            if(newName.isBlank()){
+                uiUtils.showPopUp(props.get("fileRenameError").get(),
+                        props.get("fileRenameEmpty").get(),
+                        Alert.AlertType.ERROR);
+                return;
+            }
             String oldName = selectedFile.getName();
+
             String fileExtension = "." + selectedFile.getType()
                     .substring(selectedFile.getType().indexOf('/') + 1);
+
+            String sameNameTest = newName + fileExtension;
+            if(sameNameTest.equals(oldName)){
+                uiUtils.showPopUp(props.get("fileRenameError").get(),
+                        props.get("fileRenameSameNameError").get(),
+                        Alert.AlertType.ERROR);
+                return;
+            }
+
+            if(newName.length() >= 4) {
+                String s = newName.substring(newName.length() - fileExtension.length());;
+                if(fileExtension.equals(".jpeg") && s.equals(".jpg"))
+                    s = newName.substring(newName.length() - fileExtension.length() + 1);
+                if (s.equals(fileExtension)) {
+                    uiUtils.showPopUp(props.get("fileRenameError").get(),
+                            props.get("fileRenameTypeError").get(),
+                            Alert.AlertType.ERROR);
+                    return;
+                }
+            }
 
             // Rename on the server
             embeddedFileServerUtils.renameEmbeddedFile(currentCollection.getServer(),
@@ -1268,7 +1301,8 @@ public class MainCtrl {
             String editorContent = noteEditor.getText();
             editorContent = StringUtils.replace(editorContent, oldLink, newLink);
             noteEditor.setText(editorContent);
-            Notification.create(stage, props.get("fileRenamed").get(), NotificationType.INFO);
+            Notification.create(stage, props.get("fileRenamed").get()
+                     + selectedFile.getName(), NotificationType.INFO);
             // Update the name in the ListView
             updateDisplay();
         }
@@ -1385,5 +1419,52 @@ public class MainCtrl {
         secondaryStage.titleProperty().bind(props.get("keyboardShortcutName"));
         secondaryStage.setScene(shortcutsOverview);
         secondaryStage.show();
+    }
+
+    /**
+     * Handles the downloading of a selected embedded file.
+     *
+     * @throws IOException If an error occurs while downloading the file.
+     */
+    public void handleDownloadFile() throws IOException {
+        EmbeddedFile selectedFile = filesListView.getSelectionModel().getSelectedItem();
+        if (selectedFile == null) {
+            uiUtils.showPopUp(props.get("deleteFileWarningTitle").get(),
+                    props.get("deleteFileWarningText").get(),
+                    Alert.AlertType.WARNING);
+            return;
+        }
+        downloadFile(selectedFile);
+    }
+
+    /**
+     * Downloads the selected file from the server and saves it to a specified location.
+     *
+     * @param selectedFile The file to be downloaded.
+     * @throws IOException If an error occurs while retrieving or saving the file.
+     */
+    private void downloadFile(EmbeddedFile selectedFile) throws IOException {
+        EmbeddedFile file = new EmbeddedFile();
+        List<EmbeddedFile> allFiles = embeddedFileServerUtils
+                .getFilesFromNote(serverUtils.getLocalAddress(),
+                        notesList.getSelectionModel().getSelectedItem().getTitle());
+        for (EmbeddedFile files : allFiles)
+            if (files.getName().equals(selectedFile.getName())) {
+                file = files;
+                break;
+            }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(props.get("setSaveLocation").get());
+        String type = file.getType().substring(file.getType().lastIndexOf('/') + 1);
+        fileChooser.setInitialFileName(file.getName() + "." + type);
+        File f = fileChooser.showSaveDialog(stage);
+        if (f != null) {
+            try (FileOutputStream fos = new FileOutputStream(f)) {
+                fos.write(file.getData());
+                Notification.create(stage, props.get("fileDownloaded")
+                        .get() + file.getName(), NotificationType.INFO);
+            }
+            System.out.println("File saved to " + f.getAbsolutePath());
+        }
     }
 }
