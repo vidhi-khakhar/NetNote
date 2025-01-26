@@ -1256,9 +1256,34 @@ public class MainCtrl {
 
         if (result.isPresent()) {
             String newName = result.get();
+            if(newName.isBlank()){
+                uiUtils.showPopUp(props.get("fileRenameError").get(),
+                        props.get("fileRenameEmpty").get(),
+                        Alert.AlertType.ERROR);
+                return;
+            }
             String oldName = selectedFile.getName();
+
             String fileExtension = "." + selectedFile.getType()
                     .substring(selectedFile.getType().indexOf('/') + 1);
+
+            String sameNameTest = newName + fileExtension;
+            if(sameNameTest.equals(oldName)){
+                uiUtils.showPopUp(props.get("fileRenameError").get(),
+                        props.get("fileRenameSameNameError").get(),
+                        Alert.AlertType.ERROR);
+                return;
+            }
+
+            if(newName.length() >= 4) {
+                String s = newName.substring(newName.length() - fileExtension.length());
+                if (s.equals(fileExtension)) {
+                    uiUtils.showPopUp(props.get("fileRenameError").get(),
+                            props.get("fileRenameTypeError").get(),
+                            Alert.AlertType.ERROR);
+                    return;
+                }
+            }
 
             // Rename on the server
             embeddedFileServerUtils.renameEmbeddedFile(currentCollection.getServer(),
@@ -1432,7 +1457,8 @@ public class MainCtrl {
         if (f != null) {
             try (FileOutputStream fos = new FileOutputStream(f)) {
                 fos.write(file.getData());
-                Notification.create(stage, props.get("fileDownloaded").get(), NotificationType.INFO);
+                Notification.create(stage, props.get("fileDownloaded")
+                        .get(), NotificationType.INFO);
             }
             System.out.println("File saved to " + f.getAbsolutePath());
         }
